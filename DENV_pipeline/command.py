@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
-from DENV_pipeline import __version__
+from denv_pipeline import __version__
 
 import os
 import sys
 import argparse
 import snakemake
 
-from DENV_pipeline.utils import misc
+from denv_pipeline.utils import misc
 
 cwd = os.getcwd()
 thisdir = os.path.abspath(os.path.dirname(__file__))
@@ -42,18 +42,18 @@ def main(sysargs = sys.argv[1:]):
     config["cwd"] = cwd
     config = misc.make_files(config)
 
-    snakefile = os.path.join(thisdir,"scripts", "denv_pipeline.smk")
-    if config['verbose']:
-        print("\n**** CONFIG ****")
-        for k in sorted(config):
-            print((f" - {k}: ") + f"{config[k]}")
-        status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
-                                    workdir=config["tempdir"],config=config,lock=False
-                                    )
-    else:
-        status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
-                                    workdir=config["tempdir"],config=config,lock=False
-                                    )
+    # snakefile = os.path.join(thisdir,"scripts", "denv_pipeline.smk")
+    # if config['verbose']:
+    #     print("\n**** CONFIG ****")
+    #     for k in sorted(config):
+    #         print((f" - {k}: ") + f"{config[k]}")
+    #     status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
+    #                                 workdir=config["tempdir"],config=config,lock=False
+    #                                 )
+    # else:
+    #     status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
+    #                                 workdir=config["tempdir"],config=config,lock=False
+                                    # )
 
     if status: # translate "success" into shell exit code of 0
         return 0

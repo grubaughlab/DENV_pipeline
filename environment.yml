@@ -1,4 +1,4 @@
-name: DENV_pipeline
+name: denv_pipeline
 channels:
   - conda-forge
   - bioconda
