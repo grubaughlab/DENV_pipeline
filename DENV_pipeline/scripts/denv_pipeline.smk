@@ -18,7 +18,7 @@ rule setup:
 
 
     
-rule denv_mapper_slurm:
+rule denv_mapper:
 
     input:
         mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh")
@@ -27,35 +27,28 @@ rule denv_mapper_slurm:
 
     output:
         jobs = os.path.join(config["cwd"], jobs.txt)
-        #have the full denv ones here?
+        #have the full denv ones here
 
     run:
+        with open(output.jobs:q, 'w') as fw:
+            with open(input.sample_file:q) as f:
+                for l in f:
+                    name = l.strip("\n")
+                    fw.write("bash {input.mapper_script:q} {name}/*/{name}*_R1_*.fastq.gz {name}/*/{name}*_R2_*.fastq.gz {input.refs:q}")
+        
+            
         if config["slurm"]:
             print("preparing for slurm run")
-            with open(output.jobs:q, 'w') as fw:
-                with open(input.sample_file:q) as f:
-                    for l in f:
-                        name = l.strip("\n")
-                        fw.write(f"bash {input.mapper_script:q} {name}/*/{name}*_R1_*.fastq.gz {name}/*/{name}*_R2_*.fastq.gz {input.refs:q}")
-        
-            shell("dsq --job-name denv.mapper --job-file output.jobs:q --mem-per-cpu=10G --cpus-per-task=1")
+            shell("dsq --job-name denv.mapper --job-file output.jobs:q --mem-per-cpu=10G --cpus-per-task=1") 
             filename = shell("ls | grep dsq")
             shell("sbatch filename")
         
         else:
-            shell("touch {output.jobs:q}")
-
-
-rule denv_mapper_nonslurm:
-    
-    input:
-        mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh")
-        sample_file = rules.setup.output.sample_file
-        refs = os.path.join(config["denv_primers"], "DENV.refs.txt")
-
-    
-
-
+            print("running each sample sequentially")
+            with open(output.jobs:q) as f:
+                for l in f:
+                    command = l.strip("\n")
+                    shell("bash {command}")
 
 rule summarise_results:
 
