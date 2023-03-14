@@ -8,11 +8,13 @@ rule all: #this will be the outputs we want
 rule setup:
     output:
         sample_file = os.path.join(config["cwd"], "samples.txt")
+    params:
+        cwd = config["cwd"]
     run:
         if not os.path.exists(config["cwd"]):
             os.mkdir(config["cwd"])
         
-        shell("cd {config['cwd']}")
+        shell("cd {params.cwd}")
         if os.path.exists("DENV.serotype.calls.tsv"):
             os.remove("DENV.serotype.calls.tsv")
         
@@ -24,7 +26,7 @@ rule setup:
     
 rule denv_mapper:
     input:
-        mapper_script = os.path.join(workflow.current_basedir,"test.sh"),
+        mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh"),
         sample_file = rules.setup.output.sample_file,
         refs = os.path.join(config["denv_primers"], "DENV.refs.txt")
     output:
