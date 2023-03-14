@@ -19,8 +19,9 @@ def main(sysargs = sys.argv[1:]):
 
     parser.add_argument("--symlink", dest="symlink", help="argument for generating symlinks"),
     parser.add_argument("--run", help="number run to make folder"),
-
+    parser.add_argument("--slurm", help="flag for if running on HPC with slurm", action="store_true")
     parser.add_argument("--verbose", "-v", dest="verbose", action="store_true")
+    
     # parser.add_argument("--temp", dest="temp", help="output temporary files", action="store_true")    
     # parser.add_argument("--temp-dir", dest="tempdir", help="where the temporary files go", default="temporary_files")
     parser.add_argument("--help", "-h", action="store_true", dest="help")
@@ -43,6 +44,7 @@ def main(sysargs = sys.argv[1:]):
     config["symlink"] = args.symlink
     config["cwd"] = os.path.join(cwd, args.run)
     config["denv_primers"] = pkg_resources.resource_filename('denv_pipeline', 'primers/')
+    config["slurm"] = args.slurm
 
     
 

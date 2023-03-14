@@ -1,8 +1,11 @@
 import os
 import sys
 
+rule all: #this will be the outputs we want
+    input:
+        os.path.join(config["cwd"], "jobs.txt")
+
 rule setup:
-        
     output:
         sample_file = os.path.join(config["cwd"], "samples.txt")
     run:
@@ -20,23 +23,20 @@ rule setup:
 
     
 rule denv_mapper:
-
     input:
-        mapper_script = os.path.join(workflow.current_basedir,"test.sh")
-        sample_file = rules.setup.output.sample_file
+        mapper_script = os.path.join(workflow.current_basedir,"test.sh"),
+        sample_file = rules.setup.output.sample_file,
         refs = os.path.join(config["denv_primers"], "DENV.refs.txt")
-
     output:
-        jobs = os.path.join(config["cwd"], jobs.txt)
+        jobs = os.path.join(config["cwd"], "jobs.txt")
         #have the full denv ones here
-
     run:
-        with open(output.jobs:q, 'w') as fw:
-            with open(input.sample_file:q) as f:
+        with open(output.jobs, 'w') as fw:
+            with open(input.sample_file) as f:
                 for l in f:
                     name = l.strip("\n")
-                    fw.write("bash {input.mapper_script:q} {name}/*/{name}*_R1_*.fastq.gz {name}/*/{name}*_R2_*.fastq.gz {input.refs:q}")
-        
+                    fw.write(f"bash {input.mapper_script} {name}/*/{name}*_R1_*.fastq.gz {name}/*/{name}*_R2_*.fastq.gz {input.refs}")
+
             
         if config["slurm"]:
             print("preparing for slurm run")
@@ -46,32 +46,12 @@ rule denv_mapper:
         
         else:
             print("running each sample sequentially")
-            with open(output.jobs:q) as f:
+            with open(output.jobs) as f:
                 for l in f:
                     command = l.strip("\n")
-                    shell("bash {command}")
-
-rule summarise_results:
-
-    input:
-
-    output:
-
-    parameters:
+                    shell("{command}")
+        
+            
 
 
-    run:
-    #DENV_summarise.sh
 
-
-rule copy_to_results:
-
-    input:
-
-    output:
-
-    parameters:
-
-    run:
-    #copy FINAL to  /gpfs/ycga/project/grubaugh/shared/DENVSEQ/CLINICAL/
-    #make a downloadable folder (ie without BAM files) for dropbox download
