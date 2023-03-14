@@ -10,6 +10,7 @@ rule setup:
         sample_file = os.path.join(config["cwd"], "samples.txt")
     params:
         cwd = config["cwd"]
+        symlink = config["symlink"]
     run:
         if not os.path.exists(config["cwd"]):
             os.mkdir(config["cwd"])
@@ -18,9 +19,8 @@ rule setup:
         if os.path.exists("DENV.serotype.calls.tsv"):
             os.remove("DENV.serotype.calls.tsv")
         
-        shell("touch {output.sample_file:q}")
-        #shell("/home/bioinfo/software/knightlab/bin_Mar2018/ycgaFastq {config['symlink']}")
-        #shell("ls | grep -v samples > {output.sample_file:q}")
+        shell("/home/bioinfo/software/knightlab/bin_Mar2018/ycgaFastq {params.symlink}")
+        shell("ls | grep -v samples > {output.sample_file:q}")
 
 
     
