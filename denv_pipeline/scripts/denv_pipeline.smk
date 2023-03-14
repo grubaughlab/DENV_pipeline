@@ -1,5 +1,6 @@
 import os
 import sys
+import datetime as dt
 
 rule all: #this will be the outputs we want
     input:
@@ -9,7 +10,7 @@ rule setup:
     output:
         sample_file = os.path.join(config["cwd"], "samples.txt")
     params:
-        cwd = config["cwd"]
+        cwd = config["cwd"],
         symlink = config["symlink"]
     run:
         if not os.path.exists(config["cwd"]):
@@ -19,7 +20,7 @@ rule setup:
         if os.path.exists("DENV.serotype.calls.tsv"):
             os.remove("DENV.serotype.calls.tsv")
        
-        shell("/home/bioinfo/software/knightlab/bin_Mar2018/ycgaFastq {params.symlink}")
+        #shell("/home/bioinfo/software/knightlab/bin_Mar2018/ycgaFastq {params.symlink:q}")
         shell("ls | grep -v samples > {output.sample_file:q}")
 
 
@@ -42,9 +43,9 @@ rule denv_mapper:
             
         if config["slurm"]:
             print("preparing for slurm run")
-            shell("dsq --job-name denv.mapper --job-file output.jobs:q --mem-per-cpu=10G --cpus-per-task=1") 
-            filename = shell("ls | grep dsq")
-            shell("sbatch filename")
+            shell("dsq --job-name denv.mapper --job-file {output.jobs:q} --mem-per-cpu=10G --cpus-per-task=1") 
+            filename = f"dsq-jobs-{dt.datetime.today().date()}.sh"
+            shell("sbatch {filename}")
         
         else:
             print("running each sample sequentially")
