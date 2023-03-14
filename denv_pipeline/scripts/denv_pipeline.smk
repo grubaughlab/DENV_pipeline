@@ -18,9 +18,9 @@ rule setup:
         if os.path.exists("DENV.serotype.calls.tsv"):
             os.remove("DENV.serotype.calls.tsv")
         
-        shell("touch {output.sample_file:q}")
-        #shell("/home/bioinfo/software/knightlab/bin_Mar2018/ycgaFastq {config['symlink']}")
-        #shell("ls | grep -v samples > {output.sample_file:q}")
+        
+        shell("/home/bioinfo/software/knightlab/bin_Mar2018/ycgaFastq {config['symlink']}")
+        shell("ls | grep -v samples > {output.sample_file:q}")
 
 
     
