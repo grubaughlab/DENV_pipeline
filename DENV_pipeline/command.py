@@ -51,23 +51,23 @@ def main(sysargs = sys.argv[1:]):
     ## check for input files
     ## at the end, test if every sample ID has an associated bam file - about half way through, bam files sometimes aren't found but the script doesn't break
 
-    # snakefile = os.path.join(thisdir,"scripts", "denv_pipeline.smk")
-    # if config['verbose']:
-    #     print("\n**** CONFIG ****")
-    #     for k in sorted(config):
-    #         print((f" - {k}: ") + f"{config[k]}")
-    #     status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
-    #                                 workdir=config["tempdir"],config=config,lock=False
-    #                                 )
-    # else:
-    #     status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
-    #                                 workdir=config["tempdir"],config=config,lock=False
-    #                                 )
+    snakefile = os.path.join(thisdir,"scripts", "denv_pipeline.smk")
+    if config['verbose']:
+        print("\n**** CONFIG ****")
+        for k in sorted(config):
+            print((f" - {k}: ") + f"{config[k]}")
+        status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
+                                    workdir=config["tempdir"],config=config,lock=False
+                                    )
+    else:
+        status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
+                                    workdir=config["tempdir"],config=config,lock=False
+                                    )
 
-    # if status: # translate "success" into shell exit code of 0
-    #     return 0
+    if status: # translate "success" into shell exit code of 0
+        return 0
 
-    # return 1
+    return 1
 
 
 

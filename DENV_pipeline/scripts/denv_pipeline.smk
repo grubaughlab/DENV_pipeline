@@ -21,7 +21,7 @@ rule setup:
 rule denv_mapper:
 
     input:
-        mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh")
+        mapper_script = os.path.join(workflow.current_basedir,"test.sh")
         sample_file = rules.setup.output.sample_file
         refs = os.path.join(config["denv_primers"], "DENV.refs.txt")
 
