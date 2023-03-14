@@ -9,6 +9,11 @@ from denv_pipeline import __version__, _program
 setup(name='denv_pipeline',
       version=__version__,
       packages=find_packages(),
+      scripts=[
+            "denv_pipeline/scripts/denv_pipeline.smk",
+            "denv_pipeline/scripts/DENV_MAPPER.sh",
+            "denv_pipeline/scripts/DENV_summarise.sh",
+            "denv_pipeline/scripts/test.sh"],
       description='Bioinformatic pipeline to generate reads and consensus sequences for DENV',
       package_data={"denv_pipeline":["primers/*"]},
       url='https://github.com/ViralVerity/DENV_pipeline',

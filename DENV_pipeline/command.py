@@ -21,8 +21,8 @@ def main(sysargs = sys.argv[1:]):
     parser.add_argument("--run", help="number run to make folder"),
 
     parser.add_argument("--verbose", "-v", dest="verbose", action="store_true")
-    parser.add_argument("--temp", dest="temp", help="output temporary files", action="store_true")    
-    parser.add_argument("--temp-dir", dest="tempdir", help="where the temporary files go", default="temporary_files")
+    # parser.add_argument("--temp", dest="temp", help="output temporary files", action="store_true")    
+    # parser.add_argument("--temp-dir", dest="tempdir", help="where the temporary files go", default="temporary_files")
     parser.add_argument("--help", "-h", action="store_true", dest="help")
 
 
@@ -38,9 +38,8 @@ def main(sysargs = sys.argv[1:]):
 
     config = {}
     config['verbose'] = args.verbose
-    config['temp'] = args.temp
-    config['tempdir'] = args.tempdir
-    config['input_file'] = args.input_file
+    # config['temp'] = args.temp
+    # config['tempdir'] = args.tempdir
     config["symlink"] = args.symlink
     config["cwd"] = os.path.join(cwd, args.run)
     config["denv_primers"] = pkg_resources.resource_filename('denv_pipeline', 'primers/')
@@ -57,11 +56,11 @@ def main(sysargs = sys.argv[1:]):
         for k in sorted(config):
             print((f" - {k}: ") + f"{config[k]}")
         status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
-                                    workdir=config["tempdir"],config=config,lock=False
+                                    workdir=config["cwd"],config=config,lock=False
                                     )
     else:
         status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
-                                    workdir=config["tempdir"],config=config,lock=False
+                                    workdir=config["cwd"],config=config,lock=False
                                     )
 
     if status: # translate "success" into shell exit code of 0
