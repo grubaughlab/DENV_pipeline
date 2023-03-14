@@ -8,10 +8,3 @@ def header(v):
                 Grubaugh Lab
     
     """)
-
-
-def make_files(config):
-
-    #detect the run number and make directories
-
-    return config

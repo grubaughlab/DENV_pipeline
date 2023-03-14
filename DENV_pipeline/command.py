@@ -6,6 +6,7 @@ import os
 import sys
 import argparse
 import snakemake
+import pkg_resources
 
 from denv_pipeline.utils import misc
 
@@ -16,7 +17,8 @@ def main(sysargs = sys.argv[1:]):
 
     parser = argparse.ArgumentParser(add_help=False, description=misc.header(__version__))
 
-    parser.add_argument("--input-file", "-i", dest="input_file", help="file with strings containing directories"),
+    parser.add_argument("--symlink", dest="symlink", help="argument for generating symlinks"),
+    parser.add_argument("--run", help="number run to make folder"),
 
     parser.add_argument("--verbose", "-v", dest="verbose", action="store_true")
     parser.add_argument("--temp", dest="temp", help="output temporary files", action="store_true")    
@@ -39,26 +41,33 @@ def main(sysargs = sys.argv[1:]):
     config['temp'] = args.temp
     config['tempdir'] = args.tempdir
     config['input_file'] = args.input_file
-    config["cwd"] = cwd
-    config = misc.make_files(config)
+    config["symlink"] = args.symlink
+    config["cwd"] = os.path.join(cwd, args.run)
+    config["denv_primers"] = pkg_resources.resource_filename('denv_pipeline', 'primers/')
 
-    snakefile = os.path.join(thisdir,"scripts", "denv_pipeline.smk")
-    if config['verbose']:
-        print("\n**** CONFIG ****")
-        for k in sorted(config):
-            print((f" - {k}: ") + f"{config[k]}")
-        status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
-                                    workdir=config["tempdir"],config=config,lock=False
-                                    )
-    else:
-        status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
-                                    workdir=config["tempdir"],config=config,lock=False
-                                    )
+    
 
-    if status: # translate "success" into shell exit code of 0
-        return 0
+    ## check for relevant installed stuff
+    ## check for input files
+    ## at the end, test if every sample ID has an associated bam file - about half way through, bam files sometimes aren't found but the script doesn't break
 
-    return 1
+    # snakefile = os.path.join(thisdir,"scripts", "denv_pipeline.smk")
+    # if config['verbose']:
+    #     print("\n**** CONFIG ****")
+    #     for k in sorted(config):
+    #         print((f" - {k}: ") + f"{config[k]}")
+    #     status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
+    #                                 workdir=config["tempdir"],config=config,lock=False
+    #                                 )
+    # else:
+    #     status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
+    #                                 workdir=config["tempdir"],config=config,lock=False
+    #                                 )
+
+    # if status: # translate "success" into shell exit code of 0
+    #     return 0
+
+    # return 1
 
 
 

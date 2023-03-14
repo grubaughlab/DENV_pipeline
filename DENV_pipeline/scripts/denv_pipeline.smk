@@ -1,33 +1,59 @@
 import os
 import sys
 
+rule setup:
+        
+    output:
+        sample_file = os.path.join(config["cwd"], "samples.txt")
+    run:
+        if not os.path.exists(config["cwd"]):
+            os.mkdir(config["cwd"])
+        
+        shell("cd {config['cwd']}")
+        if os.path.exists("DENV.serotype.calls.tsv"):
+            os.remove("DENV.serotype.calls.tsv")
+        
+        shell("/home/bioinfo/software/knightlab/bin_Mar2018/ycgaFastq {config['symlink']}")
+        shell("ls | grep -v samples > {output.sample_file:q}")
 
-rule set_up:
+
+    
+rule denv_mapper_slurm:
 
     input:
+        mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh")
+        sample_file = rules.setup.output.sample_file
+        refs = os.path.join(config["denv_primers"], "DENV.refs.txt")
 
     output:
-
-    parameters:
+        jobs = os.path.join(config["cwd"], jobs.txt)
+        #have the full denv ones here?
 
     run:
-    #symlinks
-    #make dirs - probably just call from misc.py
-    #rename samples - also misc.py
-    #ls | grep -v samples > samples.txt
+        if config["slurm"]:
+            print("preparing for slurm run")
+            with open(output.jobs:q, 'w') as fw:
+                with open(input.sample_file:q) as f:
+                    for l in f:
+                        name = l.strip("\n")
+                        fw.write(f"bash {input.mapper_script:q} {name}/*/{name}*_R1_*.fastq.gz {name}/*/{name}*_R2_*.fastq.gz {input.refs:q}")
+        
+            shell("dsq --job-name denv.mapper --job-file output.jobs:q --mem-per-cpu=10G --cpus-per-task=1")
+            filename = shell("ls | grep dsq")
+            shell("sbatch filename")
+        
+        else:
+            shell("touch {output.jobs:q}")
 
 
-rule analysis_pipeline:
-
+rule denv_mapper_nonslurm:
+    
     input:
+        mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh")
+        sample_file = rules.setup.output.sample_file
+        refs = os.path.join(config["denv_primers"], "DENV.refs.txt")
 
-    output:
-
-    parameters:
-
-
-    run:
-    #denv_mapper.sh script - pull these parts out into this smk 
+    
 
 
 
