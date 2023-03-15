@@ -20,15 +20,16 @@ rule setup:
         
         shell("cd {params.cwd}")
         
+        #snakemake force rerun or something?
         misc.remove_file("DENV.serotype.calls.tsv")
         misc.remove_multiple_files("*.serotype.txt")
         misc.remove_multiple_files("tmp.*.serotype.calls.*.txt")
+        misc.remove_multiple_files("*.*.out.aln")
 
         #shell("/home/bioinfo/software/knightlab/bin_Mar2018/ycgaFastq {params.symlink:q}")
         shell("ls | grep -v samples > {output.sample_file:q}")
 
 
-#next: pull out some of what's in DENV_MAPPER.sh eg file removal
 rule denv_mapper:
     input:
         mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh"),
@@ -42,7 +43,8 @@ rule denv_mapper:
             with open(input.sample_file) as f:
                 for l in f:
                     name = l.strip("\n")
-                    fw.write(f"bash {input.mapper_script} {name}/*/{name}*_R1_*.fastq.gz {name}/*/{name}*_R2_*.fastq.gz {input.refs}")
+                    basename = name.split("_")[0]
+                    fw.write(f"bash {input.mapper_script} {basename} {name}/*/{name}*_R1_*.fastq.gz {name}/*/{name}*_R2_*.fastq.gz {input.refs}")
 
             
         if config["slurm"]:

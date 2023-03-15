@@ -1,56 +1,48 @@
 #!/usr/bin/env bash
+fname=$1
+read1=$2
+read2=$3
+primer_dir=$4
+primer_bed=$5
 
-read1=$1
-read2=$2
-cps_refs=$3
-primer_bed=$4
 
-fname=`basename ${read1} | tr "._" "\t\t" | awk '{print $1}'`
+cat ${primer_dir}DENV.refs.txt | while read denvtype; do 
 
-rm -rf ${fname%.*}.serotype.txt > /dev/null 2>&1
-rm -rf tmp.${fname%.*}.serotype.calls.*.txt
+    depth=20
+    fasta=${primer_dir}${denvtype}.fasta
+    bed=${primer_dir}${denvtype}.bed
 
-cat ${cps_refs} | while read ref; do 
-    cps=`basename ${ref} | tr "\_\t." "\t\t" | awk '{print $1}'`
-    cps1=`dirname ${ref}`"/"`basename ${ref} | tr "\_\t\." "\t\t\t" | awk '{print $1}'`
-
-    echo "----->>>>>Mapping reads against serotype "${cps}" reference sequence"
-    bwa mem -v 1 -t 16 ${ref} $read1 $read2 | samtools view -bS -F 4 -F 2048 | samtools sort -o ${fname%.*}.${cps}.bam > /dev/null 2>&1
+    echo "----->>>>>Mapping reads against serotype "${denvtype}" reference sequence"
+    bwa mem -v 1 -t 16 ${fasta} $read1 $read2 | samtools view -bS -F 4 -F 2048 | samtools sort -o ${fname%.*}.${denvtype}.bam #> /dev/null 2>&1
 
     echo "----->>>>>Trimming bam file"
-    ivar trim -e -i ${fname%.*}.${cps}.bam -b ${cps1}.bed -p ${fname%.*}.${cps}.trimmed.bam > /dev/null 2>&1
+    ivar trim -e -i ${fname%.*}.${denvtype}.bam -b ${bed} -p ${fname%.*}.${denvtype}.trimmed.bam #> /dev/null 2>&1
 
     echo "----->>>>>Sorting bam file"
-    samtools sort ${fname%.*}.${cps}.trimmed.bam -o ${fname%.*}.${cps}.sort.bam > /dev/null 2>&1
+    samtools sort ${fname%.*}.${denvtype}.trimmed.bam -o ${fname%.*}.${denvtype}.sort.bam #> /dev/null 2>&1
 
     echo "----->>>>>Indexing bam file"
-    samtools index ${fname%.*}.${cps}.sort.bam > /dev/null 2>&1
-
-    for depth in 20
-    do
-        echo "----->>>>>Generating consensus sequence"
-        samtools mpileup -aa --reference ${ref} -A -d 10000 -Q 0 ${fname%.*}.${cps}.sort.bam | ivar consensus -t 0.75 -m ${depth} -p ${fname%.*}.${cps}.${depth}.cons -i ${fname%.*}"/"${fname%.*}.${cps}.${depth}.cons".fa/"${cps}"/"${ref} > /dev/null 2>&1
-
-        rm -rf ${fname%.*}.${cps}.out.aln  > /dev/null 2>&1
-        echo "----->>>>>Aligning consensus cps sequence against the reference serotype "${cps}" cps sequence"
-
-        echo "nextalign --output-fasta ${fname%.*}.${cps}.${depth}.out.aln --reference ${ref} --sequences ${fname%.*}.${cps}.${depth}.cons.fa"
-
-        nextalign --output-fasta ${fname%.*}.${cps}.${depth}.out.aln --reference ${ref} --sequences ${fname%.*}.${cps}.${depth}.cons.fa > /dev/null 2>&1
-
-        if [ -f ${fname%.*}.${cps}.out.aln ]; then
-            echo "----->>>>>Aligning with nextalign successful"
-        else
-            echo "----->>>>>Aligning with mafft (nextalign not successful)"
-            mafft --quiet --6merpair --maxambiguous 0.99 --addfragments --keeplength --addfragments ${fname%.*}.${cps}.${depth}.cons.fa ${ref} > ZZ.tmp000.${fname%.*}.${cps}.${depth}
-            grep -A 30000000 `grep ">" ${fname%.*}.${cps}.${depth}.cons.fa` ZZ.tmp000.${fname%.*}.${cps}.${depth} > ${fname%.*}.${cps}.${depth}.out.aln
-        fi
-        
-        rm -rf ZZ.tmp000.${fname%.*}.${cps}.${depth}
-
-        echo "----->>>>>Calculating percentage coverage against serotype "${cps}" cps reference sequence"
+    samtools index ${fname%.*}.${denvtype}.sort.bam #> /dev/null 2>&1
 
 
+    echo "----->>>>>Generating consensus sequence"
+    samtools mpileup -aa --reference ${fasta} -A -d 10000 -Q 0 ${fname%.*}.${denvtype}.sort.bam | ivar consensus -t 0.75 -m ${depth} -p ${fname%.*}.${denvtype}.${depth}.cons -i ${fname%.*}"/"${fname%.*}.${denvtype}.${depth}.cons".fa" > /dev/null 2>&1
+    
+    echo "----->>>>>Aligning consensus cps sequence against the reference serotype "${denvtype}" cps sequence"
+    nextalign run  --reference ${fasta} --output-fasta ${fname%.*}.${denvtype}.${depth}.out.aln ${fname%.*}.${denvtype}.${depth}.cons.fa
+    
+    if [ -f ${fname%.*}.${denvtype}.${depth}.out.aln ]; then
+        echo "----->>>>>Aligning with nextalign successful"
+    else
+        echo "----->>>>>Aligning with mafft (nextalign not successful)"
+        mafft --quiet --6merpair --maxambiguous 0.99 --addfragments --keeplength --addfragments ${fname%.*}.${denvtype}.${depth}.cons.fa ${ref} > ZZ.tmp000.${fname%.*}.${denvtype}.${depth}
+        grep -A 30000000 `grep ">" ${fname%.*}.${denvtype}.${depth}.cons.fa` ZZ.tmp000.${fname%.*}.${denvtype}.${depth} > ${fname%.*}.${denvtype}.${depth}.out.aln
+    fi
+
+    rm ZZ.tmp000.${fname%.*}.${denvtype}.${depth} 2>&1
+
+    echo "----->>>>>Calculating percentage coverage against serotype "${denvtype}" cps reference sequence"
+##up to here
         if [ -s ${cps}.trim.bed ]; then
             python /gpfs/ycga/project/grubaugh/shared/DENVSEQ/SCRIPT/serotypeCaller.py ${fname%.*}.${cps}.${depth}.out.aln ${cps1}.trim.bed | tr "/" "\t" | awk -v depth="$depth" '{print $1"\t"$2"\t"depth"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8}' >> ${fname%.*}.${depth}.serotype.txt
         else

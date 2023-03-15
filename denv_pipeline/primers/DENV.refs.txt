@@ -1,4 +1,4 @@
-DENV1.fasta
-DENV2.fasta
-DENV3.fasta
-DENV4.fasta
+DENV1
+DENV2
+DENV3
+DENV4
