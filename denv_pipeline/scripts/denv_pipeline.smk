@@ -35,6 +35,7 @@ rule denv_mapper:
         mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh"),
         sample_file = rules.setup.output.sample_file,
         refs = os.path.join(config["denv_primers"], "DENV.refs.txt")
+        python_script = os.path.join(workflow.current_basedir,"serotypeCaller.py")
     output:
         jobs = os.path.join(config["cwd"], "jobs.txt")
         #have the full denv ones here
@@ -44,7 +45,7 @@ rule denv_mapper:
                 for l in f:
                     name = l.strip("\n")
                     basename = name.split("_")[0]
-                    fw.write(f"bash {input.mapper_script} {basename} {name}/*/{name}*_R1_*.fastq.gz {name}/*/{name}*_R2_*.fastq.gz {input.refs}")
+                    fw.write(f"bash {input.mapper_script} {basename} {name}/*/{name}*_R1_*.fastq.gz {name}/*/{name}*_R2_*.fastq.gz {input.refs} {input.python_script}")
 
             
         if config["slurm"]:

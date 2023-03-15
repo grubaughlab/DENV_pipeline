@@ -2,55 +2,66 @@
 
 import os
 import sys
-
+import argparse
 from Bio import SeqIO
+from Bio import SeqRecord
 
+#all the names wnat to come out as Yale-XXXX/Yale-XXXX.DENVX.20.cons.fa at this point
 def main():
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--alignment")
+    parser.add_argument("--bed-file", dest="bed_file")
+
+    args = parser.parse_args()
+
     minCov=50
+    amb_list = {"n", "-", "N"}
 
-    if os.path.exists(sys.argv[1]):
-        tmp=[str(i).strip() for i in open(sys.argv[1],"r")]
+    #curent ID is formatted Yale-DN00931/Yale-DN00931.DENV1.20.cons.fa 
+    if os.path.exists(args.alignment): #when would .cons.fa not exist? is it only if it breaks?
 
-        if(len(tmp)>1):
+        for sequence in SeqIO.parse(args.alignment, 'fasta'):
+            if sequence.seq:
+                seqLen=len(sequence.seq)
+                seqLenNoAmb = len([i for i in sequence.seq if i not in amb_list])
+                percCov=round(seqLenNoAmb/seqLen*100,2)
 
-            for i in sys.argv[1:]:
-                a=SeqIO.parse(i,'fasta')
-
-                for i,k in enumerate(a):
-                    if i==0:
-                        seqLen=len(k.seq)
-                        seqLenNoAmb=len(str(k.seq).replace('n','').replace('-','').replace('N',''))
-                        percCov=round(seqLenNoAmb/seqLen*100,2)
-
-                        if len(sys.argv[1:])==2:
-                            if os.path.exists(sys.argv[2]):
-                                trimPos=[int(r) for r in [str(j).strip().split("\t") for j in open(sys.argv[2],"r")][0]]
-                                seqTrim=str(k.seq[int(trimPos[0])-1:int(trimPos[1])])
-                                seqLenTrim=len(seqTrim)
-                                seqLenNoAmbTrim=len(seqTrim.replace('n','').replace('-','').replace('N',''))
-                                percCovTrim=round(seqLenNoAmbTrim/seqLenTrim*100,2)
-                                
-                                if percCovTrim>=minCov:
-                                    print(str(k.id)+'\t'+str(seqLen)+'\t'+str(seqLenNoAmb)+'\t'+str(percCov)+'\t'+str(percCovTrim))
-                                else:
-                                    print( "/".join(str(k.id).split("/")[0:2]) +'\t'+'NA'+'\t'+'NA'+'\t'+str(seqLen)+'\t'+str(seqLenNoAmb)+'\t'+str(percCov)+'\t'+str(percCovTrim))
-
-                            trimpFile=open( str(sys.argv[1]).replace(".out.aln",".out.trim.aln"),"w")
-                            trimpFile.write(">"+str(sys.argv[1]).split(".")[0]+"\n")
-                            trimpFile.write(seqTrim+"\n")
-                            trimpFile.close()
-
+                if args.bed_file:
+                    if os.path.exists(args.bed_file):
+                        with open(args.bed_file) as f:
+                            for l in f:
+                                trimPos = [int(i) for i in l.strip("\n").split("\t")]
+                        seqTrim=sequence.seq[int(trimPos[0])-1:int(trimPos[1])]
+                        seqLenTrim=len(seqTrim)
+                        seqLenNoAmbTrim=len([i for i in seqTrim if i not in amb_list])
+                        percCovTrim=round(seqLenNoAmbTrim/seqLenTrim*100,2)
+                        
+                        if percCovTrim>=minCov:
+                            print(f"{sequence.id}\t{seqLen}\t{seqLenNoAmb}\t{percCov}\t{percCovTrim}")
                         else:
-                            if percCov>=minCov:
-                                print(str(k.id)+'\t'+str(seqLen)+'\t'+str(seqLenNoAmb)+'\t'+str(percCov)+'\t'+str('NA'))
-                            else:
-                                print("/".join(str(k.id).split("/")[0:2]) +'\t'+'NA'+'\t'+'NA'+'\t'+str(seqLen)+'\t'+str(seqLenNoAmb)+'\t'+str(percCov)+'\t'+str('NA'))
+                            print(f'{sequence.id}\tNA\tNA\t{seqLen}\t{seqLenNoAmb}\t{percCov}\t{percCovTrim}') 
 
-        else:
-            print(str(sys.argv[1]).split(".")[0]+'/'+str(".".join(str(sys.argv[1]).split(".")[0:3])+".cons.fa" )+'/Unknown\t'+'NA'+'\t'+'NA'+'\t'+'NA'+'\t'+str(0)+'\t'+str(0))
+                    
+                    new_header = sequence.id.split("/")[0]
+                    seqTrim = SeqRecord.SeqRecord(seqTrim)
+                    seqTrim.id = new_header
+                    seqTrim.name = new_header
+                    seqTrim.description = new_header
+                    with open(args.alignment.replace(".out.aln",".out.trim.aln"), 'w') as new_file:
+                        SeqIO.write(seqTrim, new_file, 'fasta')
+
+                else:
+                    if percCov>=minCov:
+                        print(f"{sequence.id}\t{seqLen}\t{seqLenNoAmb}\t{percCov}\tNA")
+                    else:
+                        print(f'{sequence.id}\tNA\tNA\t{seqLen}\t{seqLenNoAmb}\t{percCov}\tNA')  
+
+            else:
+                print(f"{sequence.id}/Unknown\tNA\tNA\tNA\t0\t0")
     else:
-        print(str(sys.argv[1]).split(".")[0]+'/'+str(".".join(str(sys.argv[1]).split(".")[0:3])+".cons.fa" )+'/Unknown\t'+'NA'+'\t'+'NA'+'\t'+'NA'+'\t'+str(0)+'\t'+str(0))
+        filename = f"{'.'.join(args.alignment.split('.')[0:2])}.cons.fa"
+        print(f"{filename}/Unknown\tNA\tNA\tNA\t0\t0")
 
 if __name__=="__main__":
     main()
