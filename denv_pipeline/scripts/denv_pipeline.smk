@@ -2,6 +2,8 @@ import os
 import sys
 import datetime as dt
 
+from misc import *
+
 rule all: #this will be the outputs we want
     input:
         os.path.join(config["cwd"], "jobs.txt")
@@ -17,14 +19,16 @@ rule setup:
             os.mkdir(config["cwd"])
         
         shell("cd {params.cwd}")
-        if os.path.exists("DENV.serotype.calls.tsv"):
-            os.remove("DENV.serotype.calls.tsv")
-       
+        
+        misc.remove_file("DENV.serotype.calls.tsv")
+        misc.remove_multiple_files("*.serotype.txt")
+        misc.remove_multiple_files("tmp.*.serotype.calls.*.txt")
+
         #shell("/home/bioinfo/software/knightlab/bin_Mar2018/ycgaFastq {params.symlink:q}")
         shell("ls | grep -v samples > {output.sample_file:q}")
 
 
-    
+#next: pull out some of what's in DENV_MAPPER.sh eg file removal
 rule denv_mapper:
     input:
         mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh"),
@@ -56,5 +60,29 @@ rule denv_mapper:
         
             
 
+    rule denv_summary:
 
+        input:
+
+        output:
+
+        parameters:
+
+
+        run:
+        #DENV_summarise.sh
+
+
+    rule copy_to_results:
+
+        input:
+
+        output:
+
+        parameters:
+
+        run:
+        #copy FINAL to  /gpfs/ycga/project/grubaugh/shared/DENVSEQ/CLINICAL/
+        #make a downloadable folder (ie without BAM files) for dropbox download
+        
 
