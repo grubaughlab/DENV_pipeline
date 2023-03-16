@@ -24,7 +24,7 @@ cat ${primer_dir}DENV.refs.txt | while read denvtype; do
     echo "----->>>>>Indexing bam file"
     samtools index ${fname%.*}.${denvtype}.sort.bam #> /dev/null 2>&1
 
-
+#where the loop for depth starts
     echo "----->>>>>Generating consensus sequence"
     samtools mpileup -aa --reference ${fasta} -A -d 10000 -Q 0 ${fname%.*}.${denvtype}.sort.bam | ivar consensus -t 0.75 -m ${depth} -p ${fname%.*}.${denvtype}.${depth}.cons -i ${fname%.*}"/"${fname%.*}.${denvtype}.${depth}.cons".fa" > /dev/null 2>&1
     
@@ -42,24 +42,23 @@ cat ${primer_dir}DENV.refs.txt | while read denvtype; do
     rm ZZ.tmp000.${fname%.*}.${denvtype}.${depth} 2>&1
 
     echo "----->>>>>Calculating percentage coverage against serotype "${denvtype}" cps reference sequence"
-##up to here
-        if [ -s ${cps}.trim.bed ]; then
-            python /gpfs/ycga/project/grubaugh/shared/DENVSEQ/SCRIPT/serotypeCaller.py ${fname%.*}.${cps}.${depth}.out.aln ${cps1}.trim.bed | tr "/" "\t" | awk -v depth="$depth" '{print $1"\t"$2"\t"depth"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8}' >> ${fname%.*}.${depth}.serotype.txt
-        else
-            python /gpfs/ycga/project/grubaugh/shared/DENVSEQ/SCRIPT/serotypeCaller.py ${fname%.*}.${cps}.${depth}.out.aln | tr "/" "\t" | awk -v depth="$depth" '{print $1"\t"$2"\t"depth"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8}' >> ${fname%.*}.${depth}.serotype.txt
-        fi
+    if [ -s ${cps}.trim.bed ]; then
+        python /gpfs/ycga/project/grubaugh/shared/DENVSEQ/SCRIPT/serotypeCaller.py ${fname%.*}.${cps}.${depth}.out.aln ${cps1}.trim.bed | tr "/" "\t" | awk -v depth="$depth" '{print $1"\t"$2"\t"depth"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8}' >> ${fname%.*}.${depth}.serotype.txt
+    else
+        python /gpfs/ycga/project/grubaugh/shared/DENVSEQ/SCRIPT/serotypeCaller.py ${fname%.*}.${cps}.${depth}.out.aln | tr "/" "\t" | awk -v depth="$depth" '{print $1"\t"$2"\t"depth"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8}' >> ${fname%.*}.${depth}.serotype.txt
+    fi
 
-        echo "----->>>>>Identifying variants"
-        samtools mpileup -aa --reference ${ref} -A -d 0 -Q 0 ${fname%.*}.${cps}.sort.bam | ivar variants -p ${fname%.*}.${cps}.${depth}_variants -q 20 -t 0.03 -r ${ref} 
+    echo "----->>>>>Identifying variants"
+    samtools mpileup -aa --reference ${ref} -A -d 0 -Q 0 ${fname%.*}.${cps}.sort.bam | ivar variants -p ${fname%.*}.${cps}.${depth}_variants -q 20 -t 0.03 -r ${ref} 
 
-        awk -F '\t' '(0.2 < $11 && $11 < 0.80) && ($14=="TRUE")' ${fname%.*}.${cps}.${depth}_variants.tsv > ${fname%.*}.${cps}.${depth}_variants_frequency.tsv
-        echo -e ${fname%.*}"\t"`wc -l ${fname%.*}.${cps}.${depth}_variants_frequency.tsv | awk '{print $1}'` > ${fname%.*}.${cps}.${depth}_variants_frequency_count.txt
-    
-        rm -rf ${fname%.*}.${cps}.cons.qual.txt ${fname%.*}.${cps}.bam ${fname_path} ${fname%.*}.${cps}.sort.bam*bai ${fname%.*}.${cps}.trimmed.bam
-    done
+    awk -F '\t' '(0.2 < $11 && $11 < 0.80) && ($14=="TRUE")' ${fname%.*}.${cps}.${depth}_variants.tsv > ${fname%.*}.${cps}.${depth}_variants_frequency.tsv
+    echo -e ${fname%.*}"\t"`wc -l ${fname%.*}.${cps}.${depth}_variants_frequency.tsv | awk '{print $1}'` > ${fname%.*}.${cps}.${depth}_variants_frequency_count.txt
+
+    rm -rf ${fname%.*}.${cps}.cons.qual.txt ${fname%.*}.${cps}.bam ${fname_path} ${fname%.*}.${cps}.sort.bam*bai ${fname%.*}.${cps}.trimmed.bam
+#depth loop finishes here
     
     bedtools genomecov -d -ibam ${fname%.*}.${cps}.sort.bam > ${fname%.*}.${cps}.depth.txt; 
-done
+
 
 rm -rf tmp.${fname%.*}.serotype.calls.*.txt > /dev/null 2>&1
 
