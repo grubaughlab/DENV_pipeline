@@ -7,6 +7,7 @@ from Bio import SeqIO
 from Bio import SeqRecord
 
 #all the names wnat to come out as Yale-XXXX/Yale-XXXX.DENVX.20.cons.fa at this point
+#make everything snakecase?
 def main():
 
     parser = argparse.ArgumentParser()
@@ -15,7 +16,7 @@ def main():
 
     args = parser.parse_args()
 
-    minCov=50
+    min_coverage=50
     amb_list = {"n", "-", "N"}
 
     #curent ID is formatted Yale-DN00931/Yale-DN00931.DENV1.20.cons.fa 
@@ -23,39 +24,39 @@ def main():
 
         for sequence in SeqIO.parse(args.alignment, 'fasta'):
             if sequence.seq:
-                seqLen=len(sequence.seq)
-                seqLenNoAmb = len([i for i in sequence.seq if i not in amb_list])
-                percCov=round(seqLenNoAmb/seqLen*100,2)
+                seq_len=len(sequence.seq)
+                seq_len_no_amb = len([i for i in sequence.seq if i not in amb_list])
+                perc_cov=round(seq_len_no_amb/seq_len*100,2)
 
                 if args.bed_file:
                     if os.path.exists(args.bed_file):
                         with open(args.bed_file) as f:
                             for l in f:
-                                trimPos = [int(i) for i in l.strip("\n").split("\t")]
-                        seqTrim=sequence.seq[int(trimPos[0])-1:int(trimPos[1])]
-                        seqLenTrim=len(seqTrim)
-                        seqLenNoAmbTrim=len([i for i in seqTrim if i not in amb_list])
-                        percCovTrim=round(seqLenNoAmbTrim/seqLenTrim*100,2)
+                                trim_pos = [int(i) for i in l.strip("\n").split("\t")]
+                        seq_trim=sequence.seq[int(trim_pos[0])-1:int(trim_pos[1])]
+                        seq_len_trim=len(seq_trim)
+                        seq_len_no_amb_trim=len([i for i in seq_trim if i not in amb_list])
+                        perc_cov_trim=round(seq_len_no_amb_trim/seq_len_trim*100,2)
                         
-                        if percCovTrim>=minCov:
-                            print(f"{sequence.id}\t{seqLen}\t{seqLenNoAmb}\t{percCov}\t{percCovTrim}")
+                        if perc_cov_trim>=min_coverage:
+                            print(f"{sequence.id}\t{seq_len}\t{seq_len_no_amb}\t{perc_cov}\t{perc_cov_trim}")
                         else:
-                            print(f'{sequence.id}\tNA\tNA\t{seqLen}\t{seqLenNoAmb}\t{percCov}\t{percCovTrim}') 
+                            print(f'{sequence.id}\tNA\tNA\t{seq_len}\t{seq_len_no_amb}\t{perc_cov}\t{perc_cov_trim}') 
 
                     
                     new_header = sequence.id.split("/")[0]
-                    seqTrim = SeqRecord.SeqRecord(seqTrim)
-                    seqTrim.id = new_header
-                    seqTrim.name = new_header
-                    seqTrim.description = new_header
+                    seq_trim = SeqRecord.SeqRecord(seq_trim)
+                    seq_trim.id = new_header
+                    seq_trim.name = new_header
+                    seq_trim.description = new_header
                     with open(args.alignment.replace(".out.aln",".out.trim.aln"), 'w') as new_file:
-                        SeqIO.write(seqTrim, new_file, 'fasta')
+                        SeqIO.write(seq_trim, new_file, 'fasta')
 
                 else:
-                    if percCov>=minCov:
-                        print(f"{sequence.id}\t{seqLen}\t{seqLenNoAmb}\t{percCov}\tNA")
+                    if perc_cov>=min_coverage:
+                        print(f"{sequence.id}\t{seq_len}\t{seq_len_no_amb}\t{perc_cov}\tNA")
                     else:
-                        print(f'{sequence.id}\tNA\tNA\t{seqLen}\t{seqLenNoAmb}\t{percCov}\tNA')  
+                        print(f'{sequence.id}\tNA\tNA\t{seq_len}\t{seq_len_no_amb}\t{perc_cov}\tNA')  
 
             else:
                 print(f"{sequence.id}/Unknown\tNA\tNA\tNA\t0\t0")
