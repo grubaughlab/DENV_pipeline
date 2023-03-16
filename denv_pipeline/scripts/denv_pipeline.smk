@@ -87,5 +87,10 @@ rule denv_mapper:
         run:
         #copy FINAL to  /gpfs/ycga/project/grubaugh/shared/DENVSEQ/CLINICAL/
         #make a downloadable folder (ie without BAM files) for dropbox download
+
+
+    rule make_qc_plots:
+
+    
         
 

@@ -7,7 +7,6 @@ from Bio import SeqIO
 from Bio import SeqRecord
 
 #all the names want to come out as Yale-XXXX/Yale-XXXX.DENVX.20.cons.fa at this point
-
 def main():
 
     parser = argparse.ArgumentParser()

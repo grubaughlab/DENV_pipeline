@@ -3,7 +3,7 @@ fname=$1
 read1=$2
 read2=$3
 primer_dir=$4
-primer_bed=$5
+serotype_caller=$6
 
 
 cat ${primer_dir}DENV.refs.txt | while read denvtype; do 
@@ -11,6 +11,7 @@ cat ${primer_dir}DENV.refs.txt | while read denvtype; do
     depth=20
     fasta=${primer_dir}${denvtype}.fasta
     bed=${primer_dir}${denvtype}.bed
+    trimbed=${primer_dir}${denvtype}.trim.bed
 
     echo "----->>>>>Mapping reads against serotype "${denvtype}" reference sequence"
     bwa mem -v 1 -t 16 ${fasta} $read1 $read2 | samtools view -bS -F 4 -F 2048 | samtools sort -o ${fname%.*}.${denvtype}.bam #> /dev/null 2>&1
@@ -42,10 +43,10 @@ cat ${primer_dir}DENV.refs.txt | while read denvtype; do
     rm ZZ.tmp000.${fname%.*}.${denvtype}.${depth} 2>&1
 
     echo "----->>>>>Calculating percentage coverage against serotype "${denvtype}" cps reference sequence"
-    if [ -s ${cps}.trim.bed ]; then
-        python /gpfs/ycga/project/grubaugh/shared/DENVSEQ/SCRIPT/serotypeCaller.py ${fname%.*}.${cps}.${depth}.out.aln ${cps1}.trim.bed | tr "/" "\t" | awk -v depth="$depth" '{print $1"\t"$2"\t"depth"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8}' >> ${fname%.*}.${depth}.serotype.txt
+    if [ -s ${trimbed} ]; then
+        python ${serotype_caller} --alignment ${fname%.*}.${denvtype}.${depth}.out.aln --bed-file ${trimbed} >> ${fname%.*}.${depth}.serotype.txt
     else
-        python /gpfs/ycga/project/grubaugh/shared/DENVSEQ/SCRIPT/serotypeCaller.py ${fname%.*}.${cps}.${depth}.out.aln | tr "/" "\t" | awk -v depth="$depth" '{print $1"\t"$2"\t"depth"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7"\t"$8}' >> ${fname%.*}.${depth}.serotype.txt
+        python ${serotype_caller}  --alignment ${fname%.*}.${dentype}.${depth}.out.aln  >> ${fname%.*}.${depth}.serotype.txt
     fi
 
     echo "----->>>>>Identifying variants"
