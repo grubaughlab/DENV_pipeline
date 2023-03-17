@@ -20,11 +20,11 @@ rule setup:
         
         shell("cd {params.cwd}")
         
-        #snakemake force rerun or something?
         misc.remove_file("DENV.serotype.calls.tsv")
         misc.remove_multiple_files("*.serotype.txt")
         misc.remove_multiple_files("tmp.*.serotype.calls.*.txt")
         misc.remove_multiple_files("*.*.out.aln")
+        
 
         #shell("/home/bioinfo/software/knightlab/bin_Mar2018/ycgaFastq {params.symlink:q}")
         shell("ls | grep -v samples > {output.sample_file:q}")
@@ -60,6 +60,16 @@ rule denv_mapper:
                 for l in f:
                     command = l.strip("\n")
                     shell("{command}")
+
+        #tidy up the extra files here if not config["temp"]
+        if not config["temp"]:
+            misc.remove_multiple_files("*.cons.qual.txt")
+            misc.remove_multiple_files("*.DENV*.bam")
+            misc.remove_multiple_files("*.sort.bam.bai")
+            misc.remove_multiple_files("*.trimmed.bam")
+            misc.remove_multiple_files("tmp.*.serotype.calls.*.txt")
+            misc.remove_multiple_files("*.serotype.txt")
+
         
             
 
@@ -91,6 +101,6 @@ rule denv_mapper:
 
     rule make_qc_plots:
 
-    
+
         
 

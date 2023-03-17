@@ -5,10 +5,11 @@ read2=$3
 primer_dir=$4
 serotype_caller=$6
 
+depth=20
 
 cat ${primer_dir}DENV.refs.txt | while read denvtype; do 
 
-    depth=20
+
     fasta=${primer_dir}${denvtype}.fasta
     bed=${primer_dir}${denvtype}.bed
     trimbed=${primer_dir}${denvtype}.trim.bed
@@ -50,27 +51,23 @@ cat ${primer_dir}DENV.refs.txt | while read denvtype; do
     fi
 
     echo "----->>>>>Identifying variants"
-    samtools mpileup -aa --reference ${ref} -A -d 0 -Q 0 ${fname%.*}.${cps}.sort.bam | ivar variants -p ${fname%.*}.${cps}.${depth}_variants -q 20 -t 0.03 -r ${ref} 
-
-    awk -F '\t' '(0.2 < $11 && $11 < 0.80) && ($14=="TRUE")' ${fname%.*}.${cps}.${depth}_variants.tsv > ${fname%.*}.${cps}.${depth}_variants_frequency.tsv
-    echo -e ${fname%.*}"\t"`wc -l ${fname%.*}.${cps}.${depth}_variants_frequency.tsv | awk '{print $1}'` > ${fname%.*}.${cps}.${depth}_variants_frequency_count.txt
-
-    rm -rf ${fname%.*}.${cps}.cons.qual.txt ${fname%.*}.${cps}.bam ${fname_path} ${fname%.*}.${cps}.sort.bam*bai ${fname%.*}.${cps}.trimmed.bam
-#depth loop finishes here
+    samtools mpileup -aa --reference ${fasta} -A -d 0 -Q 0 ${fname%.*}.${denvtype}.sort.bam | ivar variants -p ${fname%.*}.${denvtype}.${depth}_variants -q 20 -t 0.03 -r ${fasta} 
     
-    bedtools genomecov -d -ibam ${fname%.*}.${cps}.sort.bam > ${fname%.*}.${cps}.depth.txt; 
+    #pulls variants which are above 20% and below 80% and have "PASS" as TRUE
+    awk -F '\t' '(0.2 < $11 && $11 < 0.80) && ($14=="TRUE")' ${fname%.*}.${denvtype}.${depth}_variants.tsv > ${fname%.*}.${denvtype}.${depth}_variants_frequency.tsv
+    echo -e ${fname%.*}"\t"`wc -l ${fname%.*}.${denvtype}.${depth}_variants_frequency.tsv | awk '{print $1}'` > ${fname%.*}.${denvtype}.${depth}_variants_frequency_count.txt
 
+    #depth loop finishes here
+    
+    bedtools genomecov -d -ibam ${fname%.*}.${denvtype}.sort.bam > ${fname%.*}.${denvtype}.depth.txt; 
 
-rm -rf tmp.${fname%.*}.serotype.calls.*.txt > /dev/null 2>&1
-
-for depth in 20
-do
-    cat ${fname%.*}.${depth}.serotype.txt | sort -k8 -n -r | awk '{ if( $8>=50 ){ print } }' >> tmp.${fname%.*}.serotype.calls.${depth}.txt
 done
 
-cat tmp.${fname%.*}.serotype.calls.*.txt >> DENV.serotype.calls.tsv
-rm -rf tmp.${fname%.*}.serotype.calls.*.txt > /dev/null 2>&1
 
+#other depth loop here
+cat ${fname%.*}.${depth}.serotype.txt | sort -k8 -n -r | awk '{ if( $8>=50 ){ print } }' >> tmp.${fname%.*}.serotype.calls.${depth}.txt
+
+cat tmp.${fname%.*}.serotype.calls.*.txt >> DENV.serotype.calls.tsv
 cat ${fname%.*}.*.serotype.txt > ${fname%.*}.serotype.calls.txt
-rm -rf ${fname%.*}.*.serotype.txt
+
 
