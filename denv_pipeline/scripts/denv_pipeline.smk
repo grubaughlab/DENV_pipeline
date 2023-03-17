@@ -2,7 +2,7 @@ import os
 import sys
 import datetime as dt
 
-from misc import *
+from denv_pipeline.utils.misc import *
 
 rule all: #this will be the outputs we want
     input:
@@ -20,10 +20,10 @@ rule setup:
         
         shell("cd {params.cwd}")
         
-        misc.remove_file("DENV.serotype.calls.tsv")
-        misc.remove_multiple_files("*.serotype.txt")
-        misc.remove_multiple_files("tmp.*.serotype.calls.*.txt")
-        misc.remove_multiple_files("*.*.out.aln")
+        remove_file("DENV.serotype.calls.tsv")
+        remove_multiple_files("*.serotype.txt")
+        remove_multiple_files("tmp.*.serotype.calls.*.txt")
+        remove_multiple_files("*.*.out.aln")
         
 
         #shell("/home/bioinfo/software/knightlab/bin_Mar2018/ycgaFastq {params.symlink:q}")
@@ -34,7 +34,7 @@ rule denv_mapper:
     input:
         mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh"),
         sample_file = rules.setup.output.sample_file,
-        refs = os.path.join(config["denv_primers"], "DENV.refs.txt")
+        primer_dir = config["denv_primers"],
         python_script = os.path.join(workflow.current_basedir,"serotypeCaller.py")
     output:
         jobs = os.path.join(config["cwd"], "jobs.txt")
@@ -45,7 +45,7 @@ rule denv_mapper:
                 for l in f:
                     name = l.strip("\n")
                     basename = name.split("_")[0]
-                    fw.write(f"bash {input.mapper_script} {basename} {name}/*/{name}*_R1_*.fastq.gz {name}/*/{name}*_R2_*.fastq.gz {input.refs} {input.python_script}")
+                    fw.write(f"bash {input.mapper_script} {basename} {name}/*/{name}*_R1_*.fastq.gz {name}/*/{name}*_R2_*.fastq.gz {input.primer_dir} {input.python_script}")
 
             
         if config["slurm"]:
@@ -63,43 +63,43 @@ rule denv_mapper:
 
         #tidy up the extra files here if not config["temp"]
         if not config["temp"]:
-            misc.remove_multiple_files("*.cons.qual.txt")
-            misc.remove_multiple_files("*.DENV*.bam")
-            misc.remove_multiple_files("*.sort.bam.bai")
-            misc.remove_multiple_files("*.trimmed.bam")
-            misc.remove_multiple_files("tmp.*.serotype.calls.*.txt")
-            misc.remove_multiple_files("*.serotype.txt")
+            remove_multiple_files("*.cons.qual.txt")
+            remove_multiple_files("*.DENV*.bam")
+            remove_multiple_files("*.sort.bam.bai")
+            remove_multiple_files("*.trimmed.bam")
+            remove_multiple_files("tmp.*.serotype.calls.*.txt")
+            remove_multiple_files("*.serotype.txt")
 
         
             
 
-    rule denv_summary:
+   # rule denv_summary:
+#
+ #       input:
 
-        input:
+  #      output:
 
-        output:
-
-        parameters:
+   #     parameters:
 
 
-        run:
+    #    run:
         #DENV_summarise.sh
 
 
-    rule copy_to_results:
+    #rule copy_to_results:
 
-        input:
+     #   input:
 
-        output:
+      #  output:
 
-        parameters:
+       # parameters:
 
-        run:
+        #run:
         #copy FINAL to  /gpfs/ycga/project/grubaugh/shared/DENVSEQ/CLINICAL/
         #make a downloadable folder (ie without BAM files) for dropbox download
 
 
-    rule make_qc_plots:
+   # rule make_qc_plots:
 
 
         

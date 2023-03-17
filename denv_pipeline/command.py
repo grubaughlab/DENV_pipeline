@@ -7,6 +7,7 @@ import sys
 import argparse
 import snakemake
 import pkg_resources
+import datetime as dt
 
 from denv_pipeline.utils import misc
 
@@ -23,7 +24,6 @@ def main(sysargs = sys.argv[1:]):
     parser.add_argument("--temp", dest="temp", action="store_true", help="keep intermediate files")
     parser.add_argument("--verbose", "-v", dest="verbose", action="store_true")
     
-    # parser.add_argument("--temp", dest="temp", help="output temporary files", action="store_true")    
     # parser.add_argument("--temp-dir", dest="tempdir", help="where the temporary files go", default="temporary_files")
     parser.add_argument("--help", "-h", action="store_true", dest="help")
 
@@ -40,13 +40,18 @@ def main(sysargs = sys.argv[1:]):
 
     config = {}
     config['verbose'] = args.verbose
-    # config['temp'] = args.temp
     # config['tempdir'] = args.tempdir
     config["symlink"] = args.symlink
-    config["cwd"] = os.path.join(cwd, args.run)
-    config["denv_primers"] = pkg_resources.resource_filename('denv_pipeline', 'primers/')
     config["slurm"] = args.slurm
     config["temp"] = args.temp
+    config["denv_primers"] = pkg_resources.resource_filename('denv_pipeline', 'primers/')
+
+    if not args.run:
+        run = f'denv_seq_{dt.datetime.today().date()}'
+    else:
+        run = args.run
+    config["cwd"] = os.path.join(cwd, run)
+    
 
     
 

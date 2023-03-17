@@ -7,12 +7,12 @@ serotype_caller=$6
 
 depth=20
 
-cat ${primer_dir}DENV.refs.txt | while read denvtype; do 
+cat ${primer_dir}/DENV.refs.txt | while read denvtype; do 
 
 
-    fasta=${primer_dir}${denvtype}.fasta
-    bed=${primer_dir}${denvtype}.bed
-    trimbed=${primer_dir}${denvtype}.trim.bed
+    fasta=${primer_dir}/${denvtype}.fasta
+    bed=${primer_dir}/${denvtype}.bed
+    trimbed=${primer_dir}/${denvtype}.trim.bed
 
     echo "----->>>>>Mapping reads against serotype "${denvtype}" reference sequence"
     bwa mem -v 1 -t 16 ${fasta} $read1 $read2 | samtools view -bS -F 4 -F 2048 | samtools sort -o ${fname%.*}.${denvtype}.bam #> /dev/null 2>&1
