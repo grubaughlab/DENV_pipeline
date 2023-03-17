@@ -3,10 +3,11 @@ fname=$1
 read1=$2
 read2=$3
 primer_dir=$4
-serotype_caller=$6
+serotype_caller=$5
 
 depth=20
-
+#do proper log files - name them by the sample name put them in a folder.
+#currently the log gets written to dsq-jobs-XXXX.out on HPC - either change dsq file or rename jobs file afterwards
 cat ${primer_dir}/DENV.refs.txt | while read denvtype; do 
 
 
@@ -41,10 +42,9 @@ cat ${primer_dir}/DENV.refs.txt | while read denvtype; do
         grep -A 30000000 `grep ">" ${fname%.*}.${denvtype}.${depth}.cons.fa` ZZ.tmp000.${fname%.*}.${denvtype}.${depth} > ${fname%.*}.${denvtype}.${depth}.out.aln
     fi
 
-    rm ZZ.tmp000.${fname%.*}.${denvtype}.${depth} 2>&1
-
     echo "----->>>>>Calculating percentage coverage against serotype "${denvtype}" cps reference sequence"
     if [ -s ${trimbed} ]; then
+        echo "python ${serotype_caller} --alignment ${fname%.*}.${denvtype}.${depth}.out.aln --bed-file ${trimbed} >> ${fname%.*}.${depth}.serotype.txt"
         python ${serotype_caller} --alignment ${fname%.*}.${denvtype}.${depth}.out.aln --bed-file ${trimbed} >> ${fname%.*}.${depth}.serotype.txt
     else
         python ${serotype_caller}  --alignment ${fname%.*}.${dentype}.${depth}.out.aln  >> ${fname%.*}.${depth}.serotype.txt
