@@ -75,11 +75,11 @@ def main(sysargs = sys.argv[1:]):
         for k in sorted(config):
             print((f" - {k}: ") + f"{config[k]}")
         status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
-                                    workdir=config["cwd"],config=config,lock=False
+                                    workdir=cwd,config=config,lock=False
                                     )
     else:
         status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
-                                    workdir=config["cwd"],config=config,lock=False
+                                    workdir=cwd,config=config,lock=False
                                     )
         
 
