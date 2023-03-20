@@ -18,14 +18,15 @@ def main(sysargs = sys.argv[1:]):
 
     parser = argparse.ArgumentParser(add_help=False, description=misc.header(__version__))
 
-    parser.add_argument("--symlink", dest="symlink", help="argument for generating symlinks")
+    parser.add_argument("--symlink", dest="symlink", help="argument for generating symlinks", default="")
+    parser.add_argument("--indir", help="directory containing samples. Each sample must be a folder with the forward and reverse runs in")
     parser.add_argument("--outdir", dest="outdir", help="files will be stored.")
-    parser.add_argument("--slurm", help="flag for if running on HPC with slurm", action="store_true")
     
     parser.add_argument("--temp", dest="temp", action="store_true", help="keep intermediate files")
     parser.add_argument("--tempdir", dest="tempdir", help="where the temporary files go", default="temporary_files")
     parser.add_argument("--download", action="store_true", help="make a folder without bam files for download")
 
+    parser.add_argument("--slurm", help="flag for if running on HPC with slurm", action="store_true")
     parser.add_argument("--verbose", "-v", dest="verbose", action="store_true")
     parser.add_argument("--help", "-h", action="store_true", dest="help")
 
@@ -43,9 +44,12 @@ def main(sysargs = sys.argv[1:]):
     config = {}
     config['verbose'] = args.verbose
     config["symlink"] = args.symlink
+    config["indir"] = args.indir
+
     config["slurm"] = args.slurm
     config["temp"] = args.temp
     config["download"] = args.download
+    
     config["denv_primers"] = pkg_resources.resource_filename('denv_pipeline', 'primers/')
 
     if not args.outdir:
@@ -54,10 +58,13 @@ def main(sysargs = sys.argv[1:]):
         outdir = args.outdir
     config["cwd"] = os.path.join(cwd, outdir)
     config["tempdir"] = os.path.join(cwd, args.tempdir)
+
+    if not args.indir:
+        config["indir"] = config["cwd"]
     
 
     ## check for relevant installed stuff
-    ## check for input files - this has to be during the pipeline because the symlink happens then
+    ## check for input files - either the symlink is present, or if an "indir" is used then they should be in there already. Also in the right format
     
 
     snakefile = os.path.join(thisdir,"scripts", "denv_pipeline.smk")

@@ -25,16 +25,25 @@ rule setup:
         if config["temp"]:
             os.mkdir(os.mkdir(os.path.join(config["cwd"], config["tempdir"])))
     
-        
         shell("cd {params.cwd}")
         
-        #this is messy
+        #this is messy - a loop would tidy, but does snakemake do it anyway?
         remove_file("DENV.serotype.calls.tsv")
         remove_multiple_files("*.serotype.txt")
         remove_multiple_files("tmp.*.serotype.calls.20.txt") 
         remove_multiple_files("*.*.out.aln")
 
-        #shell("/home/bioinfo/software/knightlab/bin_Mar2018/ycgaFastq {params.symlink:q}")
+        if symlink != "":
+            shell("/home/bioinfo/software/knightlab/bin_Mar2018/ycgaFastq {params.symlink:q}")
+            for sample_dir in os.listdir(params.cwd):
+                if os.path.isdir(sample_dir):
+                    folder_path = os.path.join(sample_dir, "Unaligned")
+                    shell("mv {folder_path}/* {sample_dir}/)
+                    shell("rm -r {folder_path}")
+
+        else:
+            pass #going to check for input files in the command.py
+        
         shell("ls | grep -v samples > {output.sample_file:q}")
 
 
@@ -55,8 +64,8 @@ rule prepare_jobs:
                     name = l.strip("\n")
                     output.denv_sample_list.append(name)
                     basename = name.split("_")[0]
-                    primer1 = f"{name}/*/*R1*"
-                    primer2 = f"{name}/*/*R2*"
+                    primer1 = f"{name}/*R1*"
+                    primer2 = f"{name}/*R2*"
                     fw.write(f'bash {input.mapper_script} {basename} {os.path.join(input.cwd, primer1)} {os.path.join(input.cwd, primer2)} {input.primer_dir} {input.python_script}')
 
 
@@ -114,7 +123,7 @@ rule prepare_outputs:
         remove_multiple_files("ZZ.tmp000.*")
 
 
-        #make FINAL directory, call it "results"
+        #make FINAL directory, call it "results" 
         
 
 
