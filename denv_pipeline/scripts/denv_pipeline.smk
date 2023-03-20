@@ -20,12 +20,18 @@ rule setup:
     run:
         if not os.path.exists(config["cwd"]):
             os.mkdir(config["cwd"])
+        if config["download"]:
+            os.mkdir(os.path.join(config["cwd"], "downloads"))
+        if config["temp"]:
+            os.mkdir(os.mkdir(os.path.join(config["cwd"], config["tempdir"])))
+    
         
         shell("cd {params.cwd}")
         
+        #this is messy
         remove_file("DENV.serotype.calls.tsv")
         remove_multiple_files("*.serotype.txt")
-        remove_multiple_files("tmp.*.serotype.calls.20.txt") #not sure this is getting removed currently
+        remove_multiple_files("tmp.*.serotype.calls.20.txt") 
         remove_multiple_files("*.*.out.aln")
 
         #shell("/home/bioinfo/software/knightlab/bin_Mar2018/ycgaFastq {params.symlink:q}")
@@ -64,6 +70,7 @@ rule denv_mapper:
         bam_files = expand(os.path.join(config["cwd"], "{denv_type}.{denv_samples}.sort.bam"), denv_type = denvtype_list, denv_samples=rules.prepare_jobs.output.denv_sample_list)
         out_alns = expand(os.path.join(config["cwd"], "{denv_type}.{denv_samples}.20.out.aln"), denv_type = denvtype_list, denv_samples=rules.prepare_jobs.output.denv_sample_list)
         consensus = expand(os.path.join(config["cwd"], "{denv_type}.{denv_samples}.20.cons.fa"), denv_type = denvtype_list, denv_samples=rules.prepare_jobs.output.denv_sample_list)
+        
     run:    
         if config["slurm"]:
             print("preparing for slurm run")
@@ -77,20 +84,6 @@ rule denv_mapper:
                 for l in f:
                     command = l.strip("\n")
                     shell("{command}")
-
-        if not config["temp"]:
-            remove_multiple_files("*.cons.qual.txt")
-            remove_multiple_files("*.DENV1.bam")
-            remove_multiple_files("*.DENV2.bam")
-            remove_multiple_files("*.DENV3.bam")
-            remove_multiple_files("*.DENV4.bam")
-            remove_multiple_files("*.sort.bam.bai")
-            remove_multiple_files("*.trimmed.bam")
-            remove_multiple_files("tmp.*.serotype.calls.*.txt")
-            remove_multiple_files("*.serotype.txt")
-        remove_multiple_files("ZZ.tmp000.*")
-
-        
             
 
    # rule denv_summary:
@@ -106,17 +99,23 @@ rule denv_mapper:
         #DENV_summarise.sh
 
 
-    #rule copy_to_results:
+    
+rule prepare_outputs:
+    params:
+        temp_files = ["*.cons.qual.txt","*.DENV1.bam", "*.DENV2.bam", "*.DENV3.bam", "*.DENV4.bam", "*.sort.bam.bai", "*.trimmed.bam", "tmp.*.serotype.calls.*.txt",  "*.serotype.txt"]
+        tempdir = config["tempdir"]
+    run:
+        if not config["temp"]:
+            for i in temp_files:
+                remove_multiple_files(i)
+        else:
+            for i in temp_files:
+                shell("mv {i} {params.tempdir}")
+        remove_multiple_files("ZZ.tmp000.*")
 
-     #   input:
 
-      #  output:
-
-       # parameters:
-
-        #run:
-        #copy FINAL to  /gpfs/ycga/project/grubaugh/shared/DENVSEQ/CLINICAL/
-        #make a downloadable folder (ie without BAM files) for dropbox download
+        #make FINAL directory, call it "results"
+        
 
 
    # rule make_qc_plots:
