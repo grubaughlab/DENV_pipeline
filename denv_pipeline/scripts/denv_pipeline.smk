@@ -41,7 +41,8 @@ rule setup:
         with open(output.sample_file, "w") as fw:
             for sample_dir in os.listdir(params.indir):
                 if os.path.isdir(os.path.join(params.indir, sample_dir)):
-                    fw.write(sample_dir + "\n")
+                    if sample_dir != "download" and os.path.join(params.indir, sample_dir) != params.tempdir:
+                        fw.write(sample_dir + "\n")
 
 rule prepare_jobs:
     output:
@@ -51,7 +52,8 @@ rule prepare_jobs:
         sample_file = rules.setup.output.sample_file,
         mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh"),
         primer_dir = config["denv_primers"],
-        python_script = os.path.join(workflow.current_basedir,"serotypeCaller.py"),
+        python_script = os.path.join(workflow.current_basedir,"serotypeCaller.py")
+    params:
         outdir = config["outdir"],
         indir = config["indir"]
     run:
@@ -63,7 +65,7 @@ rule prepare_jobs:
                     basename = name.split("_")[0]
                     primer1 = f"{name}/*R1*"
                     primer2 = f"{name}/*R2*"
-                    fw.write(f'bash {input.mapper_script} {basename} {os.path.join(input.indir, primer1)} {os.path.join(input.indir, primer2)} {input.primer_dir} {input.python_script} {input.outdir}')
+                    fw.write(f'bash {input.mapper_script} {basename} {os.path.join(params.indir, primer1)} {os.path.join(params.indir, primer2)} {input.primer_dir} {input.python_script} {params.outdir}')
 
 
 rule denv_mapper:
