@@ -10,6 +10,6 @@ dependencies:
   - bedtools
   - bwa
   - ivar
-  - nextalign
+  - nextalign=2.11.0
   - mafft
   - snakemake-minimal

@@ -29,8 +29,10 @@ def main(sysargs = sys.argv[1:]):
     parser.add_argument("--slurm", help="flag for if running on HPC with slurm", action="store_true")
     parser.add_argument("--verbose", "-v", dest="verbose", action="store_true")
     parser.add_argument("--help", "-h", action="store_true", dest="help")
+    parser.add_argument("--overwrite", help="overwrite current results", action="store_true")
 
-
+#add primer dict as an argument so it can be flex and add bit to readme explaining that
+#add depth as an argument to the full thing and to the main script
     if len(sysargs)<1: 
         parser.print_help()
         sys.exit(0)
@@ -48,6 +50,7 @@ def main(sysargs = sys.argv[1:]):
     config["slurm"] = args.slurm
     config["temp"] = args.temp
     config["download"] = args.download
+    config["overwrite"] = args.overwrites
     
     config["denv_primers"] = pkg_resources.resource_filename('denv_pipeline', 'primers/')
 

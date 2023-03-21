@@ -1,6 +1,7 @@
 import os
 import sys
 import datetime as dt
+import shutil
 
 from denv_pipeline.utils.misc import *
 
@@ -27,6 +28,15 @@ rule setup:
            os.mkdir(os.path.join(params.outdir, "downloads"))
         if config["temp"] and not os.path.exists(params.tempdir):
            os.mkdir(params.tempdir)
+        
+        if os.path.exists(os.path.join(params.outdir, "FINAL")):
+            if config["overwite"]:
+                shutil.rmtree(os.path.join(params.outdir, "FINAL"), ignore_errors=True)
+            else:
+                sys.stderr.write(f"Error: results file already exists at {os.path.join(params.outdir)}. Use --overwrite flag to delete and regenerate results.")
+                sys.exit(-1)
+
+        os.mkdir(os.path.join(params.outdir, "FINAL"))
 
         if params.symlink != "":
             shell("cd {params.indir}")
@@ -94,40 +104,42 @@ rule denv_mapper:
                     shell("{command}")
             
 
-#    # rule denv_summary:
-# #
-#  #       input:
+   rule denv_summary:
 
-#   #      output:
+       input:
 
-#    #     parameters:
+       output:
+
+       params:
 
 
-#     #    run:
-#         #DENV_summarise.sh
+       run:
+        if 
 
+        DENV_summarise.sh
+#fix Variants_summary.tsv file so it only has the top serotype registered
 
     
-# rule prepare_outputs:
-#     params:
-#         temp_files = ["*.cons.qual.txt","*.DENV1.bam", "*.DENV2.bam", "*.DENV3.bam", "*.DENV4.bam", "*.sort.bam.bai", "*.trimmed.bam", "tmp.*.serotype.calls.*.txt",  "*.serotype.txt"],
-#         tempdir = config["tempdir"]
-#     run:
-#         if not config["temp"]:
-#             for i in temp_files:
-#                 remove_multiple_files(i)
-#         else:
-#             for i in temp_files:
-#                 shell("mv {i} {params.tempdir}")
-#         remove_multiple_files("ZZ.tmp000.*")
+rule prepare_outputs:
+    params:
+        temp_files = ["*.cons.qual.txt","*.DENV1.bam", "*.DENV2.bam", "*.DENV3.bam", "*.DENV4.bam", "*.sort.bam.bai", "*.trimmed.bam", "tmp.*.serotype.calls.*.txt",  "*.serotype.txt"],
+        tempdir = config["tempdir"]
+    run:
+        if not config["temp"]:
+            for i in temp_files:
+                remove_multiple_files(i)
+        else:
+            for i in temp_files:
+                shell("mv {i} {params.tempdir}")
+        remove_multiple_files("ZZ.tmp000.*")
 
 
-#         #make FINAL directory, call it "results" 
+        #make FINAL directory, call it "results" after sorted out the denv.summarise.sh
         
 
 
 #    # rule make_qc_plots:
-
+#will have to have ct file as an argument
 
         
 

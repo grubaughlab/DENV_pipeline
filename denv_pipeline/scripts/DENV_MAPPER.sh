@@ -69,6 +69,7 @@ done
 #other depth loop here
 cat ${outdir}/${fname%.*}.${depth}.serotype.txt | sort -k8 -n -r | awk '{ if( $8>=50 ){ print } }' >> ${outdir}/tmp.${fname%.*}.serotype.calls.${depth}.txt
 
+#these want to move to whatever dengue summarising script we have
 cat ${outdir}/tmp.${fname%.*}.serotype.calls.*.txt >> ${outdir}/DENV.serotype.calls.tsv
 cat ${outdir}/${fname%.*}.*.serotype.txt > ${outdir}/${fname%.*}.serotype.calls.txt
 
