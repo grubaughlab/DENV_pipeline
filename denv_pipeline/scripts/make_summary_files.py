@@ -23,7 +23,8 @@ def main():
                 serotypes[l['SampleID']].append(l['Serotype'])
 
 
-    get_right_serotype_files(serotypes, config)
+    get_right_serotype_files(config, serotypes)
+    sort_variant_files(config, serotypes)
     
     if config["temp"]:
         with open(os.path.join(config["tempdir"], "DENV.serotype.calls.mincov50.final.tsv"), 'w') as fw:
@@ -43,7 +44,7 @@ def sort_variant_files(config, serotypes):
     
     old_to_new = {'POS': 'position', 'REF': 'reference_base', 'ALT': 'alternative_base', 'REF_DP': 'reference_depth', 'REF_RV': 'reference_depth_reverse', 'REF_QUAL': 'reference_quality', 'ALT_DP': 'alternate_depth', 'ALT_RV': 'alternate_depth_reverse', 'ALT_QUAL': 'alternative_quality', 'ALT_FREQ': 'alternative_frequency', 'TOTAL_DP': 'total_depth', 'PVAL': 'p_value_fisher', 'PASS': 'pass', 'GFF_FEATURE': 'gff_feature', 'REF_CODON': 'reference_codon', 'REF_AA': 'reference_amino_acid', 'ALT_CODON': 'alternative_codon', 'ALT_AA': 'alternative_amino_acid'}
 
-    summary_file = open(os.path.join(config["outdir"], "variants_summary.tsv"), 'w')
+    summary_file = open(os.path.join(config["outdir"], "results", "variants", "variants_summary.tsv"), 'w')
     summary_file.write("sample_id\tserotype\tvariant_count\n")
 
     for file in os.listdir(config["outdir"]):
@@ -72,8 +73,26 @@ def sort_variant_files(config, serotypes):
 
     summary_file.close()
     return
+
+def clean_depth_file(config, depth_file):
+
+    new_depth_file = depth_file.split("/")[-1]
+    headers = ["position", "depth"]
+    with open(new_depth_file) as fw:
+        writer = csv.DictWriter(fw, delimiter="\t")
+        writer.writeheader(fieldnames=headers)
+        with open(depth_file) as f:
+            for l in f:
+                write_dict = {}
+                toks = l.strip("\n").split("\t")
+                write_dict["position"] = toks[1]
+                write_dict["depth"] = toks[2]
+                writer.writerow(write_dict)
+
+    return new_depth_file
+
     
-def get_right_serotype_files(serotypes, config):
+def get_right_serotype_files(config, serotypes):
 
     bam_files = set()
     consensus = set()
@@ -102,7 +121,7 @@ def get_right_serotype_files(serotypes, config):
         shutil.move(source, dest)
 
     for dep in depths:
-        source = os.path.join(config['outdir'], dep)
+        source = clean_depth_file(config, os.path.join(config['outdir'], dep))
         dest = os.path.join(config["outdir"], "results", "depth")
         shutil.move(source, dest)
 
