@@ -6,7 +6,7 @@ primer_dir=$4
 serotype_caller=$5
 outdir=$6
 
-depth=20 #check with chantal if this makes sense for other people
+depth=20 #make this an argument
 
 #do proper log files - name them by the sample name put them in a folder.
 #currently the log gets written to dsq-jobs-XXXX.out on HPC - either change dsq file or rename jobs file afterwards
@@ -54,10 +54,6 @@ cat ${primer_dir}/DENV.refs.txt | while read denvtype; do
 
     echo "----->>>>>Identifying variants"
     samtools mpileup -aa --reference ${fasta} -A -d 0 -Q 0 ${outdir}/${fname%.*}.${denvtype}.sort.bam | ivar variants -p ${outdir}/${fname%.*}.${denvtype}.${depth}_variants -q 20 -t 0.03 -r ${fasta} 
-    
-    #pulls variants which are above 20% and below 80% and have "PASS" as TRUE
-    awk -F '\t' '(0.2 < $11 && $11 < 0.80) && ($14=="TRUE")' ${outdir}/${fname%.*}.${denvtype}.${depth}_variants.tsv > ${outdir}/${fname%.*}.${denvtype}.${depth}_variants_frequency.tsv
-    echo -e ${fname%.*}"\t"`wc -l ${outdir}/${fname%.*}.${denvtype}.${depth}_variants_frequency.tsv | awk '{print $1}'` > ${outdir}/${fname%.*}.${denvtype}.${depth}_variants_frequency_count.txt
 
     #depth loop finishes here
     
@@ -69,8 +65,6 @@ done
 #other depth loop here
 cat ${outdir}/${fname%.*}.${depth}.serotype.txt | sort -k8 -n -r | awk '{ if( $8>=50 ){ print } }' >> ${outdir}/tmp.${fname%.*}.serotype.calls.${depth}.txt
 
-#these want to move to whatever dengue summarising script we have
-cat ${outdir}/tmp.${fname%.*}.serotype.calls.*.txt >> ${outdir}/DENV.serotype.calls.tsv
-cat ${outdir}/${fname%.*}.*.serotype.txt > ${outdir}/${fname%.*}.serotype.calls.txt
+
 
 

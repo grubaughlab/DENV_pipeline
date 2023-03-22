@@ -29,14 +29,14 @@ rule setup:
         if config["temp"] and not os.path.exists(params.tempdir):
            os.mkdir(params.tempdir)
         
-        if os.path.exists(os.path.join(params.outdir, "FINAL")):
+        if os.path.exists(os.path.join(params.outdir, "results")):
             if config["overwite"]:
-                shutil.rmtree(os.path.join(params.outdir, "FINAL"), ignore_errors=True)
+                shutil.rmtree(os.path.join(params.outdir, "results"), ignore_errors=True)
             else:
                 sys.stderr.write(f"Error: results file already exists at {os.path.join(params.outdir)}. Use --overwrite flag to delete and regenerate results.")
                 sys.exit(-1)
 
-        os.mkdir(os.path.join(params.outdir, "FINAL"))
+        os.mkdir(os.path.join(params.outdir, "results"))
 
         if params.symlink != "":
             shell("cd {params.indir}")
@@ -104,23 +104,29 @@ rule denv_mapper:
                     shell("{command}")
             
 
-   rule denv_summary:
+rule denv_summary:
 
-       input:
+    input:
+        
 
-       output:
+    output:
+        denv_serotype = os.path.join(config["outdir"], "DENV.serotype.calls.tsv"),
 
-       params:
+    params:
+        results_dir = os.path.join(config["outdir"], "results")
 
-
-       run:
-        if 
+    run:
+    #or do these go in the next rule - or do I just combine these two rules?
+        os.mkdir(os.path.join(params.results_dir, "bam_files"))
+        os.mkdir(os.path.join(params.results_dir, "variants"))
+        os.mkdir(os.path.join(params.results_dir, "depth"))
+        os.mkdir(os.path.join(params.results_dir, "consensus_sequences"))
 
         DENV_summarise.sh
 #fix Variants_summary.tsv file so it only has the top serotype registered
 
     
-rule prepare_outputs:
+rule tidy_up:
     params:
         temp_files = ["*.cons.qual.txt","*.DENV1.bam", "*.DENV2.bam", "*.DENV3.bam", "*.DENV4.bam", "*.sort.bam.bai", "*.trimmed.bam", "tmp.*.serotype.calls.*.txt",  "*.serotype.txt"],
         tempdir = config["tempdir"]
@@ -133,13 +139,16 @@ rule prepare_outputs:
                 shell("mv {i} {params.tempdir}")
         remove_multiple_files("ZZ.tmp000.*")
 
+        mv DENV.serotype.calls.final.tsv ${resultdir};
+        mv summary.all.samples.tsv ${resultdir};
 
         #make FINAL directory, call it "results" after sorted out the denv.summarise.sh
         
 
 
 #    # rule make_qc_plots:
-#will have to have ct file as an argument
+#will have to have ct file and column as an argument
+# have a secret grubaugh lab option so it picks up all of the samples, not just over 50%
 
         
 

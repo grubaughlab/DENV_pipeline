@@ -1,77 +1,32 @@
 #!/usr/bin/env bash
 
-rm -rf FINAL > /dev/null 2>&1
+outdir=$1
+#bash
+echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > DENV.serotype.calls.tsv
+cat ${outdir}/tmp.*.serotype.calls.*.txt >> ${outdir}/DENV.serotype.calls.tsv
 
-echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > DENV.serotype.calls.final.tsv
-cat DENV.serotype.calls.tsv >> DENV.serotype.calls.final.tsv
+#without the depth, these are the same thing, so just renaming this - bash
+#not sure star to star is gonna work, might need to do this better
+mv ${outdir}/*.*.serotype.txt > ${outdir}/*.serotype.calls.txt
 
-echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > DENV.serotype.calls.mincov50.final.tsv
-cat DENV.serotype.calls.tsv | awk '{ if( $8>=50 ){ print } }' >> DENV.serotype.calls.mincov50.final.tsv
+#move to python
+echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > ${outdir}/DENV.serotype.calls.mincov50.final.tsv
+cat ${outdir}/DENV.serotype.calls.tsv | awk '{ if( $8>=50 ){ print } }' >>  ${outdir}/DENV.serotype.calls.mincov50.final.tsv
 
-echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > summary.all.samples.tsv
-cat *.serotype.calls.txt >> summary.all.samples.tsv
+#bash
+echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" >  ${outdir}/summary.all.samples.tsv
+cat ${outdir}/*.serotype.calls.txt >> ${outdir}/summary.all.samples.tsv
 
-echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > DENV.top.serotype.calls.all.samples.tsv;
+#from here on, python
+echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > ${outdir}/DENV.top.serotype.calls.all.samples.tsv;
 
-ls *.serotype.calls.txt | while read i; 
+#this sorts the serotype file per sample by coverage and takes the top one, writes it to file
+ls ${outdir}/*.serotype.calls.txt | while read i; 
     do 
-        cat $i | sort -k8 -n -r | head -1 >> DENV.top.serotype.calls.all.samples.tsv; 
+        cat $i | sort -k8 -n -r | head -1 >> ${outdir}/DENV.top.serotype.calls.all.samples.tsv; 
     done
 
-mkdir -p FINAL/BAM FINAL/VARIANTS FINAL/DEPTH FINAL/ALIGNMENT FINAL/CONSENSUS;
 
-cp DENV.serotype.calls.final.tsv FINAL;
-cp summary.all.samples.tsv FINAL;
-
-mkdir -p FINAL/VARIANTS FINAL/DEPTH FINAL/ALIGNMENT FINAL/CONSENSUS;
-
-grep -v ConsSequence DENV.serotype.calls.mincov50.final.tsv | while read i; 
-    do 
-        cp `echo -e $i | awk '{print $1"."$4".sort.bam"}'` FINAL/BAM/; 
-    done
-
-grep -v ConsSequence DENV.serotype.calls.mincov50.final.tsv | cut -f2 | while read i; 
-    do 
-        cat ${i} | tr "/" "\t" | awk '{print $1}' > FINAL/CONSENSUS/${i}; 
-    done
-
-grep -v ConsSequence DENV.serotype.calls.mincov50.final.tsv | cut -f2 | while read i; 
-    do 
-        NN=`echo $i | cut -f2 | tr "." "\t" | awk '{print $2}'`; 
-        j=${i%.*}; 
-        r=${j%.*}; 
-        cat ${r}.out.trim.aln >> FINAL/ALIGNMENT/${NN}.trim.aln; 
-    done
-
-grep -v ConsSequence DENV.serotype.calls.mincov50.final.tsv | cut -f2 | while read i; 
-    do 
-        NN=`echo $i | cut -f2 | tr "." "\t" | awk '{print $2}'`; 
-        j=${i%.*}; r=${j%.*}; 
-        cat ${r}.out.aln >> FINAL/ALIGNMENT/${NN}.untrim.aln; 
-    done
-
-grep -v ConsSequence DENV.serotype.calls.mincov50.final.tsv | cut -f2 | while read i; 
-    do  
-        j=${i%.*}; 
-        r=${j%.*};
-        cp ${r%.*}.depth.txt FINAL/DEPTH/; 
-    done
-
-grep -v ConsSequence DENV.serotype.calls.mincov50.final.tsv | cut -f2 | while read i; 
-    do  
-        j=${i%.*}; 
-        r=${j%.*}; 
-        cp ${r}_variants_frequency.tsv FINAL/VARIANTS; 
-    done
-
-grep -v ConsSequence DENV.serotype.calls.mincov50.final.tsv | cut -f2 | while read i; 
-    do  
-        j=${i%.*}; 
-        r=${j%.*}; 
-        cp ${r}_variants_frequency_count.txt FINAL/VARIANTS; 
-    done
-
+#copies
 cp DENV.top.serotype.calls.all.samples.tsv FINAL;
 
-cat *variants_frequency_count.txt > Variants_summary.tsv;
-cp Variants_summary.tsv FINAL/VARIANTS; 
