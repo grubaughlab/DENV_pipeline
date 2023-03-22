@@ -4,27 +4,26 @@ import argparse
 from collections import defaultdict
 import shutil
 
-def main():
+def summarise_files(config, serotype_calls):
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--serotype-calls", dest="serotype_calls")
-    parser.add_argument("--config")
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("--serotype-calls", dest="serotype_calls")
+    # parser.add_argument("--config")
 
-    args = parser.parse_args()
-    config = args.config
+    # args = parser.parse_args()
+    # config = args.config
 
     min_coverage = []
     serotypes = defaultdict(list)
-    with open(args.serotype_calls) as f:
+    with open(serotype_calls) as f:
         data = csv.DictReader(f, delimiter="\t")
         for l in data:
             if int(l['CoverageUntrimmed']) >= 50:
                 min_coverage.append(l)
                 serotypes[l['SampleID']].append(l['Serotype'])
 
-
-    get_right_serotype_files(config, serotypes)
     sort_variant_files(config, serotypes)
+    get_right_serotype_files(config, serotypes)
     
     if config["temp"]:
         with open(os.path.join(config["tempdir"], "DENV.serotype.calls.mincov50.final.tsv"), 'w') as fw:
@@ -131,6 +130,3 @@ def get_right_serotype_files(config, serotypes):
         shutil.move(source, dest)
 
 
-
-if __name__=="__main__":
-    main()

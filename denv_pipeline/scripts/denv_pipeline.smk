@@ -4,6 +4,7 @@ import datetime as dt
 import shutil
 
 from denv_pipeline.utils.misc import *
+from denv_pipeline.scripts.make_summary_files import *
 
 denvtype_list = ["DENV1", "DENV2","DENV3","DENV4"]
 cwd = os.getcwd()
@@ -35,8 +36,6 @@ rule setup:
             else:
                 sys.stderr.write(f"Error: results file already exists at {os.path.join(params.outdir)}. Use --overwrite flag to delete and regenerate results.")
                 sys.exit(-1)
-
-        os.mkdir(os.path.join(params.outdir, "results"))
 
         if params.symlink != "":
             shell("cd {params.indir}")
@@ -82,13 +81,10 @@ rule denv_mapper:
     input:
         jobs = rules.prepare_jobs.output.jobs
     output:
-        overall_denv_serotype_calls = os.path.join(config["outdir"], "DENV.serotype.calls.tsv"),
         sample_denv_serotype_calls = expand(os.path.join(config["outdir"], "{denv_samples}.serotype.calls.txt"), denv_samples=rules.prepare_jobs.output.denv_sample_list),
-        frequency_counts = expand(os.path.join(config["outdir"], "{denv_type}.{denv_samples}.20_variants_frequency_count.txt"), denv_type = denvtype_list, denv_samples=rules.prepare_jobs.output.denv_sample_list),
         bam_files = expand(os.path.join(config["outdir"], "{denv_type}.{denv_samples}.sort.bam"), denv_type = denvtype_list, denv_samples=rules.prepare_jobs.output.denv_sample_list),
         out_alns = expand(os.path.join(config["outdir"], "{denv_type}.{denv_samples}.20.out.aln"), denv_type = denvtype_list, denv_samples=rules.prepare_jobs.output.denv_sample_list),
         consensus = expand(os.path.join(config["outdir"], "{denv_type}.{denv_samples}.20.cons.fa"), denv_type = denvtype_list, denv_samples=rules.prepare_jobs.output.denv_sample_list)
-        
     run:    
         if config["slurm"]:
             print("preparing for slurm run")
@@ -105,27 +101,45 @@ rule denv_mapper:
             
 
 rule denv_summary:
-
     input:
-        
-
+        sample_serotype_cals = rules.denv_mapper.output.sample_denv_serotype_calls,
+        bam_files = rules.denv_mapper.output.bam_files,
+        alignments = rules.denv_mapper.output.out_alns,
+        consensus = rules.denv_mapper.output.consensus
     output:
-        denv_serotype = os.path.join(config["outdir"], "DENV.serotype.calls.tsv"),
-
+        denv_serotype_calls = os.path.join(config["outdir"], "DENV.serotype.calls.tsv"),
+        all_sample_summary = os.path.join(config["outdir"],"summary.all.samples.tsv"),
+        top_serotype_calls_all = os.path.join(config["outdir"], "DENV.top.serotype.calls.all.samples.tsv")
     params:
-        results_dir = os.path.join(config["outdir"], "results")
-
+        results_dir = os.path.join(config["outdir"], "results"),
+        outdir = config["outdir"],
+        python_script = os.path.join(workflow.current_basedir,"make_summary_files.py")
     run:
-    #or do these go in the next rule - or do I just combine these two rules?
+        os.mkdir(params.results_dir)
         os.mkdir(os.path.join(params.results_dir, "bam_files"))
         os.mkdir(os.path.join(params.results_dir, "variants"))
         os.mkdir(os.path.join(params.results_dir, "depth"))
         os.mkdir(os.path.join(params.results_dir, "consensus_sequences"))
 
-        DENV_summarise.sh
-#fix Variants_summary.tsv file so it only has the top serotype registered
+        shell('echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > {output.denv_serotype_calls}')
+        shell('cat {params.outdir}/tmp.*.serotype.calls.*.txt >> {output.denv_serotype_calls}')
 
-    
+        make_summary_files.summarise_files(config, os.path.join(params.outdir, "DENV.serotype.calls.tsv"))
+        
+        shell('echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > {output.all_sample_summary}')
+        shell('cat {params.outdir}/*.serotype.calls.txt >> {output.all_sample_summary}')
+       
+        shell('echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > {output.top_serotype_calls_all}'
+        
+            'ls {params.outdir}/*.serotype.calls.txt | while read i;'' 
+            'do' 
+                'cat $i | sort -k8 -n -r | head -1 >> {output.top_serotype_calls_all};' 
+            'done'
+        )
+
+        
+
+
 rule tidy_up:
     params:
         temp_files = ["*.cons.qual.txt","*.DENV1.bam", "*.DENV2.bam", "*.DENV3.bam", "*.DENV4.bam", "*.sort.bam.bai", "*.trimmed.bam", "tmp.*.serotype.calls.*.txt",  "*.serotype.txt"],
@@ -141,6 +155,9 @@ rule tidy_up:
 
         mv DENV.serotype.calls.final.tsv ${resultdir};
         mv summary.all.samples.tsv ${resultdir};
+
+        cp DENV.top.serotype.calls.all.samples.tsv FINAL;
+    
 
         #make FINAL directory, call it "results" after sorted out the denv.summarise.sh
         

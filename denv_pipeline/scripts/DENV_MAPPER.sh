@@ -44,12 +44,13 @@ cat ${primer_dir}/DENV.refs.txt | while read denvtype; do
         grep -A 30000000 `grep ">" ${fname%.*}.${denvtype}.${depth}.cons.fa` ${outdir}/ZZ.tmp000.${fname%.*}.${denvtype}.${depth} > ${outdir}/${fname%.*}.${denvtype}.${depth}.out.aln
     fi
 
+    #to put depth loop back in here, add depth to output name
     echo "----->>>>>Calculating percentage coverage against serotype "${denvtype}" cps reference sequence"
     if [ -s ${trimbed} ]; then
-        echo "python ${serotype_caller} --alignment ${outdir}/${fname%.*}.${denvtype}.${depth}.out.aln --bed-file ${trimbed} >> ${outdir}/${fname%.*}.${depth}.serotype.txt"
-        python ${serotype_caller} --alignment ${outdir}/${fname%.*}.${denvtype}.${depth}.out.aln --bed-file ${trimbed} >> ${outdir}/${fname%.*}.${depth}.serotype.txt
+        echo "python ${serotype_caller} --alignment ${outdir}/${fname%.*}.${denvtype}.${depth}.out.aln --bed-file ${trimbed} >> ${outdir}/${fname%.*}.serotype.txt"
+        python ${serotype_caller} --alignment ${outdir}/${fname%.*}.${denvtype}.${depth}.out.aln --bed-file ${trimbed} >> ${outdir}/${fname%.*}.serotype.txt
     else
-        python ${serotype_caller}  --alignment ${outdir}/${fname%.*}.${dentype}.${depth}.out.aln  >> ${outdir}/${fname%.*}.${depth}.serotype.txt
+        python ${serotype_caller}  --alignment ${outdir}/${fname%.*}.${dentype}.${depth}.out.aln  >> ${outdir}/${fname%.*}.serotype.txt
     fi
 
     echo "----->>>>>Identifying variants"
@@ -65,6 +66,8 @@ done
 #other depth loop here
 cat ${outdir}/${fname%.*}.${depth}.serotype.txt | sort -k8 -n -r | awk '{ if( $8>=50 ){ print } }' >> ${outdir}/tmp.${fname%.*}.serotype.calls.${depth}.txt
 
+#if depth loop goes back in, need this at the end
+#cat ${outdir}/${fname%.*}.*.serotype.txt > ${outdir}/${fname%.*}.serotype.calls.txt
 
 
 
