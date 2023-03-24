@@ -7,6 +7,7 @@ serotype_caller=$5
 depth=$6
 outdir=$7
 
+#sort out output files - probably mostly change names so they make sense
 #do proper log files - name them by the sample name put them in a folder.
 #currently the log gets written to dsq-jobs-XXXX.out on HPC - either change dsq file or rename jobs file afterwards
 cat ${primer_dir}/refs.txt | while read virustype; do 

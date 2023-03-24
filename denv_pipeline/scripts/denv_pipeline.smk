@@ -87,8 +87,8 @@ rule denv_mapper:
         temp_call_files = expand(os.path.join(config["outdir"], "tmp.{sample}.serotype.calls.20.txt"), sample=config["sample_list"]),
         sample_serotype_calls = expand(os.path.join(config["outdir"], "{sample}.serotype.calls.txt"), sample=config["sample_list"]),
         bam_files = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.sort.bam"), sample=config["sample_list"], virus_type=config["option_list"]),
-        out_alns = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.20.out.aln"), sample=config["sample_list"], virus_type=["option_list"]),
-        consensus = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.20.cons.fa"), sample=config["sample_list"], virus_type=["option_list"]),
+        out_alns = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.20.out.aln"), sample=config["sample_list"], virus_type=config["option_list"]),
+        consensus = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.20.cons.fa"), sample=config["sample_list"], virus_type=config["option_list"]),
         status_file = os.path.join(config["outdir"], "status.txt"),
     run:    
         if config["slurm"]:
