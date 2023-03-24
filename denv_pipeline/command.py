@@ -94,11 +94,11 @@ def main(sysargs = sys.argv[1:]):
         print("\n**** CONFIG ****")
         for k in sorted(config):
             print((f" - {k}: ") + f"{config[k]}")
-        status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
+        status = snakemake.snakemake(snakefile, printshellcmds=False, forceall=True, force_incomplete=True,
                                     workdir=cwd,config=config,lock=False
                                     )
     else:
-        status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
+        status = snakemake.snakemake(snakefile, printshellcmds=False, forceall=True, force_incomplete=True,
                                     workdir=cwd,config=config,lock=False
                                     )
         

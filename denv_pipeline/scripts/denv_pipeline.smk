@@ -12,9 +12,7 @@ rule all:
     input:
         os.path.join(config["outdir"], "samples.txt"),
         os.path.join(config["outdir"], "jobs.txt"),
-        #os.path.join(config["outdir"], "status.txt"),
         os.path.join(config["outdir"], "results", "DENV.serotype.calls.tsv")
-        #os.path.join(config["outdir"], "status_tidy.txt")
 
 rule setup:
     output:
@@ -85,12 +83,11 @@ rule denv_mapper:
         jobs = rules.prepare_jobs.output.jobs
     output:
         #at some point need to add the depth  modifier into these
-        temp_call_files = expand(os.path.join(config["outdir"], "tmp.{sample}.serotype.calls.20.txt"), sample=config["sample_list"]),
+        temp_call_files = expand(os.path.join(config["outdir"], "tmp.{sample}.serotype.calls.{depth}.txt"), sample=config["sample_list"], depth=config["depth"]),
         sample_serotype_calls = expand(os.path.join(config["outdir"], "{sample}.serotype.calls.txt"), sample=config["sample_list"]),
         bam_files = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.sort.bam"), sample=config["sample_list"], virus_type=config["option_list"]),
-        out_alns = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.20.out.aln"), sample=config["sample_list"], virus_type=config["option_list"]),
-        consensus = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.20.cons.fa"), sample=config["sample_list"], virus_type=config["option_list"]),
-        #status_file = os.path.join(config["outdir"], "status.txt")
+        out_alns = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.out.aln"), sample=config["sample_list"], virus_type=config["option_list"], depth=config["depth"]),
+        consensus = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.cons.fa"), sample=config["sample_list"], virus_type=config["option_list"], depth=config["depth"]),
     run:    
         if config["slurm"]:
             print("preparing for slurm run")
@@ -104,9 +101,6 @@ rule denv_mapper:
                 for l in f:
                     command = l.strip("\n")
                     shell("{command}")
-        
-        #shell("touch {output.status_file}")
-
 
 rule denv_summary:
     input:
@@ -139,14 +133,10 @@ rule denv_summary:
         
         shell('echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > {output.all_sample_summary}')
         shell('cat {input.sample_serotype_calls} >> {output.all_sample_summary}')
-       
-        shell('echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > {output.top_serotype_calls_all}'
-        
-            'ls {input.sample_serotype_calls} | while read i;' 
-            'do' 
-                'cat $i | sort -k8 -n -r | head -1 >> {output.top_serotype_calls_all};' 
-            'done'
-        )
+
+        shell('echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > {output.top_serotype_calls_all};')
+            
+        shell('ls {input.sample_serotype_calls} | while read i; do cat $i | sort -k8 -n -r | head -1 >> {output.top_serotype_calls_all}; done')
 
 
 rule tidy_up:
@@ -158,21 +148,17 @@ rule tidy_up:
         os.path.join(config["outdir"], "results", "DENV.serotype.calls.tsv")
     #     status = os.path.join(config["outdir"], "status_tidy.txt")
     params:
-        temp_files = ["*.cons.qual.txt","*.DENV1.bam", "*.DENV2.bam", "*.DENV3.bam", "*.DENV4.bam", "*.sort.bam.bai", "*.trimmed.bam", "tmp.*.serotype.calls.*.txt",  "*.serotype.txt", "*.serotype.calls.txt"],
+        temp_files = ["*.cons.qual.txt","*.bam", "*.sort.bam.bai", "*.trimmed.bam", "tmp.*.serotype.calls.*.txt", "*.serotype.calls.txt"],
         tempdir = config["tempdir"],
         results_dir = os.path.join(config["outdir"], "results")
     run:
-        if not config["temp"]:
-            for i in temp_files:
-                remove_multiple_files(i)
-        else:
-            for i in temp_files:
-                shutil.move(i, {params.tempdir})
+        temp_files(config, params.temp_files, params.tempdir)
+
         remove_multiple_files("ZZ.tmp000.*")
 
-        shutil.move(input.serotype_calls, {params.results_dir})
-        shutil.move(input.all_samples, {params.results_dir})
-        shutil.move(input.top_calls_all, {params.results_dir})  
+        shutil.move(input.serotype_calls, params.results_dir)
+        shutil.move(input.all_samples, params.results_dir)
+        shutil.move(input.top_calls_all, params.results_dir)  
 
 
         if config["download"]:

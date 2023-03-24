@@ -49,7 +49,7 @@ def sort_variant_files(config, serotypes):
     for file in os.listdir(config["outdir"]):
         if file.endswith("_variants.tsv"):
             count = 0
-            new_file_name = file.replace("_variants.tsv", "variants_frequency.tsv")
+            new_file_name = file.replace("_variants.tsv", "_variants_frequency.tsv")
             new_file = os.path.join(config['outdir'], new_file_name)
             with open(new_file, 'w') as fw:
                 headers = list(old_to_new.values())
@@ -99,18 +99,31 @@ def get_right_serotype_files(config, serotypes):
     depths = set()
     variant_frequencies = set()    
     depth = config["depth"]
+    full_option_list = config["option_list"]
+        
     for sample, serotype_lst in serotypes.items():
-        for serotype in serotype_lst:
-            bam_file = f'{sample}.{serotype}.sort.bam'
-            consensus_file = f'{sample}.{serotype}.{depth}.cons.fa'
-            depth = f'{sample}.{serotype}.depth.txt'
-            variant_frequency = f'{sample}.{serotype}.{depth}_variants_frequency.tsv'
+        for option in full_option_list:
+            
+            bam_file = f'{sample}.{option}.sort.bam'
+            consensus_file = f'{sample}.{option}.{depth}.cons.fa'
+            depth_file = f'{sample}.{option}.depth.txt'
+            variant_frequency = f'{sample}.{option}.{depth}_variants_frequency.tsv'
 
+        unwanted = []
+        if option in serotype_lst:
             bam_files.add(bam_file)
             consensus.add(consensus_file)
-            depths.add(depth)
+            depths.add(depth_file)
             variant_frequencies.add(variant_frequency)
-
+        else:
+            print(bam_file)
+            print(consensus_file)
+            print(depth)
+            print(variant_frequency)
+            unwanted.append(bam_file)
+            unwanted.append(consensus_file)
+            unwanted.append(depth_file)
+            unwanted.append(variant_frequency)
 
     for bam in bam_files:
         source = os.path.join(config['outdir'], bam)
@@ -131,5 +144,12 @@ def get_right_serotype_files(config, serotypes):
         source = os.path.join(config['outdir'], var_freq)
         dest = os.path.join(config["outdir"], "results", "variants")
         shutil.move(source, dest)
+
+    for i in unwanted:
+        # print(i)
+        if config["temp"]:
+            shutil.move(os.path.join(config['outdir'], i), config['tempdir'])
+        else:
+            os.remove(os.path.join(config['outdir'], i))
 
 

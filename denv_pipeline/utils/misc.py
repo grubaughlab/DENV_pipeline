@@ -1,5 +1,6 @@
 import os
 import glob
+import shutil
 
 def header(v):
 
@@ -27,6 +28,36 @@ def make_directory(dir_path):
     if not os.path.exists(dir_path):
         os.mkdir(dir_path)
 
+def temp_files(config, temp_files, dest):
+
+    contains_depth = ["cons.qual.txt"]
+    depth = config["depth"]
+    
+    for file_pattern in temp_files:
+        end_pattern = ".".join(file_pattern.split(".")[1:])
+        for sample in config["sample_list"]:
+            for option in config["option_list"]:
+                if "serotype.calls" in file_pattern:
+                    if "tmp" in file_pattern:
+                        name = f"tmp.{sample}.serotype.calls.{depth}.txt"
+                    else:
+                        name = f"{sample}.serotype.calls.txt"
+                elif ".bam" in end_pattern:
+                    if ".sort" in end_pattern and ".bai" not in end_pattern:
+                        pass
+                    else:
+                        name = f"{sample}.{option}.{end_pattern}"
+                else:
+                    if end_pattern in contains_depth:
+                        name = f"{sample}.{option}.{depth}.{end_pattern}"
+                    else:
+                        name = f"{sample}.{option}.{end_pattern}"
+
+                    if config["temp"]:
+                        shutil.move(os.path.join(config["outdir"], name), dest)
+                    else:
+                        os.remove(os.path.join(config["outdir"], name))
+                
 
 def check_input_files(config):
 
