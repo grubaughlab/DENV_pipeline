@@ -102,7 +102,7 @@ def get_right_serotype_files(config, serotypes):
     for sample, serotype_lst in serotypes.items():
         for serotype in serotype_lst:
             bam_file = f'{sample}.{serotype}.sort.bam'
-            consensus_file = f'{sample}.{serotype}.{depth}cons.fa'
+            consensus_file = f'{sample}.{serotype}.{depth}.cons.fa'
             depth = f'{sample}.{serotype}.depth.txt'
             variant_frequency = f'{sample}.{serotype}.{depth}_variants_frequency.tsv'
 
