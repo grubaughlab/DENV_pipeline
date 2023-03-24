@@ -9,24 +9,23 @@ outdir=$7
 
 #do proper log files - name them by the sample name put them in a folder.
 #currently the log gets written to dsq-jobs-XXXX.out on HPC - either change dsq file or rename jobs file afterwards
-#everything needs to be written to outdir
-cat ${primer_dir}/DENV.refs.txt | while read denvtype; do 
+cat ${primer_dir}/refs.txt | while read denvtype; do 
 
     fasta=${primer_dir}/${denvtype}.fasta
     bed=${primer_dir}/${denvtype}.bed
     trimbed=${primer_dir}/${denvtype}.trim.bed
 
     echo "----->>>>>Mapping reads against serotype "${denvtype}" reference sequence"
-    bwa mem -v 1 -t 16 ${fasta} $read1 $read2 | samtools view -bS -F 4 -F 2048 | samtools sort -o ${outdir}/${fname%.*}.${denvtype}.bam #> /dev/null 2>&1
+    bwa mem -v 1 -t 16 ${fasta} $read1 $read2 | samtools view -bS -F 4 -F 2048 | samtools sort -o ${outdir}/${fname%.*}.${denvtype}.bam > /dev/null 2>&1
 
     echo "----->>>>>Trimming bam file"
-    ivar trim -e -i ${outdir}/${fname%.*}.${denvtype}.bam -b ${bed} -p ${outdir}/${fname%.*}.${denvtype}.trimmed.bam #> /dev/null 2>&1
+    ivar trim -e -i ${outdir}/${fname%.*}.${denvtype}.bam -b ${bed} -p ${outdir}/${fname%.*}.${denvtype}.trimmed.bam > /dev/null 2>&1
 
     echo "----->>>>>Sorting bam file"
-    samtools sort ${outdir}/${fname%.*}.${denvtype}.trimmed.bam -o ${outdir}/${fname%.*}.${denvtype}.sort.bam #> /dev/null 2>&1
+    samtools sort ${outdir}/${fname%.*}.${denvtype}.trimmed.bam -o ${outdir}/${fname%.*}.${denvtype}.sort.bam > /dev/null 2>&1
 
     echo "----->>>>>Indexing bam file"
-    samtools index ${outdir}/${fname%.*}.${denvtype}.sort.bam #> /dev/null 2>&1
+    samtools index ${outdir}/${fname%.*}.${denvtype}.sort.bam > /dev/null 2>&1
 
 #where the loop for depth starts
     echo "----->>>>>Generating consensus sequence"

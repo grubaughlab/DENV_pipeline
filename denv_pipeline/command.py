@@ -80,6 +80,11 @@ def main(sysargs = sys.argv[1:]):
         if os.path.isdir(os.path.join(config["indir"], sample_dir)):
             if sample_dir != "download" and os.path.join(config["indir"], sample_dir) != config["tempdir"]:
                 config["sample_list"].append(sample_dir)
+
+    config["option_list"] = []
+    with open(os.path.join("primer_directory"), "refs.txt") as f:
+        for l in f:
+            config["option_list"].append(l.strip("\n"))
     
     ## check for relevant installed stuff
     ## check for input files - either the symlink is present, or if an "indir" is used then they should be in there already. Also in the right format
@@ -91,7 +96,7 @@ def main(sysargs = sys.argv[1:]):
         for k in sorted(config):
             print((f" - {k}: ") + f"{config[k]}")
         status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
-                                    workdir=cwd,config=config,lock=False, debug_dag=True
+                                    workdir=cwd,config=config,lock=False
                                     )
     else:
         status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
@@ -99,11 +104,7 @@ def main(sysargs = sys.argv[1:]):
                                     )
         
 
-    #add mail option here so it emails me when it's done
-
-    #denv_summarise
     #QC plots
-    #copy to right place - if temp tru, put in temporary folder, if not then delete it all
 
     if status: # translate "success" into shell exit code of 0
         return 0
