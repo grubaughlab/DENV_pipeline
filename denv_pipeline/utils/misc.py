@@ -48,23 +48,24 @@ def temp_files(config, temp_files, dest):
                 else:
                     os.remove(os.path.join(config["outdir"], name))
             
-            for option in config["option_list"]:
-                
-                if ".bam" in end_pattern:
-                    if ".sort" in end_pattern and ".bai" not in end_pattern:
-                        pass
+            else:
+                for option in config["option_list"]:
+                    
+                    if ".bam" in end_pattern:
+                        if ".sort" in end_pattern and ".bai" not in end_pattern:
+                            pass
+                        else:
+                            name = f"{sample}.{option}.{end_pattern}"
                     else:
-                        name = f"{sample}.{option}.{end_pattern}"
-                else:
-                    if end_pattern in contains_depth:
-                        name = f"{sample}.{option}.{depth}.{end_pattern}"
-                    else:
-                        name = f"{sample}.{option}.{end_pattern}"
+                        if end_pattern in contains_depth:
+                            name = f"{sample}.{option}.{depth}.{end_pattern}"
+                        else:
+                            name = f"{sample}.{option}.{end_pattern}"
 
-                if config["temp"]:
-                    shutil.move(os.path.join(config["outdir"], name), dest)
-                else:
-                    os.remove(os.path.join(config["outdir"], name))
+                    if config["temp"]:
+                        shutil.move(os.path.join(config["outdir"], name), dest)
+                    else:
+                        os.remove(os.path.join(config["outdir"], name))
                 
 
 def check_input_files(config):
