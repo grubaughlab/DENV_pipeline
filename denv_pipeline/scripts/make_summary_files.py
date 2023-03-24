@@ -18,18 +18,18 @@ def summarise_files(config, serotype_calls):
     with open(serotype_calls) as f:
         data = csv.DictReader(f, delimiter="\t")
         for l in data:
-            if int(l['CoverageUntrimmed']) >= 50:
+            if float(l['CoverageUntrimmed']) >= 50:
                 min_coverage.append(l)
                 serotypes[l['SampleID']].append(l['Serotype'])
-
+    
     sort_variant_files(config, serotypes)
     get_right_serotype_files(config, serotypes)
     
     if config["temp"]:
         with open(os.path.join(config["tempdir"], "DENV.serotype.calls.mincov50.final.tsv"), 'w') as fw:
             headers = ["sample_id", "consensus_sequence_file", "depth", "serotype", "reference_serotype_name", "reference_sequence_length", "number_aligned_bases", "coverage_untrimmed", "coverage_trimmed"]
-            writer = csv.DictWriter(fw, delimiter="\t")
-            writer.writeheader(fieldnames=headers)
+            writer = csv.DictWriter(fw, headers, delimiter="\t")
+            writer.writeheader()
             write_dict = {}
             for i in min_coverage:
                 for k,v in i.items():
@@ -52,8 +52,9 @@ def sort_variant_files(config, serotypes):
             new_file_name = file.replace("_variants.tsv", "variants_frequency.tsv")
             new_file = os.path.join(config['outdir'], new_file_name)
             with open(new_file, 'w') as fw:
-                writer = csv.DictWriter(fw, delimiter="\t")
-                writer.writeheader(fieldnames=list(old_to_new.values()))
+                headers = list(old_to_new.values())
+                writer = csv.DictWriter(fw, headers, delimiter="\t")
+                writer.writeheader()
                 with open(os.path.join(config['outdir'], file)) as f:
                     data = csv.DictReader(f, delimiter="\t")
                     for l in data: 
@@ -78,8 +79,8 @@ def clean_depth_file(config, depth_file):
     new_depth_file = depth_file.split("/")[-1]
     headers = ["position", "depth"]
     with open(new_depth_file) as fw:
-        writer = csv.DictWriter(fw, delimiter="\t")
-        writer.writeheader(fieldnames=headers)
+        writer = csv.DictWriter(fw,headers, delimiter="\t")
+        writer.writeheader()
         with open(depth_file) as f:
             for l in f:
                 write_dict = {}
@@ -108,6 +109,7 @@ def get_right_serotype_files(config, serotypes):
             consensus.add(consensus_file)
             depths.add(depth)
             variant_frequencies.add(variant_frequency)
+
 
     for bam in bam_files:
         source = os.path.join(config['outdir'], bam)

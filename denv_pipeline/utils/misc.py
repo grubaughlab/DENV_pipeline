@@ -23,6 +23,10 @@ def remove_multiple_files(pattern):
         print(f"removing {pattern}")
         os.remove(f)
 
+def make_directory(dir_path):
+    if not os.path.exists(dir_path):
+        os.mkdir(dir_path)
+
 
 def check_input_files(config):
 

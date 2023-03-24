@@ -50,7 +50,8 @@ def main(sysargs = sys.argv[1:]):
     config["slurm"] = args.slurm
     config["temp"] = args.temp
     config["download"] = args.download
-    config["overwrite"] = args.overwrites
+    config["overwrite"] = args.overwrite
+    config["depth"] = args.depth
     
     if not args.outdir:
         outdir = f'denv_seq_{dt.datetime.today().date()}'
@@ -72,6 +73,13 @@ def main(sysargs = sys.argv[1:]):
     
 
     misc.check_input_files(config)
+
+
+    config["sample_list"] = []
+    for sample_dir in os.listdir(config["indir"]):
+        if os.path.isdir(os.path.join(config["indir"], sample_dir)):
+            if sample_dir != "download" and os.path.join(config["indir"], sample_dir) != config["tempdir"]:
+                config["sample_list"].append(sample_dir)
     
     ## check for relevant installed stuff
     ## check for input files - either the symlink is present, or if an "indir" is used then they should be in there already. Also in the right format
@@ -83,7 +91,7 @@ def main(sysargs = sys.argv[1:]):
         for k in sorted(config):
             print((f" - {k}: ") + f"{config[k]}")
         status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
-                                    workdir=cwd,config=config,lock=False
+                                    workdir=cwd,config=config,lock=False, debug_dag=True
                                     )
     else:
         status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
@@ -91,6 +99,7 @@ def main(sysargs = sys.argv[1:]):
                                     )
         
 
+    #add mail option here so it emails me when it's done
 
     #denv_summarise
     #QC plots

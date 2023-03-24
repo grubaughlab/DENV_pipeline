@@ -20,7 +20,7 @@ def main():
 
     headers = ["SampleID", "ConsSequence", "Depth", "Serotype", "RefSerotypeSequence", "RefSeqLength", "AlignedBases", "CoverageUntrimmed", "CoverageTrimmed"]
 
-    name_elements = args.alignment.split(".")
+    name_elements = args.alignment.split("/")[-1].split(".")
     serotype = name_elements[1]
     ref_sequence = f'{serotype}.fasta'
     

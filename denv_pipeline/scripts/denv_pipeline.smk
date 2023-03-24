@@ -4,14 +4,17 @@ import datetime as dt
 import shutil
 
 from denv_pipeline.utils.misc import *
-from denv_pipeline.scripts.make_summary_files import *
+from denv_pipeline.scripts.make_summary_files import summarise_files
 
 denvtype_list = ["DENV1", "DENV2","DENV3","DENV4"]
 cwd = os.getcwd()
 
-rule all: #this will be the outputs we want - in the end have the FINAL directory stuff
+rule all: 
     input:
-        overall_denv_serotype_calls = os.path.join(config["outdir"], "DENV.serotype.calls.tsv")
+        os.path.join(config["outdir"], "samples.txt"),
+        os.path.join(config["outdir"], "jobs.txt"),
+        os.path.join(config["outdir"], "status.txt"),
+        os.path.join(config["outdir"], "DENV.serotype.calls.tsv")
 
 
 rule setup:
@@ -31,10 +34,10 @@ rule setup:
            os.mkdir(params.tempdir)
         
         if os.path.exists(os.path.join(params.outdir, "results")):
-            if config["overwite"]:
+            if config["overwrite"]:
                 shutil.rmtree(os.path.join(params.outdir, "results"), ignore_errors=True)
             else:
-                sys.stderr.write(f"Error: results file already exists at {os.path.join(params.outdir)}. Use --overwrite flag to delete and regenerate results.")
+                sys.stderr.write(green(f"Error: results file already exists at {os.path.join(params.outdir)}. Use --overwrite flag to delete and regenerate results."))
                 sys.exit(-1)
 
         if params.symlink != "":
@@ -56,7 +59,6 @@ rule setup:
 rule prepare_jobs:
     output:
         jobs = os.path.join(config["outdir"], "jobs.txt"),
-        sample_list = []
     input:
         sample_file = rules.setup.output.sample_file,
         mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh"),
@@ -67,11 +69,12 @@ rule prepare_jobs:
         indir = config["indir"],
         depth = config["depth"]
     run:
+        config['sample_list'] = []
         with open(output.jobs, 'w') as fw:
             with open(input.sample_file) as f:
                 for l in f:
                     name = l.strip("\n")
-                    output.sample_list.append(name)
+                    config['sample_list'].append(name)
                     basename = name.split("_")[0]
                     primer1 = f"{name}/*R1*"
                     primer2 = f"{name}/*R2*"
@@ -82,10 +85,13 @@ rule denv_mapper:
     input:
         jobs = rules.prepare_jobs.output.jobs
     output:
-        sample_denv_serotype_calls = expand(os.path.join(config["outdir"], "{denv_samples}.serotype.calls.txt"), denv_samples=rules.prepare_jobs.output.sample_list),
-        bam_files = expand(os.path.join(config["outdir"], "{denv_type}.{denv_samples}.sort.bam"), denv_type = denvtype_list, denv_samples=rules.prepare_jobs.output.sample_list),
-        out_alns = expand(os.path.join(config["outdir"], "{denv_type}.{denv_samples}.20.out.aln"), denv_type = denvtype_list, denv_samples=rules.prepare_jobs.output.sample_list),
-        consensus = expand(os.path.join(config["outdir"], "{denv_type}.{denv_samples}.20.cons.fa"), denv_type = denvtype_list, denv_samples=rules.prepare_jobs.output.sample_list)
+        #at some point need to add the depth  modifier into these
+        temp_call_files = expand(os.path.join(config["outdir"], "tmp.{denv_samples}.serotype.calls.20.txt"), denv_samples=config["sample_list"]),
+        sample_serotype_calls = expand(os.path.join(config["outdir"], "{denv_samples}.serotype.calls.txt"), denv_samples=config["sample_list"]),
+        bam_files = expand(os.path.join(config["outdir"], "{denv_type}.{denv_samples}.sort.bam"), denv_type=denvtype_list, denv_samples=config["sample_list"]),
+        out_alns = expand(os.path.join(config["outdir"], "{denv_type}.{denv_samples}.20.out.aln"), denv_type=denvtype_list, denv_samples=config["sample_list"]),
+        consensus = expand(os.path.join(config["outdir"], "{denv_type}.{denv_samples}.20.cons.fa"), denv_type=denvtype_list, denv_samples=config["sample_list"]),
+        status_file = os.path.join(config["outdir"], "status.txt"),
     run:    
         if config["slurm"]:
             print("preparing for slurm run")
@@ -99,14 +105,18 @@ rule denv_mapper:
                 for l in f:
                     command = l.strip("\n")
                     shell("{command}")
-            
+        
+        shell("touch {output.status_file}")
+
 
 rule denv_summary:
     input:
-        sample_serotype_cals = rules.denv_mapper.output.sample_denv_serotype_calls,
+        sample_serotype_calls = rules.denv_mapper.output.sample_serotype_calls,
         bam_files = rules.denv_mapper.output.bam_files,
         alignments = rules.denv_mapper.output.out_alns,
-        consensus = rules.denv_mapper.output.consensus
+        consensus = rules.denv_mapper.output.consensus,
+        temp_call_files = rules.denv_mapper.output.temp_call_files,
+        status = rules.denv_mapper.output.status_file
     output:
         denv_serotype_calls = os.path.join(config["outdir"], "DENV.serotype.calls.tsv"),
         all_sample_summary = os.path.join(config["outdir"],"summary.all.samples.tsv"),
@@ -116,29 +126,30 @@ rule denv_summary:
         outdir = config["outdir"],
         python_script = os.path.join(workflow.current_basedir,"make_summary_files.py")
     run:
-        os.mkdir(params.results_dir)
-        os.mkdir(os.path.join(params.results_dir, "bam_files"))
-        os.mkdir(os.path.join(params.results_dir, "variants"))
-        os.mkdir(os.path.join(params.results_dir, "depth"))
-        os.mkdir(os.path.join(params.results_dir, "consensus_sequences"))
+        make_directory(params.results_dir)
+        make_directory(os.path.join(params.results_dir, "bam_files"))
+        make_directory(os.path.join(params.results_dir, "variants"))
+        make_directory(os.path.join(params.results_dir, "depth"))
+        make_directory(os.path.join(params.results_dir, "consensus_sequences"))
+
+        print(input.status)
 
         shell('echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > {output.denv_serotype_calls}')
-        shell('cat {params.outdir}/tmp.*.serotype.calls.*.txt >> {output.denv_serotype_calls}')
-
-        make_summary_files.summarise_files(config, os.path.join(params.outdir, "DENV.serotype.calls.tsv"))
+        shell('cat {input.temp_call_files} >> {output.denv_serotype_calls}')
+        
+        print("summarising files")
+        summarise_files(config, output.denv_serotype_calls)
         
         shell('echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > {output.all_sample_summary}')
-        shell('cat {params.outdir}/*.serotype.calls.txt >> {output.all_sample_summary}')
+        shell('cat {input.sample_serotype_calls} >> {output.all_sample_summary}')
        
         shell('echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > {output.top_serotype_calls_all}'
         
-            'ls {params.outdir}/*.serotype.calls.txt | while read i;'' 
+            'ls {input.sample_serotype_calls} | while read i;' 
             'do' 
                 'cat $i | sort -k8 -n -r | head -1 >> {output.top_serotype_calls_all};' 
             'done'
         )
-
-        
 
 
 rule tidy_up:
@@ -149,7 +160,7 @@ rule tidy_up:
     params:
         temp_files = ["*.cons.qual.txt","*.DENV1.bam", "*.DENV2.bam", "*.DENV3.bam", "*.DENV4.bam", "*.sort.bam.bai", "*.trimmed.bam", "tmp.*.serotype.calls.*.txt",  "*.serotype.txt"],
         tempdir = config["tempdir"],
-        resultdir = config["resultdir"]
+        results_dir = os.path.join(config["outdir"], "results")
     run:
         if not config["temp"]:
             for i in temp_files:
@@ -159,9 +170,9 @@ rule tidy_up:
                 shutil.move(i, {params.tempdir})
         remove_multiple_files("ZZ.tmp000.*")
 
-        shutil.move(input.serotype_calls, {params.resultdir})
-        shutil.move(input.all_samples, {params.resultdir})
-        shutil.move(input.top_calls_all, {params.resultdir})        
+        shutil.move(input.serotype_calls, {params.results_dir})
+        shutil.move(input.all_samples, {params.results_dir})
+        shutil.move(input.top_calls_all, {params.results_dir})        
 
 
 #    # rule make_qc_plots:
