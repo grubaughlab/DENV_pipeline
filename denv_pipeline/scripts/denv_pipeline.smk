@@ -142,26 +142,26 @@ rule denv_summary:
 
 
 rule tidy_up:
+    input:
+        serotype_calls = rules.denv_summary.output.denv_serotype_calls,
+        all_samples = rules.denv_summary.output.all_sample_summary,
+        top_calls_all = rules.denv_summary.output.top_serotype_calls_all
     params:
         temp_files = ["*.cons.qual.txt","*.DENV1.bam", "*.DENV2.bam", "*.DENV3.bam", "*.DENV4.bam", "*.sort.bam.bai", "*.trimmed.bam", "tmp.*.serotype.calls.*.txt",  "*.serotype.txt"],
-        tempdir = config["tempdir"]
+        tempdir = config["tempdir"],
+        resultdir = config["resultdir"]
     run:
         if not config["temp"]:
             for i in temp_files:
                 remove_multiple_files(i)
         else:
             for i in temp_files:
-                shell("mv {i} {params.tempdir}")
+                shutil.move(i, {params.tempdir})
         remove_multiple_files("ZZ.tmp000.*")
 
-        mv DENV.serotype.calls.final.tsv ${resultdir};
-        mv summary.all.samples.tsv ${resultdir};
-
-        cp DENV.top.serotype.calls.all.samples.tsv FINAL;
-    
-
-        #make FINAL directory, call it "results" after sorted out the denv.summarise.sh
-        
+        shutil.move(input.serotype_calls, {params.resultdir})
+        shutil.move(input.all_samples, {params.resultdir})
+        shutil.move(input.top_calls_all, {params.resultdir})        
 
 
 #    # rule make_qc_plots:
