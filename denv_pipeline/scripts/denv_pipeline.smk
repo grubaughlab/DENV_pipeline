@@ -15,7 +15,6 @@ rule all:
         os.path.join(config["outdir"], "status.txt"),
         os.path.join(config["outdir"], "DENV.serotype.calls.tsv")
 
-
 rule setup:
     output:
         sample_file = os.path.join(config["outdir"], "samples.txt"),
@@ -85,11 +84,11 @@ rule denv_mapper:
         jobs = rules.prepare_jobs.output.jobs
     output:
         #at some point need to add the depth  modifier into these
-        temp_call_files = expand(os.path.join(config["outdir"], "tmp.{denv_samples}.serotype.calls.20.txt"), denv_samples=config["sample_list"]),
-        sample_serotype_calls = expand(os.path.join(config["outdir"], "{denv_samples}.serotype.calls.txt"), denv_samples=config["sample_list"]),
-        bam_files = expand(os.path.join(config["outdir"], "{denv_type}.{denv_samples}.sort.bam"), denv_type=config["option_list"], denv_samples=config["sample_list"]),
-        out_alns = expand(os.path.join(config["outdir"], "{denv_type}.{denv_samples}.20.out.aln"), denv_type=["option_list"], denv_samples=config["sample_list"]),
-        consensus = expand(os.path.join(config["outdir"], "{denv_type}.{denv_samples}.20.cons.fa"), denv_type=["option_list"], denv_samples=config["sample_list"]),
+        temp_call_files = expand(os.path.join(config["outdir"], "tmp.{sample}.serotype.calls.20.txt"), sample=config["sample_list"]),
+        sample_serotype_calls = expand(os.path.join(config["outdir"], "{sample}.serotype.calls.txt"), sample=config["sample_list"]),
+        bam_files = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.sort.bam"), virus_type=config["option_list"], sample=config["sample_list"]),
+        out_alns = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.20.out.aln"), virus_type=["option_list"], sample=config["sample_list"]),
+        consensus = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.20.cons.fa"), virus_type=["option_list"], sample=config["sample_list"]),
         status_file = os.path.join(config["outdir"], "status.txt"),
     run:    
         if config["slurm"]:

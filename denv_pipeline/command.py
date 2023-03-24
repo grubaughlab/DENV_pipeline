@@ -74,7 +74,6 @@ def main(sysargs = sys.argv[1:]):
 
     misc.check_input_files(config)
 
-
     config["sample_list"] = []
     for sample_dir in os.listdir(config["indir"]):
         if os.path.isdir(os.path.join(config["indir"], sample_dir)):
@@ -82,7 +81,7 @@ def main(sysargs = sys.argv[1:]):
                 config["sample_list"].append(sample_dir)
 
     config["option_list"] = []
-    with open(os.path.join("primer_directory"), "refs.txt") as f:
+    with open(os.path.join(config["primer_directory"], "refs.txt")) as f:
         for l in f:
             config["option_list"].append(l.strip("\n"))
     
