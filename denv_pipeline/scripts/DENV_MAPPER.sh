@@ -46,10 +46,10 @@ cat ${primer_dir}/DENV.refs.txt | while read denvtype; do
     #to put depth loop back in here, add depth to output name
     echo "----->>>>>Calculating percentage coverage against serotype "${denvtype}" cps reference sequence"
     if [ -s ${trimbed} ]; then
-        echo "python ${serotype_caller} --alignment ${outdir}/${fname%.*}.${denvtype}.${depth}.out.aln --bed-file ${trimbed} >> ${outdir}/${fname%.*}.${depth}.serotype.txt"
-        python ${serotype_caller} --alignment ${outdir}/${fname%.*}.${denvtype}.${depth}.out.aln --bed-file ${trimbed} >> ${outdir}/${fname%.*}.${depth}.serotype.txt
+        echo "python ${serotype_caller} --alignment ${outdir}/${fname%.*}.${denvtype}.${depth}.out.aln --bed-file ${trimbed} >> ${outdir}/${fname%.*}.serotype.calls.txt"
+        python ${serotype_caller} --alignment ${outdir}/${fname%.*}.${denvtype}.${depth}.out.aln --bed-file ${trimbed} >> ${outdir}/${fname%.*}.serotype.calls.txt
     else
-        python ${serotype_caller}  --alignment ${outdir}/${fname%.*}.${dentype}.${depth}.out.aln  >> ${outdir}/${fname%.*}.${depth}.serotype.txt
+        python ${serotype_caller}  --alignment ${outdir}/${fname%.*}.${dentype}.${depth}.out.aln  >> ${outdir}/${fname%.*}.serotype.calls.txt
     fi
 
     echo "----->>>>>Identifying variants"
@@ -64,11 +64,10 @@ done
 
 #other depth loop here
 #takes the top call if it's over 50% coverage
-cat ${outdir}/${fname%.*}.${depth}.serotype.txt | sort -k8 -n -r | awk '{ if( $8>=50 ){ print } }' >> ${outdir}/tmp.${fname%.*}.serotype.calls.${depth}.txt
+cat ${outdir}/${fname%.*}.serotype.calls.txt | sort -k8 -n -r | awk '{ if( $8>=50 ){ print } }' >> ${outdir}/tmp.${fname%.*}.serotype.calls.${depth}.txt
 
-#if depth loop goes back in, need this at the end
-#currently this just renames from serotype.txt to serotype.calls.txt but keep it for now
-cat ${outdir}/${fname%.*}.*.serotype.txt > ${outdir}/${fname%.*}.serotype.calls.txt
+#if depth loop goes back in, need this at the end - and change the outputs of the python script to be name.depth.serotype.txt
+#cat ${outdir}/${fname%.*}.*.serotype.txt > ${outdir}/${fname%.*}.serotype.calls.txt
 
 
 

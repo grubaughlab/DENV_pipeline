@@ -132,8 +132,6 @@ rule denv_summary:
         make_directory(os.path.join(params.results_dir, "depth"))
         make_directory(os.path.join(params.results_dir, "consensus_sequences"))
 
-        print(input.status)
-
         shell('echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > {output.denv_serotype_calls}')
         shell('cat {input.temp_call_files} >> {output.denv_serotype_calls}')
         
@@ -158,7 +156,7 @@ rule tidy_up:
         all_samples = rules.denv_summary.output.all_sample_summary,
         top_calls_all = rules.denv_summary.output.top_serotype_calls_all
     params:
-        temp_files = ["*.cons.qual.txt","*.DENV1.bam", "*.DENV2.bam", "*.DENV3.bam", "*.DENV4.bam", "*.sort.bam.bai", "*.trimmed.bam", "tmp.*.serotype.calls.*.txt",  "*.serotype.txt"],
+        temp_files = ["*.cons.qual.txt","*.DENV1.bam", "*.DENV2.bam", "*.DENV3.bam", "*.DENV4.bam", "*.sort.bam.bai", "*.trimmed.bam", "tmp.*.serotype.calls.*.txt",  "*.serotype.txt", "*.serotype.calls.txt"],
         tempdir = config["tempdir"],
         results_dir = os.path.join(config["outdir"], "results")
     run:
