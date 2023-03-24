@@ -21,6 +21,8 @@ def main(sysargs = sys.argv[1:]):
     parser.add_argument("--symlink", dest="symlink", help="argument for generating symlinks", default="")
     parser.add_argument("--indir", help="directory containing samples. Each sample must be a folder with the forward and reverse runs in. Default is same as output directory")
     parser.add_argument("--outdir", dest="outdir", help="location where files will be stored.")
+    parser.add_argument("--primer-directory", "-pd", help="location where bed files etc for references are")
+    parser.add_argument("--depth", help="depth to map sequences to. Default=20")
     
     parser.add_argument("--temp", dest="temp", action="store_true", help="keep intermediate files")
     parser.add_argument("--tempdir", dest="tempdir", help="where the temporary files go", default="temporary_files")
@@ -31,8 +33,6 @@ def main(sysargs = sys.argv[1:]):
     parser.add_argument("--help", "-h", action="store_true", dest="help")
     parser.add_argument("--overwrite", help="overwrite current results", action="store_true")
 
-#add primer dict as an argument so it can be flex and add bit to readme explaining that
-#add depth as an argument to the full thing and to the main script
     if len(sysargs)<1: 
         parser.print_help()
         sys.exit(0)
@@ -52,8 +52,6 @@ def main(sysargs = sys.argv[1:]):
     config["download"] = args.download
     config["overwrite"] = args.overwrites
     
-    config["denv_primers"] = pkg_resources.resource_filename('denv_pipeline', 'primers/')
-
     if not args.outdir:
         outdir = f'denv_seq_{dt.datetime.today().date()}'
     else:
@@ -64,6 +62,13 @@ def main(sysargs = sys.argv[1:]):
 
     if not args.indir:
         config["indir"] = config["outdir"]
+
+    if args.primer_directory:
+        config["primer_directory"] = args.primer_directory
+    else:
+        if config["verbose"]:
+            print("Using DENV primers")
+            config["primer_directory"] = pkg_resources.resource_filename('denv_pipeline', 'primers/')
     
 
     misc.check_input_files(config)

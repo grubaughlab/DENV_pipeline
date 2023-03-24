@@ -4,9 +4,8 @@ read1=$2
 read2=$3
 primer_dir=$4
 serotype_caller=$5
-outdir=$6
-
-depth=20 #make this an argument
+depth=$6
+outdir=$7
 
 #do proper log files - name them by the sample name put them in a folder.
 #currently the log gets written to dsq-jobs-XXXX.out on HPC - either change dsq file or rename jobs file afterwards

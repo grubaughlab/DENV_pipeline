@@ -56,35 +56,36 @@ rule setup:
 rule prepare_jobs:
     output:
         jobs = os.path.join(config["outdir"], "jobs.txt"),
-        denv_sample_list = []
+        sample_list = []
     input:
         sample_file = rules.setup.output.sample_file,
         mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh"),
-        primer_dir = config["denv_primers"],
+        primer_dir = config["primer_directory"],
         python_script = os.path.join(workflow.current_basedir,"serotypeCaller.py")
     params:
         outdir = config["outdir"],
-        indir = config["indir"]
+        indir = config["indir"],
+        depth = config["depth"]
     run:
         with open(output.jobs, 'w') as fw:
             with open(input.sample_file) as f:
                 for l in f:
                     name = l.strip("\n")
-                    output.denv_sample_list.append(name)
+                    output.sample_list.append(name)
                     basename = name.split("_")[0]
                     primer1 = f"{name}/*R1*"
                     primer2 = f"{name}/*R2*"
-                    fw.write(f'bash {input.mapper_script} {basename} {os.path.join(params.indir, primer1)} {os.path.join(params.indir, primer2)} {input.primer_dir} {input.python_script} {params.outdir}')
+                    fw.write(f'bash {input.mapper_script} {basename} {os.path.join(params.indir, primer1)} {os.path.join(params.indir, primer2)} {input.primer_dir} {input.python_script} {params.depth} {params.outdir}')
 
 
 rule denv_mapper:
     input:
         jobs = rules.prepare_jobs.output.jobs
     output:
-        sample_denv_serotype_calls = expand(os.path.join(config["outdir"], "{denv_samples}.serotype.calls.txt"), denv_samples=rules.prepare_jobs.output.denv_sample_list),
-        bam_files = expand(os.path.join(config["outdir"], "{denv_type}.{denv_samples}.sort.bam"), denv_type = denvtype_list, denv_samples=rules.prepare_jobs.output.denv_sample_list),
-        out_alns = expand(os.path.join(config["outdir"], "{denv_type}.{denv_samples}.20.out.aln"), denv_type = denvtype_list, denv_samples=rules.prepare_jobs.output.denv_sample_list),
-        consensus = expand(os.path.join(config["outdir"], "{denv_type}.{denv_samples}.20.cons.fa"), denv_type = denvtype_list, denv_samples=rules.prepare_jobs.output.denv_sample_list)
+        sample_denv_serotype_calls = expand(os.path.join(config["outdir"], "{denv_samples}.serotype.calls.txt"), denv_samples=rules.prepare_jobs.output.sample_list),
+        bam_files = expand(os.path.join(config["outdir"], "{denv_type}.{denv_samples}.sort.bam"), denv_type = denvtype_list, denv_samples=rules.prepare_jobs.output.sample_list),
+        out_alns = expand(os.path.join(config["outdir"], "{denv_type}.{denv_samples}.20.out.aln"), denv_type = denvtype_list, denv_samples=rules.prepare_jobs.output.sample_list),
+        consensus = expand(os.path.join(config["outdir"], "{denv_type}.{denv_samples}.20.cons.fa"), denv_type = denvtype_list, denv_samples=rules.prepare_jobs.output.sample_list)
     run:    
         if config["slurm"]:
             print("preparing for slurm run")
