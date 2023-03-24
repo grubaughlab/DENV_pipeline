@@ -12,8 +12,9 @@ rule all:
     input:
         os.path.join(config["outdir"], "samples.txt"),
         os.path.join(config["outdir"], "jobs.txt"),
-        os.path.join(config["outdir"], "status.txt"),
-        os.path.join(config["outdir"], "DENV.serotype.calls.tsv")
+        #os.path.join(config["outdir"], "status.txt"),
+        os.path.join(config["outdir"], "results", "DENV.serotype.calls.tsv")
+        #os.path.join(config["outdir"], "status_tidy.txt")
 
 rule setup:
     output:
@@ -89,7 +90,7 @@ rule denv_mapper:
         bam_files = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.sort.bam"), sample=config["sample_list"], virus_type=config["option_list"]),
         out_alns = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.20.out.aln"), sample=config["sample_list"], virus_type=config["option_list"]),
         consensus = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.20.cons.fa"), sample=config["sample_list"], virus_type=config["option_list"]),
-        status_file = os.path.join(config["outdir"], "status.txt"),
+        #status_file = os.path.join(config["outdir"], "status.txt")
     run:    
         if config["slurm"]:
             print("preparing for slurm run")
@@ -104,7 +105,7 @@ rule denv_mapper:
                     command = l.strip("\n")
                     shell("{command}")
         
-        shell("touch {output.status_file}")
+        #shell("touch {output.status_file}")
 
 
 rule denv_summary:
@@ -114,7 +115,7 @@ rule denv_summary:
         alignments = rules.denv_mapper.output.out_alns,
         consensus = rules.denv_mapper.output.consensus,
         temp_call_files = rules.denv_mapper.output.temp_call_files,
-        status = rules.denv_mapper.output.status_file
+        #status = rules.denv_mapper.output.status_file
     output:
         denv_serotype_calls = os.path.join(config["outdir"], "DENV.serotype.calls.tsv"),
         all_sample_summary = os.path.join(config["outdir"],"summary.all.samples.tsv"),
@@ -153,6 +154,9 @@ rule tidy_up:
         serotype_calls = rules.denv_summary.output.denv_serotype_calls,
         all_samples = rules.denv_summary.output.all_sample_summary,
         top_calls_all = rules.denv_summary.output.top_serotype_calls_all
+    output:
+        os.path.join(config["outdir"], "results", "DENV.serotype.calls.tsv")
+    #     status = os.path.join(config["outdir"], "status_tidy.txt")
     params:
         temp_files = ["*.cons.qual.txt","*.DENV1.bam", "*.DENV2.bam", "*.DENV3.bam", "*.DENV4.bam", "*.sort.bam.bai", "*.trimmed.bam", "tmp.*.serotype.calls.*.txt",  "*.serotype.txt", "*.serotype.calls.txt"],
         tempdir = config["tempdir"],
@@ -168,8 +172,18 @@ rule tidy_up:
 
         shutil.move(input.serotype_calls, {params.results_dir})
         shutil.move(input.all_samples, {params.results_dir})
-        shutil.move(input.top_calls_all, {params.results_dir})        
+        shutil.move(input.top_calls_all, {params.results_dir})  
 
+
+        if config["download"]:
+            make_directory(os.path.join(config["outdir"], "download")) 
+            for directory in os.listdir(results_dir):
+                if directory != "bam_files":
+                    shutil.copytree(os.path.join(results_dir, directory), os.path.join(config["outdir"], "download"))
+
+
+
+        #shell("touch {output.status}")
 
 #    # rule make_qc_plots:
 #will have to have ct file and column as an argument
