@@ -34,15 +34,23 @@ def temp_files(config, temp_files, dest):
     depth = config["depth"]
     
     for file_pattern in temp_files:
+        print(file_pattern)
         end_pattern = ".".join(file_pattern.split(".")[1:])
         for sample in config["sample_list"]:
+            if "serotype.calls" in file_pattern:
+                if "tmp" in file_pattern:
+                    name = f"tmp.{sample}.serotype.calls.{depth}.txt"
+                else:
+                    name = f"{sample}.serotype.calls.txt"
+
+                if config["temp"]:
+                    shutil.move(os.path.join(config["outdir"], name), dest)
+                else:
+                    os.remove(os.path.join(config["outdir"], name))
+            
             for option in config["option_list"]:
-                if "serotype.calls" in file_pattern:
-                    if "tmp" in file_pattern:
-                        name = f"tmp.{sample}.serotype.calls.{depth}.txt"
-                    else:
-                        name = f"{sample}.serotype.calls.txt"
-                elif ".bam" in end_pattern:
+                
+                if ".bam" in end_pattern:
                     if ".sort" in end_pattern and ".bai" not in end_pattern:
                         pass
                     else:
@@ -53,10 +61,10 @@ def temp_files(config, temp_files, dest):
                     else:
                         name = f"{sample}.{option}.{end_pattern}"
 
-                    if config["temp"]:
-                        shutil.move(os.path.join(config["outdir"], name), dest)
-                    else:
-                        os.remove(os.path.join(config["outdir"], name))
+                if config["temp"]:
+                    shutil.move(os.path.join(config["outdir"], name), dest)
+                else:
+                    os.remove(os.path.join(config["outdir"], name))
                 
 
 def check_input_files(config):

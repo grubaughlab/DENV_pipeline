@@ -116,10 +116,6 @@ def get_right_serotype_files(config, serotypes):
             depths.add(depth_file)
             variant_frequencies.add(variant_frequency)
         else:
-            print(bam_file)
-            print(consensus_file)
-            print(depth)
-            print(variant_frequency)
             unwanted.append(bam_file)
             unwanted.append(consensus_file)
             unwanted.append(depth_file)
