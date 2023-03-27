@@ -122,16 +122,16 @@ rule denv_summary:
         make_directory(os.path.join(params.results_dir, "consensus_sequences"))
         make_directory(os.path.join(params.results_dir, "alignments"))
 
-        shell('echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > {output.denv_serotype_calls}')
+        shell('echo -e "sample_id\tconsensus_sequence_file\tdepth\tserotype\treference_serotype_name\treference_sequence_length\tnumber_aligned_bases\tcoverage_untrimmed\tcoverage_trimmed" > {output.denv_serotype_calls}')
         shell('cat {input.temp_call_files} >> {output.denv_serotype_calls}')
         
         print("summarising files")
         summarise_files(config, output.denv_serotype_calls)
         
-        shell('echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > {output.all_sample_summary}')
+        shell('echo -e "sample_id\tconsensus_sequence_file\tdepth\tserotype\treference_serotype_name\treference_sequence_length\tnumber_aligned_bases\tcoverage_untrimmed\tcoverage_trimmed" > {output.all_sample_summary}')
         shell('cat {input.sample_serotype_calls} >> {output.all_sample_summary}')
 
-        shell('echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > {output.top_serotype_calls_all};')
+        shell('echo -e "sample_id\tconsensus_sequence_file\tdepth\tserotype\treference_serotype_name\treference_sequence_length\tnumber_aligned_bases\tcoverage_untrimmed\tcoverage_trimmed" > {output.top_serotype_calls_all};')
         shell('ls {input.sample_serotype_calls} | while read i; do cat $i | sort -k8 -n -r | head -1 >> {output.top_serotype_calls_all}; done')
         
         alignment_dir = os.path.join(params.results_dir, "alignments")

@@ -53,7 +53,7 @@ def main(sysargs = sys.argv[1:]):
     config["depth"] = args.depth
     
     if not args.outdir:
-        outdir = f'denv_seq_{dt.datetime.today().date()}'
+        outdir = f'seq_analysis_{dt.datetime.today().date()}'
     else:
         outdir = (args.outdir).rstrip("/")
     
