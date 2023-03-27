@@ -1,4 +1,6 @@
 import os
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import csv
 import matplotlib.patches as mpatches
@@ -30,7 +32,7 @@ def variant_plot(results_dir, variants_summary_file, serotype_dict, colour_dict,
     
     variant_num = {}
     with open(variants_summary_file) as f:
-        data = csv.DictReader(delimiter="\t")
+        data = csv.DictReader(f, delimiter="\t")
         for l in data:
             variant_num[l['sample_id']] = float(l['variant_count'])
 
@@ -67,10 +69,14 @@ def ct_plot(results_dir, ct_file, ct_column, id_column, final_serotype_calls, se
         data = csv.DictReader(f)
         for l in data:
             if l[id_column] in serotype_dict:
-                if type(l[ct_column]) == float and not np.isnan(l[ct_column]):
-                    ct_dict[l[id_column]] = float(l[ct_column])
-                else:
-                    ct_dict[l[id_column]] = 45
+                try:
+                    value = float(l[ct_column])
+                    if np.isnan(value):
+                        value = 45
+                except ValueError:
+                    value = 45
+                    
+                ct_dict[l[id_column]] = value
                 
                 
     coverage_dict = {}   
