@@ -53,11 +53,8 @@ def temp_files(config, temp_files, dest):
                         else:
                             name = f"{sample}.{option}.{file_pattern}"
                     else:
-                        print(file_pattern)
                         if file_pattern in contains_depth:
-                            print(f"yes {file_pattern}")
                             name = f"{sample}.{option}.{depth}.{file_pattern}"
-                            print(name)
                         else:
                             name = f"{sample}.{option}.{file_pattern}"
 
