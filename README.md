@@ -57,28 +57,38 @@ Within this, there will be:
 3. downloads (if option ``--download`` is used):
 
 	The same as results, but without the bam files. 
+	
 	For download and storage in places with less data storage capacity (eg dropbox)
 	
 4. Within results, there are optional QC plots produced.
 
-	a) ct_plot: plots genome coverage against Ct value coloured by call. Requires additional input of csv or tsv containing sample name and ct value. 
-	b) variant_plot: plots sample id against the number of variants (i.e. mutations compared to the reference genome) in between 20% and 80% of the reads. Useful for detecting co-infections
+	- ct_plot: plots genome coverage against Ct value coloured by call. Requires additional input of csv or tsv containing sample name and ct value. 
+	- variant_plot: plots sample id against the number of variants (i.e. mutations compared to the reference genome) in between 20% and 80% of the reads. Useful for detecting co-infections
 
 
 ### All options
 
 ``--outdir`` location where files will be stored
+
 ``--indir`` directory containing samples. Each sample must be a folder with the forward and reverse runs in. Default is same as output directory.
 
+
 ``--primer-directory`` or ``-pd`` location where bed files etc for references are. Default is the dengue directory provided as package information
+
 ``--depth`` minimum depth to call consensus. Default is 20
 
+
 ``--temp`` keep temporary files
+
 ``--tempdir`` location of temporary files. Default is folder in output directory called "temporary_files"
+
 ``--download`` produce downloads directory (see above)
 
+
 ``--overwrite`` delete old results files and make new ones in the run
+
 ``--verbose`` print more stuff to screen
+
 ``--help`` print help message to screen and quit
 
 
