@@ -1,6 +1,6 @@
 ## Virus agnostic (but mostly dengue) analysis pipeline
 
-Original analysis scripts written by Chrispin Chaguza
+Created by Verity Hill and Chrispin Chaguza, Grubaugh Lab
 
 This pipeline takes raw read data in the form of fastq files, maps them against provided bed files and then provides a series of outputs for further analysis including consensus sequences.
 
@@ -95,6 +95,7 @@ Within this, there will be:
 #### Yale specific options
 
 ``--symlink`` for use on Yale's HPC. Provide the second half of the link emailed by genomics core. 
+
 ``--slurm`` flag for use on Yale's HPC. This will parallelise the analysis. This uses DSQ (dead simple queue) to run the jobs text file. If your HPC uses DSQ and slurm, this should also work for you.
 
     

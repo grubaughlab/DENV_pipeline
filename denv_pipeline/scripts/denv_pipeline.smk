@@ -147,7 +147,7 @@ rule tidy_up:
         all_samples = rules.denv_summary.output.all_sample_summary,
         top_calls_all = rules.denv_summary.output.top_serotype_calls_all
     output:
-        os.path.join(config["outdir"], "results", "DENV.serotype.calls.tsv")
+        results_serotype_calls = os.path.join(config["outdir"], "results", "DENV.serotype.calls.tsv")
     params:
         temp_files = ["cons.qual.txt","bam", "sort.bam.bai", "trimmed.bam", "tmp.*.serotype.calls.*.txt", "serotype.calls.txt", "variants.tsv"],
         tempdir = config["tempdir"],
@@ -165,12 +165,18 @@ rule tidy_up:
 
         if config["download"]:
             make_directory(os.path.join(config["outdir"], "downloads")) 
-            for directory in os.listdir(results_dir):
+            for directory in os.listdir(params.results_dir):
                 if directory != "bam_files":
-                    shutil.copytree(os.path.join(params.results_dir, directory), os.path.join(config["outdir"], "downloads"))
+                    source = os.path.join(params.results_dir, directory)
+                    dest = os.path.join(config["outdir"], "downloads")
+                    shell("cp -r {source} {dest}")
 
 
-#    # rule make_qc_plots:
+# rule make_qc_plots:
+#     input:
+#         serotype_calls_file = rules.tidy_up.output.results_serotype_calls
+#     output:
+
 #will have to have ct file and column as an argument
 # have a secret grubaugh lab option so it picks up all of the samples, not just over 50%
 

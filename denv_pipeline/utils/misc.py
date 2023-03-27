@@ -82,7 +82,7 @@ def move_temp_files(config, temp_files, dest):
 
 def clean_up_alignment_components(config, temp_dir):
 
-    path = os.path.join(config["outdir"],"results", "alignment")
+    path = os.path.join(config["outdir"],"results", "alignments")
     depth = config["depth"]
     components = []
     for option in config["option_list"]:
