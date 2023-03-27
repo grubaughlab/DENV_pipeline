@@ -10,6 +10,7 @@ import pkg_resources
 import datetime as dt
 
 from denv_pipeline.utils import misc
+from denv_pipeline.utils import error_checks
 
 cwd = os.getcwd()
 thisdir = os.path.abspath(os.path.dirname(__file__))
@@ -33,6 +34,10 @@ def main(sysargs = sys.argv[1:]):
     parser.add_argument("--help", "-h", action="store_true", dest="help")
     parser.add_argument("--overwrite", help="overwrite current results", action="store_true")
 
+    parser.add_argument("--ct-file",dest="ct_file", help="to produce a plot of Ct against coverage, provide a csv file containing Ct information by sample", default=None)
+    parser.add_argument("--ct-column", dest="ct_column", help="Name of Ct column in Ct file for plot", default=None)
+    parser.add_argument("--id-column", dest="id_column", help="Name of ID column in Ct file to make Ct plot", default=None)
+
     if len(sysargs)<1: 
         parser.print_help()
         sys.exit(0)
@@ -51,6 +56,9 @@ def main(sysargs = sys.argv[1:]):
     config["download"] = args.download
     config["overwrite"] = args.overwrite
     config["depth"] = args.depth
+    config["ct_file"] = args.ct_file
+    config["ct_column"] = args.ct_column
+    config["id_column"] = args.id_column
     
     if not args.outdir:
         outdir = f'seq_analysis_{dt.datetime.today().date()}'
@@ -74,7 +82,7 @@ def main(sysargs = sys.argv[1:]):
             config["primer_directory"] = pkg_resources.resource_filename('denv_pipeline', 'primers/')
     
 
-    misc.check_input_files(config)
+    error_checks.check_input_files(config)
 
     config["sample_list"] = []
     for sample_dir in os.listdir(config["indir"]):
@@ -89,6 +97,9 @@ def main(sysargs = sys.argv[1:]):
 
     if config["overwrite"]:
         misc.overwrite(config)
+
+    if config["ct_file"] or config["ct_column"] or config["id_column"]:
+        error_checks.check_ct_file(config)
         
     
     ## check for relevant installed stuff

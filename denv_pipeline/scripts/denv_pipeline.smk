@@ -4,7 +4,9 @@ import datetime as dt
 import shutil
 
 from denv_pipeline.utils.misc import *
+from denv_pipeline.scripts.visualisations import *
 from denv_pipeline.scripts.make_summary_files import summarise_files
+
 
 cwd = os.getcwd()
 
@@ -12,7 +14,8 @@ rule all:
     input:
         os.path.join(config["outdir"], "samples.txt"),
         os.path.join(config["outdir"], "jobs.txt"),
-        os.path.join(config["outdir"], "results", "DENV.serotype.calls.tsv")
+        os.path.join(config["outdir"], "results", "DENV.serotype.calls.tsv"),
+        os.path.join(config["outdir"], "results", "variant_plot.pdf")
 
 rule setup:
     output:
@@ -107,7 +110,8 @@ rule denv_summary:
     output:
         denv_serotype_calls = os.path.join(config["outdir"], "DENV.serotype.calls.tsv"),
         all_sample_summary = os.path.join(config["outdir"],"summary.all.samples.tsv"),
-        top_serotype_calls_all = os.path.join(config["outdir"], "DENV.top.serotype.calls.all.samples.tsv")
+        top_serotype_calls_all = os.path.join(config["outdir"], "DENV.top.serotype.calls.all.samples.tsv"),
+        variant_summary_file = os.path.join(config["outdir"], "results", "variants", "variants_summary.tsv")
     params:
         results_dir = os.path.join(config["outdir"], "results"),
         outdir = config["outdir"],
@@ -141,11 +145,30 @@ rule denv_summary:
                     else:
                         shell("cat {alignment_dir}/{file_name} >> {alignment_dir}/{virus_type}.untrim.aln")
 
+rule make_qc_plots:
+    input:
+        serotype_calls_file = rules.denv_summary.output.denv_serotype_calls,
+        variant_summary_file = rules.denv_summary.output.variant_summary_file
+    output:
+        variant_plot = os.path.join(config["outdir"], "results", "variant_plot.pdf")
+    params:
+        results_dir = rules.denv_summary.params.results_dir
+    run:
+
+        serotype_dict, colour_dict, patch_list = prepare_for_plots(input.serotype_calls_file)
+        
+        variant_plot(params.results_dir, input.variant_summary_file, serotype_dict, colour_dict, patch_list)
+
+        if config["ct_file"] and config["ct_column"] and config["id_column"]:
+            ct_plot(params.results_dir, config["ct_file"], config["ct_column"], config["id_column"], input.serotype_calls_file, serotype_dict, colour_dict, patch_list)
+
+
 rule tidy_up:
     input:
         serotype_calls = rules.denv_summary.output.denv_serotype_calls,
         all_samples = rules.denv_summary.output.all_sample_summary,
-        top_calls_all = rules.denv_summary.output.top_serotype_calls_all
+        top_calls_all = rules.denv_summary.output.top_serotype_calls_all,
+        variant_plot = rules.make_qc_plots.output.variant_plot
     output:
         results_serotype_calls = os.path.join(config["outdir"], "results", "DENV.serotype.calls.tsv")
     params:
@@ -162,7 +185,6 @@ rule tidy_up:
         shutil.move(input.all_samples, params.results_dir)
         shutil.move(input.top_calls_all, params.results_dir)  
 
-
         if config["download"]:
             make_directory(os.path.join(config["outdir"], "downloads")) 
             for directory in os.listdir(params.results_dir):
@@ -171,14 +193,6 @@ rule tidy_up:
                     dest = os.path.join(config["outdir"], "downloads")
                     shell("cp -r {source} {dest}")
 
-
-# rule make_qc_plots:
-#     input:
-#         serotype_calls_file = rules.tidy_up.output.results_serotype_calls
-#     output:
-
-#will have to have ct file and column as an argument
-# have a secret grubaugh lab option so it picks up all of the samples, not just over 50%
 
         
 

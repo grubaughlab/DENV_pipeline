@@ -99,12 +99,6 @@ def clean_up_alignment_components(config, temp_dir):
                     os.remove(os.path.join(path, file2))
                 
 
-def check_input_files(config):
-
-    #if input != output, does it exist (can put symlinks in diff place so not reliant on that)
-    #if not symlink, does it exist and is the structure correct - ie sample_name folder with 2xfastq files in it with R1 and R2 on them
-
-    return
 
 END_FORMATTING = '\033[0m'
 RED = '\033[31m'

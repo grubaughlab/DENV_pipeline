@@ -5,6 +5,8 @@ channels:
   - defaults
 dependencies:
   - biopython
+  - matplotlib
+  - numpy
   - python=3.9
   - samtools
   - bedtools

@@ -70,8 +70,8 @@ def sort_variant_files(config, serotypes):
             if sero in serotypes[sample]:
                 summary_file.write(f"{sample}\t{sero}\t{count}\n")
 
-
     summary_file.close()
+    
     return
 
 def clean_depth_file(config, depth_file):
