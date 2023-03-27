@@ -26,21 +26,15 @@ rule setup:
         if not os.path.exists(params.outdir):
             os.mkdir(params.outdir)
         
-        if os.path.exists(os.path.join(params.outdir, "results")):
-            if config["overwrite"]:
-                shutil.rmtree(os.path.join(params.outdir, "results"), ignore_errors=True)
-                if os.path.exists(params.tempdir):
-                    shutil.rmtree(params.tempdir, ignore_errors=True)
-                if os.path.exists(os.path.join(params.outdir, "download")):
-                    shutil.rmtree(os.path.join(params.outdir, "download"), ignore_errors=True)
-            else:
-                sys.stderr.write(green(f"Error: results files already exists at {os.path.join(params.outdir)}. Use --overwrite flag to delete and regenerate results."))
-                sys.exit(-1)
-
-        if config["download"] and not os.path.exists(os.path.join(params.outdir, "downloads")):
-            os.mkdir(os.path.join(params.outdir, "downloads"))
-        if config["temp"] and not os.path.exists(params.tempdir):
-            os.mkdir(params.tempdir)
+        if os.path.exists(os.path.join(params.outdir, "results")) and not config["overwrite"]:
+            sys.stderr.write(green(f"Error: results files already exist at {params.outdir}. Use --overwrite flag to delete and regenerate results."))
+            sys.exit(-1)
+        else:
+            os.mkdir(os.path.join(params.outdir, "results"))
+            if config["download"]:
+                os.mkdir(os.path.join(params.outdir, "downloads"))
+            if config["temp"]:
+                os.mkdir(params.tempdir)
 
         if params.symlink != "":
             shell("cd {params.indir}")

@@ -78,7 +78,7 @@ def clean_depth_file(config, depth_file):
 
     new_depth_file = depth_file.split("/")[-1]
     headers = ["position", "depth"]
-    with open(new_depth_file) as fw:
+    with open(new_depth_file, 'w') as fw:
         writer = csv.DictWriter(fw,headers, delimiter="\t")
         writer.writeheader()
         with open(depth_file) as f:

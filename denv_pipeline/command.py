@@ -46,7 +46,6 @@ def main(sysargs = sys.argv[1:]):
     config = {}
     config['verbose'] = args.verbose
     config["symlink"] = args.symlink
-    config["indir"] = args.indir
     config["slurm"] = args.slurm
     config["temp"] = args.temp
     config["download"] = args.download
@@ -63,6 +62,9 @@ def main(sysargs = sys.argv[1:]):
 
     if not args.indir:
         config["indir"] = config["outdir"]
+    else:
+        config["indir"] = args.indir
+
 
     if args.primer_directory:
         config["primer_directory"] = args.primer_directory
@@ -84,6 +86,10 @@ def main(sysargs = sys.argv[1:]):
     with open(os.path.join(config["primer_directory"], "refs.txt")) as f:
         for l in f:
             config["option_list"].append(l.strip("\n"))
+
+    if config["overwrite"]:
+        misc.overwrite(config)
+        
     
     ## check for relevant installed stuff
     ## check for input files - either the symlink is present, or if an "indir" is used then they should be in there already. Also in the right format

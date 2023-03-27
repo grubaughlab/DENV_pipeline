@@ -28,6 +28,21 @@ def make_directory(dir_path):
     if not os.path.exists(dir_path):
         os.mkdir(dir_path)
 
+
+def overwrite(config):
+
+    shutil.rmtree(os.path.join(config["outdir"], "results"), ignore_errors=True)
+    if os.path.exists(config["tempdir"]):
+        shutil.rmtree(config["tempdir"], ignore_errors=True)
+    if os.path.exists(os.path.join(config["outdir"], "downloads")):
+        shutil.rmtree(os.path.join(config["outdir"], "downloads"), ignore_errors=True)
+    
+    if os.path.exists(os.path.join(config["outdir"], "samples.txt")):
+        os.remove(os.path.join(config["outdir"], "samples.txt"))
+    if os.path.exists(os.path.join(config["outdir"], "jobs.txt")):
+        os.remove(os.path.join(config["outdir"], "jobs.txt"))
+
+
 def temp_files(config, temp_files, dest):
 
     contains_depth = ["cons.qual.txt", "variants.tsv", "out.aln", "out.trim.aln"]
