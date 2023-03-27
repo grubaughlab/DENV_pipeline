@@ -31,8 +31,6 @@ rule setup:
             sys.exit(-1)
         else:
             os.mkdir(os.path.join(params.outdir, "results"))
-            if config["download"]:
-                os.mkdir(os.path.join(params.outdir, "downloads"))
             if config["temp"]:
                 os.mkdir(params.tempdir)
 
@@ -166,10 +164,10 @@ rule tidy_up:
 
 
         if config["download"]:
-            make_directory(os.path.join(config["outdir"], "download")) 
+            make_directory(os.path.join(config["outdir"], "downloads")) 
             for directory in os.listdir(results_dir):
                 if directory != "bam_files":
-                    shutil.copytree(os.path.join(results_dir, directory), os.path.join(config["outdir"], "download"))
+                    shutil.copytree(os.path.join(params.results_dir, directory), os.path.join(config["outdir"], "downloads"))
 
 
 #    # rule make_qc_plots:
