@@ -66,12 +66,10 @@ rule prepare_jobs:
         indir = config["indir"],
         depth = config["depth"]
     run:
-        config['sample_list'] = []
         with open(output.jobs, 'w') as fw:
             with open(input.sample_file) as f:
                 for l in f:
                     name = l.strip("\n")
-                    config['sample_list'].append(name)
                     basename = name.split("_")[0]
                     primer1 = f"{name}/*R1*"
                     primer2 = f"{name}/*R2*"
@@ -109,7 +107,6 @@ rule denv_summary:
         alignments = rules.denv_mapper.output.out_alns,
         consensus = rules.denv_mapper.output.consensus,
         temp_call_files = rules.denv_mapper.output.temp_call_files,
-        #status = rules.denv_mapper.output.status_file
     output:
         denv_serotype_calls = os.path.join(config["outdir"], "DENV.serotype.calls.tsv"),
         all_sample_summary = os.path.join(config["outdir"],"summary.all.samples.tsv"),
@@ -124,6 +121,7 @@ rule denv_summary:
         make_directory(os.path.join(params.results_dir, "variants"))
         make_directory(os.path.join(params.results_dir, "depth"))
         make_directory(os.path.join(params.results_dir, "consensus_sequences"))
+        make_directory(os.path.join(params.results_dir, "alignments"))
 
         shell('echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > {output.denv_serotype_calls}')
         shell('cat {input.temp_call_files} >> {output.denv_serotype_calls}')
@@ -135,9 +133,16 @@ rule denv_summary:
         shell('cat {input.sample_serotype_calls} >> {output.all_sample_summary}')
 
         shell('echo -e "SampleID\tConsSequence\tDepth\tSerotype\tRefSerotypeSequence\tRefSeqLength\tAlignedBases\tCoverageUntrimmed\tCoverageTrimmed" > {output.top_serotype_calls_all};')
-            
         shell('ls {input.sample_serotype_calls} | while read i; do cat $i | sort -k8 -n -r | head -1 >> {output.top_serotype_calls_all}; done')
-
+        
+        alignment_dir = os.path.join(params.results_dir, "alignments")
+        for virus_type in config["option_list"]:
+            for file_name in os.listdir(alignment_dir):
+                if virus_type in file_name:
+                    if "trim" in file_name:
+                        shell("cat {alignment_dir}/{file_name} >> {alignment_dir}/{virus_type}.trim.aln")
+                    else:
+                        shell("cat {alignment_dir}/{file_name} >> {alignment_dir}/{virus_type}.untrim.aln")
 
 rule tidy_up:
     input:
@@ -146,13 +151,13 @@ rule tidy_up:
         top_calls_all = rules.denv_summary.output.top_serotype_calls_all
     output:
         os.path.join(config["outdir"], "results", "DENV.serotype.calls.tsv")
-    #     status = os.path.join(config["outdir"], "status_tidy.txt")
     params:
-        temp_files = ["*.cons.qual.txt","*.bam", "*.sort.bam.bai", "*.trimmed.bam", "tmp.*.serotype.calls.*.txt", "*.serotype.calls.txt"],
+        temp_files = ["cons.qual.txt","bam", "sort.bam.bai", "trimmed.bam", "tmp.*.serotype.calls.*.txt", "serotype.calls.txt", "variants.tsv", "out.aln", "out.trim.aln"],
         tempdir = config["tempdir"],
         results_dir = os.path.join(config["outdir"], "results")
     run:
         temp_files(config, params.temp_files, params.tempdir)
+        alignment_components(config, params.tempdir)
 
         remove_multiple_files("ZZ.tmp000.*")
 
@@ -167,9 +172,6 @@ rule tidy_up:
                 if directory != "bam_files":
                     shutil.copytree(os.path.join(results_dir, directory), os.path.join(config["outdir"], "download"))
 
-
-
-        #shell("touch {output.status}")
 
 #    # rule make_qc_plots:
 #will have to have ct file and column as an argument

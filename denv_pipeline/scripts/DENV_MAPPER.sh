@@ -53,7 +53,7 @@ cat ${primer_dir}/refs.txt | while read virustype; do
     fi
 
     echo "----->>>>>Identifying variants"
-    samtools mpileup -aa --reference ${fasta} -A -d 0 -Q 0 ${outdir}/${fname%.*}.${virustype}.sort.bam | ivar variants -p ${outdir}/${fname%.*}.${virustype}.${depth}_variants -q 20 -t 0.03 -r ${fasta} 
+    samtools mpileup -aa --reference ${fasta} -A -d 0 -Q 0 ${outdir}/${fname%.*}.${virustype}.sort.bam | ivar variants -p ${outdir}/${fname%.*}.${virustype}.${depth}.variants -q 20 -t 0.03 -r ${fasta} 
 
     #depth loop finishes here
     

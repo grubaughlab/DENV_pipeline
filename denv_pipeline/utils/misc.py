@@ -30,12 +30,9 @@ def make_directory(dir_path):
 
 def temp_files(config, temp_files, dest):
 
-    contains_depth = ["cons.qual.txt"]
+    contains_depth = ["cons.qual.txt", "variants.tsv", "out.aln", "out.trim.aln"]
     depth = config["depth"]
-    
     for file_pattern in temp_files:
-        print(file_pattern)
-        end_pattern = ".".join(file_pattern.split(".")[1:])
         for sample in config["sample_list"]:
             if "serotype.calls" in file_pattern:
                 if "tmp" in file_pattern:
@@ -50,22 +47,44 @@ def temp_files(config, temp_files, dest):
             
             else:
                 for option in config["option_list"]:
-                    
-                    if ".bam" in end_pattern:
-                        if ".sort" in end_pattern and ".bai" not in end_pattern:
+                    if ".bam" in file_pattern:
+                        if ".sort" in file_pattern and ".bai" not in file_pattern:
                             pass
                         else:
-                            name = f"{sample}.{option}.{end_pattern}"
+                            name = f"{sample}.{option}.{file_pattern}"
                     else:
-                        if end_pattern in contains_depth:
-                            name = f"{sample}.{option}.{depth}.{end_pattern}"
+                        print(file_pattern)
+                        if file_pattern in contains_depth:
+                            print(f"yes {file_pattern}")
+                            name = f"{sample}.{option}.{depth}.{file_pattern}"
+                            print(name)
                         else:
-                            name = f"{sample}.{option}.{end_pattern}"
+                            name = f"{sample}.{option}.{file_pattern}"
 
                     if config["temp"]:
                         shutil.move(os.path.join(config["outdir"], name), dest)
                     else:
                         os.remove(os.path.join(config["outdir"], name))
+
+    
+
+def alignment_components(config, temp_dir):
+
+    path = os.path.join(config["outdir"],"results", "alignment")
+    depth = config["depth"]
+    components = []
+    for option in config["option_list"]:
+        for sample in config["sample_list"]:
+            file1 = f'{sample}.{option}.{depth}.out.aln'
+            file2 = f'{sample}.{option}.{depth}.out.trim.aln'
+
+            if os.path.exists(os.path.join(path, file1)):
+                if config["temp"]:
+                    shutil.move(os.path.join(path, file1), temp_dir)
+                    shutil.move(os.path.join(path, file2), temp_dir)
+                else:
+                    os.remove(os.path.join(path, file1))
+                    os.remove(os.path.join(path, file2))
                 
 
 def check_input_files(config):

@@ -47,9 +47,9 @@ def sort_variant_files(config, serotypes):
     summary_file.write("sample_id\tserotype\tvariant_count\n")
 
     for file in os.listdir(config["outdir"]):
-        if file.endswith("_variants.tsv"):
+        if file.endswith(".variants.tsv"):
             count = 0
-            new_file_name = file.replace("_variants.tsv", "_variants_frequency.tsv")
+            new_file_name = file.replace(".variants.tsv", ".variants_frequency.tsv")
             new_file = os.path.join(config['outdir'], new_file_name)
             with open(new_file, 'w') as fw:
                 headers = list(old_to_new.values())
@@ -98,28 +98,35 @@ def get_right_serotype_files(config, serotypes):
     consensus = set()
     depths = set()
     variant_frequencies = set()    
+    alignments = set()
     depth = config["depth"]
     full_option_list = config["option_list"]
-        
+    
+    unwanted = []
     for sample, serotype_lst in serotypes.items():
         for option in full_option_list:
             
             bam_file = f'{sample}.{option}.sort.bam'
             consensus_file = f'{sample}.{option}.{depth}.cons.fa'
             depth_file = f'{sample}.{option}.depth.txt'
-            variant_frequency = f'{sample}.{option}.{depth}_variants_frequency.tsv'
+            variant_frequency = f'{sample}.{option}.{depth}.variants_frequency.tsv'
+            trimmed = f'{sample}.{option}.{depth}.out.trim.aln'
+            untrimmed = f'{sample}.{option}.{depth}.out.aln'
 
-        unwanted = []
-        if option in serotype_lst:
-            bam_files.add(bam_file)
-            consensus.add(consensus_file)
-            depths.add(depth_file)
-            variant_frequencies.add(variant_frequency)
-        else:
-            unwanted.append(bam_file)
-            unwanted.append(consensus_file)
-            unwanted.append(depth_file)
-            unwanted.append(variant_frequency)
+            if option in serotype_lst:
+                bam_files.add(bam_file)
+                consensus.add(consensus_file)
+                depths.add(depth_file)
+                variant_frequencies.add(variant_frequency)
+                alignments.add(trimmed)
+                alignments.add(untrimmed)
+            else:
+                unwanted.append(bam_file)
+                unwanted.append(consensus_file)
+                unwanted.append(depth_file)
+                unwanted.append(variant_frequency)
+                # unwanted.append(trimmed)
+                # unwanted.append(untrimmed)
 
     for bam in bam_files:
         source = os.path.join(config['outdir'], bam)
@@ -141,8 +148,12 @@ def get_right_serotype_files(config, serotypes):
         dest = os.path.join(config["outdir"], "results", "variants")
         shutil.move(source, dest)
 
+    for aln in alignments:
+        source = os.path.join(config['outdir'], aln)
+        dest = os.path.join(config["outdir"], "results", "alignments")
+        shutil.move(source, dest)
+
     for i in unwanted:
-        # print(i)
         if config["temp"]:
             shutil.move(os.path.join(config['outdir'], i), config['tempdir'])
         else:
