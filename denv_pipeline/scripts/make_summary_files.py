@@ -18,9 +18,9 @@ def summarise_files(config, serotype_calls):
     with open(serotype_calls) as f:
         data = csv.DictReader(f, delimiter="\t")
         for l in data:
-            if float(l['CoverageUntrimmed']) >= 50:
+            if float(l['coverage_untrimmed']) >= 50:
                 min_coverage.append(l)
-                serotypes[l['SampleID']].append(l['Serotype'])
+                serotypes[l['sample_id']].append(l['serotype'])
     
     sort_variant_files(config, serotypes)
     get_right_serotype_files(config, serotypes)
@@ -125,8 +125,8 @@ def get_right_serotype_files(config, serotypes):
                 unwanted.append(consensus_file)
                 unwanted.append(depth_file)
                 unwanted.append(variant_frequency)
-                # unwanted.append(trimmed)
-                # unwanted.append(untrimmed)
+                unwanted.append(trimmed)
+                unwanted.append(untrimmed)
 
     for bam in bam_files:
         source = os.path.join(config['outdir'], bam)
@@ -142,6 +142,7 @@ def get_right_serotype_files(config, serotypes):
         source = clean_depth_file(config, os.path.join(config['outdir'], dep))
         dest = os.path.join(config["outdir"], "results", "depth")
         shutil.move(source, dest)
+        unwanted.append(dep)
 
     for var_freq in variant_frequencies:
         source = os.path.join(config['outdir'], var_freq)

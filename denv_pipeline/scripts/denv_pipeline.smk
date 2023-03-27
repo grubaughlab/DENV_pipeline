@@ -151,12 +151,12 @@ rule tidy_up:
     output:
         os.path.join(config["outdir"], "results", "DENV.serotype.calls.tsv")
     params:
-        temp_files = ["cons.qual.txt","bam", "sort.bam.bai", "trimmed.bam", "tmp.*.serotype.calls.*.txt", "serotype.calls.txt", "variants.tsv", "out.aln", "out.trim.aln"],
+        temp_files = ["cons.qual.txt","bam", "sort.bam.bai", "trimmed.bam", "tmp.*.serotype.calls.*.txt", "serotype.calls.txt", "variants.tsv"],
         tempdir = config["tempdir"],
         results_dir = os.path.join(config["outdir"], "results")
     run:
-        temp_files(config, params.temp_files, params.tempdir)
-        alignment_components(config, params.tempdir)
+        move_temp_files(config, params.temp_files, params.tempdir)
+        clean_up_alignment_components(config, params.tempdir)
 
         remove_multiple_files("ZZ.tmp000.*")
 

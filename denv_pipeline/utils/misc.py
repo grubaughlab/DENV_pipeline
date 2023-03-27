@@ -43,9 +43,9 @@ def overwrite(config):
         os.remove(os.path.join(config["outdir"], "jobs.txt"))
 
 
-def temp_files(config, temp_files, dest):
+def move_temp_files(config, temp_files, dest):
 
-    contains_depth = ["cons.qual.txt", "variants.tsv", "out.aln", "out.trim.aln"]
+    contains_depth = ["cons.qual.txt", "variants.tsv"]
     depth = config["depth"]
     for file_pattern in temp_files:
         for sample in config["sample_list"]:
@@ -80,7 +80,7 @@ def temp_files(config, temp_files, dest):
 
     
 
-def alignment_components(config, temp_dir):
+def clean_up_alignment_components(config, temp_dir):
 
     path = os.path.join(config["outdir"],"results", "alignment")
     depth = config["depth"]
