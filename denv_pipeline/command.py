@@ -74,6 +74,9 @@ def main(sysargs = sys.argv[1:]):
     else:
         config["indir"] = args.indir
 
+    if config["overwrite"]:
+        misc.overwrite(config)
+
     set_up_scripts.make_folders(config)
     
     if args.symlink:
@@ -93,9 +96,6 @@ def main(sysargs = sys.argv[1:]):
     with open(os.path.join(config["primer_directory"], "refs.txt")) as f:
         for l in f:
             config["option_list"].append(l.strip("\n"))
-
-    if config["overwrite"]:
-        misc.overwrite(config)
 
     if config["ct_file"] or config["ct_column"] or config["id_column"]:
         error_checks.check_ct_file(config)
