@@ -19,7 +19,7 @@ def symlink_setup(config, cwd):
         if os.path.isdir(upper_path) and sample_dir != "results" and os.path.join(config["indir"], sample_dir) != config["tempdir"]:
             lower_path = os.path.join(upper_path, "Unaligned")
             for file in os.listdir(lower_path):
-                if file.endswith(".fastq"):
+                if file.endswith(".fastq.gz"):
                     shutil.move(os.path.join(lower_path, file), upper_path)
 
             shutil.rmtree(lower_path)
