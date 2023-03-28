@@ -50,7 +50,7 @@ rule prepare_jobs:
                     basename = name.split("_")[0]
                     primer1 = f"{name}/*R1*"
                     primer2 = f"{name}/*R2*"
-                    fw.write(f'bash {input.mapper_script} {basename} {os.path.join(params.indir, primer1)} {os.path.join(params.indir, primer2)} {input.primer_dir} {input.python_script} {params.depth} {params.outdir}')
+                    fw.write(f'bash {input.mapper_script} {basename} {os.path.join(params.indir, primer1)} {os.path.join(params.indir, primer2)} {input.primer_dir} {input.python_script} {params.depth} {params.outdir}\n')
 
 
 rule denv_mapper:
@@ -66,6 +66,7 @@ rule denv_mapper:
     run:    
         if config["slurm"]:
             print("preparing for slurm run")
+            shell("module load dSQ")
             shell("dsq --job-name denv.mapper --job-file {input.jobs:q} --mem-per-cpu=10G --cpus-per-task=1") 
             filename = f"dsq-jobs-{dt.datetime.today().date()}.sh"
             shell("sbatch {filename}")
