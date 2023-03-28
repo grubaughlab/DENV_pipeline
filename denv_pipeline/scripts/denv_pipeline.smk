@@ -57,7 +57,6 @@ rule denv_mapper:
     input:
         jobs = rules.prepare_jobs.output.jobs
     output:
-        #at some point need to add the depth  modifier into these
         temp_call_files = expand(os.path.join(config["outdir"], "tmp.{sample}.serotype.calls.{depth}.txt"), sample=config["sample_list"], depth=config["depth"]),
         sample_serotype_calls = expand(os.path.join(config["outdir"], "{sample}.serotype.calls.txt"), sample=config["sample_list"]),
         bam_files = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.sort.bam"), sample=config["sample_list"], virus_type=config["option_list"]),
@@ -66,10 +65,10 @@ rule denv_mapper:
     run:    
         if config["slurm"]:
             print("preparing for slurm run")
-            shell("module load dSQ")
-            shell("dsq --job-name denv.mapper --job-file {input.jobs:q} --mem-per-cpu=10G --cpus-per-task=1") 
+            shell("""module load dSQ;
+            dsq --job-name denv.mapper --job-file {input.jobs:q} --mem-per-cpu=10G --cpus-per-task=1 """)
             filename = f"dsq-jobs-{dt.datetime.today().date()}.sh"
-            shell("sbatch {filename}")
+            shell("sbatch {filename} --wait")
         
         else:
             print("running each sample sequentially")

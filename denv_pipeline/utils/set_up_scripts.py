@@ -51,4 +51,5 @@ def make_folders(config):
     else:
         os.mkdir(os.path.join(outdir, "results"))
         if config["temp"]:
-            os.mkdir(config["tempdir"])
+            if not os.path.exists(config["tempdir"]):
+                os.mkdir(config["tempdir"])
