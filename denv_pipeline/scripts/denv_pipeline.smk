@@ -73,7 +73,7 @@ rule denv_mapper:
             dsq --job-name denv.mapper --job-file {input.jobs:q} --mem-per-cpu=10G --cpus-per-task=1""")
              
             filename = f"dsq-jobs-{dt.datetime.today().date()}.sh"
-            shell("OUT=$(sbatch --parsable {filename}")
+            shell("OUT=$(sbatch --parsable {filename})")
             shell("sbatch --depend=afterok:$OUT {params.mapper_script} {params.outdir}") 
         
         else:
