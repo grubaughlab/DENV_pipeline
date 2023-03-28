@@ -27,7 +27,7 @@ rule setup:
         with open(output.sample_file, "w") as fw:
             for sample_dir in os.listdir(params.indir):
                 if os.path.isdir(os.path.join(params.indir, sample_dir)):
-                    if sample_dir != "download" and os.path.join(params.indir, sample_dir) != params.tempdir:
+                    if sample_dir != "download" and os.path.join(params.indir, sample_dir) != params.tempdir and sample_dir != "results":
                         fw.write(sample_dir + "\n")
 
 rule prepare_jobs:
