@@ -96,7 +96,7 @@ Within this, there will be:
 
 ``--symlink`` for use on Yale's HPC. Provide the second half of the link emailed by genomics core. 
 
-``--slurm`` flag for use on Yale's HPC. This will parallelise the analysis. This uses DSQ (dead simple queue) to run the jobs text file. If your HPC uses DSQ and slurm, this should also work for you.
+``--slurm`` flag for use on Yale's HPC. This will parallelise the analysis. Uses DSQ, which can be found here: https://github.com/ycrc/dSQ
 
     
     
