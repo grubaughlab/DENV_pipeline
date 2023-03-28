@@ -75,7 +75,7 @@ def main(sysargs = sys.argv[1:]):
         config["indir"] = args.indir
 
     if args.symlink:
-        config = set_up_scripts.symlink_setup(config)
+        config = set_up_scripts.symlink_setup(config, cwd)
 
     config=set_up_scripts.get_sample_list(config)
     error_checks.check_input_files(config)
