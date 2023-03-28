@@ -11,6 +11,7 @@ import datetime as dt
 
 from denv_pipeline.utils import misc
 from denv_pipeline.utils import error_checks
+from denv_pipeline.utils import set_up_scripts
 
 cwd = os.getcwd()
 thisdir = os.path.abspath(os.path.dirname(__file__))
@@ -19,7 +20,7 @@ def main(sysargs = sys.argv[1:]):
 
     parser = argparse.ArgumentParser(add_help=False, description=misc.header(__version__))
 
-    parser.add_argument("--symlink", dest="symlink", help="argument for generating symlinks", default="")
+    parser.add_argument("--symlink", dest="symlink", help="argument for generating symlinks", default=None)
     parser.add_argument("--indir", help="directory containing samples. Each sample must be a folder with the forward and reverse runs in. Default is same as output directory")
     parser.add_argument("--outdir", dest="outdir", help="location where files will be stored.")
     parser.add_argument("--primer-directory", "-pd", help="location where bed files etc for references are")
@@ -73,6 +74,13 @@ def main(sysargs = sys.argv[1:]):
     else:
         config["indir"] = args.indir
 
+    if args.symlink:
+        config = set_up_scripts.symlink_setup(config)
+
+    config=set_up_scripts.get_sample_list(config)
+    error_checks.check_input_files(config)
+    
+    set_up_scripts.make_folders(config)
 
     if args.primer_directory:
         config["primer_directory"] = args.primer_directory
@@ -80,15 +88,6 @@ def main(sysargs = sys.argv[1:]):
         if config["verbose"]:
             print("Using DENV primers")
             config["primer_directory"] = pkg_resources.resource_filename('denv_pipeline', 'primers/')
-    
-
-    error_checks.check_input_files(config)
-
-    config["sample_list"] = []
-    for sample_dir in os.listdir(config["indir"]):
-        if os.path.isdir(os.path.join(config["indir"], sample_dir)):
-            if sample_dir != "download" and os.path.join(config["indir"], sample_dir) != config["tempdir"]:
-                config["sample_list"].append(sample_dir)
 
     config["option_list"] = []
     with open(os.path.join(config["primer_directory"], "refs.txt")) as f:

@@ -21,32 +21,9 @@ rule setup:
     output:
         sample_file = os.path.join(config["outdir"], "samples.txt"),
     params:
-        outdir = config["outdir"],
-        symlink = config["symlink"],
         tempdir = config["tempdir"],
         indir = config["indir"]
     run:
-        if not os.path.exists(params.outdir):
-            os.mkdir(params.outdir)
-        
-        if os.path.exists(os.path.join(params.outdir, "results")) and not config["overwrite"]:
-            sys.stderr.write(green(f"Error: results files already exist at {params.outdir}. Use --overwrite flag to delete and regenerate results."))
-            sys.exit(-1)
-        else:
-            os.mkdir(os.path.join(params.outdir, "results"))
-            if config["temp"]:
-                os.mkdir(params.tempdir)
-
-        if params.symlink != "":
-            shell("cd {params.indir}")
-            shell("/home/bioinfo/software/knightlab/bin_Mar2018/ycgaFastq {params.symlink:q}")
-            for sample_dir in os.listdir(params.indir):
-                if os.path.isdir(sample_dir):
-                    folder_path = os.path.join(sample_dir, "Unaligned")
-                    shell("mv {folder_path}/* {sample_dir}/")
-                    shell("rm -r {folder_path}")
-            shell("cd {cwd}")
-
         with open(output.sample_file, "w") as fw:
             for sample_dir in os.listdir(params.indir):
                 if os.path.isdir(os.path.join(params.indir, sample_dir)):
