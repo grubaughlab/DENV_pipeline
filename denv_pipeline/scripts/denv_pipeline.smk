@@ -63,7 +63,8 @@ rule denv_mapper:
         out_alns = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.out.aln"), sample=config["sample_list"], virus_type=config["option_list"], depth=config["depth"]),
         consensus = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.cons.fa"), sample=config["sample_list"], virus_type=config["option_list"], depth=config["depth"]),
     params:
-        outdir = config["outdir"]
+        outdir = config["outdir"],
+        mapper_script = os.path.join(workflow.current_basedir,"mapper_done_slurm.sh")
     run:    
         if config["slurm"]:
             print("preparing for slurm run")
@@ -71,7 +72,7 @@ rule denv_mapper:
             dsq --job-name denv.mapper --job-file {input.jobs:q} --mem-per-cpu=10G --cpus-per-task=1""")
              
             filename = f"dsq-jobs-{dt.datetime.today().date()}.sh"
-            shell("OUT=$(sbatch --parsable {filename}) && sbatch --depend=afterok:$OUT mapper_done_slurm.sh {params.outdir}") 
+            shell("OUT=$(sbatch --parsable {filename}) && sbatch --depend=afterok:$OUT {params.mapper_script} {params.outdir}") 
         
         else:
             print("running each sample sequentially")
