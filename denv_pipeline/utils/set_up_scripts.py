@@ -14,13 +14,15 @@ def symlink_setup(config, cwd):
     os.system(f"/home/bioinfo/software/knightlab/bin_Mar2018/ycgaFastq {symlink}")
     os.chdir(cwd)
     
-    
     for sample_dir in os.listdir(config["indir"]):
-        new_path = os.path.join(config["indir"], sample_dir)
-        if os.path.isdir(sample_dir):
-            folder_path = os.path.join(sample_dir, "Unaligned")
-            shutil.move(folder_path, new_path)
-            shutil.rmtree(folder_path)
+        upper_path = os.path.join(config["indir"], sample_dir)
+        if os.path.isdir(upper_path):
+            lower_path = os.path.join(upper_path, "Unaligned")
+            for file in os.listdir(lower_path):
+                if file.endswith(".fastq"):
+                    shutil.move(os.path.join(lower_path, file), upper_path)
+
+            shutil.rmtree(lower_path)
 
     return config
 

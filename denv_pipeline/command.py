@@ -87,7 +87,7 @@ def main(sysargs = sys.argv[1:]):
     else:
         if config["verbose"]:
             print("Using DENV primers")
-            config["primer_directory"] = pkg_resources.resource_filename('denv_pipeline', 'primers/')
+        config["primer_directory"] = pkg_resources.resource_filename('denv_pipeline', 'primers/')
 
     config["option_list"] = []
     with open(os.path.join(config["primer_directory"], "refs.txt")) as f:
