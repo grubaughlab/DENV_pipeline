@@ -71,7 +71,7 @@ rule denv_mapper:
             dsq --job-name denv.mapper --job-file {input.jobs:q} --mem-per-cpu=10G --cpus-per-task=1""")
              
             filename = f"dsq-jobs-{dt.datetime.today().date()}.sh"
-            shell("RES=$(sbatch {filename}) && sbatch --depend=afterok:${RES##* } mapper_done_slurm.sh {params.outdir}") 
+            shell("output=$(sbatch --parsable {filename}) && sbatch --depend=afterok:${output} mapper_done_slurm.sh {params.outdir}") 
         
         else:
             print("running each sample sequentially")
