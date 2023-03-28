@@ -12,7 +12,7 @@ It calls input files as a virus type if it has more than 50% coverage of the ref
 - conda env create -f environment.yml
 - pip install .
 
-If step 2 fails on a server because of a "bus error", then first run the command "salloc" to request more memory
+If step 2 fails on a server because of a "bus error", then first run the command "salloc" to request more memory. If this also fails, I've found that mamba works well so if that's installed on your server give that a go
 
 
 ### Main inputs
