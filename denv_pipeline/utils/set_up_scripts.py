@@ -9,9 +9,11 @@ from denv_pipeline.utils.misc import *
 def symlink_setup(config, cwd):
 
     symlink = config["symlink"]
-    os.chdir(config["indir"])
     
+    os.chdir(config["indir"])
     os.system(f"/home/bioinfo/software/knightlab/bin_Mar2018/ycgaFastq {symlink}")
+    os.chdir(cwd)
+    
     
     for sample_dir in os.listdir(config["indir"]):
         new_path = os.path.join(config["indir"], sample_dir)
@@ -19,8 +21,6 @@ def symlink_setup(config, cwd):
             folder_path = os.path.join(sample_dir, "Unaligned")
             shutil.move(folder_path, new_path)
             shutil.rmtree(folder_path)
-    
-    os.chdir(cwd)
 
     return config
 
