@@ -66,8 +66,9 @@ rule denv_mapper:
     run:    
         if config["slurm"]:
             print("preparing for slurm run")
-            shell("module load dSQ")
-            shell("dsq --job-name denv.mapper --job-file {input.jobs:q} --mem-per-cpu=10G --cpus-per-task=1") 
+            shell("""module load dSQ; 
+            dsq --job-name denv.mapper --job-file {input.jobs:q} --mem-per-cpu=10G --cpus-per-task=1""")
+             
             filename = f"dsq-jobs-{dt.datetime.today().date()}.sh"
             shell("sbatch {filename}")
         
