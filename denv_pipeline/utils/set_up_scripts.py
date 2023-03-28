@@ -32,7 +32,7 @@ def get_sample_list(config):
     config["sample_list"] = []
     for sample_dir in os.listdir(config["indir"]):
         if os.path.isdir(os.path.join(config["indir"], sample_dir)):
-            if sample_dir != "results" and os.path.join(config["indir"], sample_dir) != config["tempdir"]:
+            if os.path.join(config["indir"], sample_dir) != "results" and os.path.join(config["indir"], sample_dir) != config["tempdir"]:
                 config["sample_list"].append(sample_dir)
 
     return config
