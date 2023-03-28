@@ -74,14 +74,14 @@ def main(sysargs = sys.argv[1:]):
     else:
         config["indir"] = args.indir
 
+    set_up_scripts.make_folders(config)
+    
     if args.symlink:
         config = set_up_scripts.symlink_setup(config, cwd)
 
     config=set_up_scripts.get_sample_list(config)
     error_checks.check_input_files(config)
     
-    set_up_scripts.make_folders(config)
-
     if args.primer_directory:
         config["primer_directory"] = args.primer_directory
     else:

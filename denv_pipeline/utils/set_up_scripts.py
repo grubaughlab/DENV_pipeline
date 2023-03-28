@@ -41,7 +41,7 @@ def make_folders(config):
     outdir = config["outdir"]
 
     if not os.path.exists(outdir):
-            os.mkdir(outdir)
+        os.mkdir(outdir)
         
     if os.path.exists(os.path.join(outdir, "results")) and not config["overwrite"]:
         sys.stderr.write(green(f"Error: results files already exist at {outdir}. Use --overwrite flag to delete and regenerate results."))
