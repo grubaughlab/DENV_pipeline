@@ -16,7 +16,7 @@ def symlink_setup(config, cwd):
     
     for sample_dir in os.listdir(config["indir"]):
         upper_path = os.path.join(config["indir"], sample_dir)
-        if os.path.isdir(upper_path):
+        if os.path.isdir(upper_path) and sample_dir != "results" and os.path.join(config["indir"], sample_dir) != config["tempdir"]:
             lower_path = os.path.join(upper_path, "Unaligned")
             for file in os.listdir(lower_path):
                 if file.endswith(".fastq"):
@@ -32,7 +32,7 @@ def get_sample_list(config):
     config["sample_list"] = []
     for sample_dir in os.listdir(config["indir"]):
         if os.path.isdir(os.path.join(config["indir"], sample_dir)):
-            if sample_dir != "download" and os.path.join(config["indir"], sample_dir) != config["tempdir"]:
+            if sample_dir != "results" and os.path.join(config["indir"], sample_dir) != config["tempdir"]:
                 config["sample_list"].append(sample_dir)
 
     return config
