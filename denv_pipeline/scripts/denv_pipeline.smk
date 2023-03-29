@@ -55,26 +55,27 @@ rule all:
 
 rule denv_mapper:
     input:
-        primer1 = expand(os.path.join(config["indir"], "{name}", "{name}{filestem}"), name=config["sample_list"], filestem = {config['fastq_filestem_R1']}),
-        primer2 = expand(os.path.join(config["indir"], "{name}", "{name}{filestem}"), name=config["sample_list"], filestem = {config['fastq_filestem_R2']}),
+        primer1 = (os.path.join(config["indir"], "{sample}", "".join(["{sample}", config["fastq_filestem_R1"]]))),
+        primer2 = (os.path.join(config["indir"], "{sample}", "".join(["{sample}", config["fastq_filestem_R1"]])))
     output:
-        temp_call_files = expand(os.path.join(config["outdir"], "tmp.{sample}.serotype.calls.{depth}.txt"), sample=config["sample_list"], depth=config["depth"]),
-        sample_serotype_calls = expand(os.path.join(config["outdir"], "{sample}.serotype.calls.txt"), sample=config["sample_list"]),
-        bam_files = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.sort.bam"), sample=config["sample_list"], virus_type=config["option_list"]),
-        out_alns = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.out.aln"), sample=config["sample_list"], virus_type=config["option_list"], depth=config["depth"]),
-        consensus = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.cons.fa"), sample=config["sample_list"], virus_type=config["option_list"], depth=config["depth"])
+        temp_call_files = (os.path.join(config["outdir"], ".".join(["tmp.{sample}.serotype.calls", str(config["depth"]), "txt"]))),
+        sample_serotype_calls = (os.path.join(config["outdir"], "{sample}.serotype.calls.txt"))
+        # bam_files = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.sort.bam"), sample=config["sample_list"], virus_type=config["option_list"]),
+        # out_alns = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.out.aln"), sample=config["sample_list"], virus_type=config["option_list"], depth=config["depth"]),
+        # consensus = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.cons.fa"), sample=config["sample_list"], virus_type=config["option_list"], depth=config["depth"])
     params:
         mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh"),
         primer_dir = config["primer_directory"],
         depth = config["depth"],
         outdir = config["outdir"],
-        sample_name = expand("{name}", name=config["sample_list"])
+        python_script = os.path.join(workflow.current_basedir,"serotypeCaller.py"),
+        # sample_name = expand("{name}", name=config["sample_list"])
     resources:
         partition="general",
         mem_mb_per_cpu="10G",
         cpus_per_task=1
     shell:
-        "{params.mapper_script} {params.sample_name} {input.primer1} {input.primer2} {params.primer_dir} {params.depth} {params.outdir}"
+        "{params.mapper_script} {wildcards.sample} {input.primer1} {input.primer2} {params.primer_dir} {params.python_script} {params.depth} {params.outdir}"
 
 
 
@@ -109,11 +110,11 @@ rule denv_mapper:
 
 rule denv_summary:
     input:
-        sample_serotype_calls = rules.denv_mapper.output.sample_serotype_calls,
-        bam_files = rules.denv_mapper.output.bam_files,
-        alignments = rules.denv_mapper.output.out_alns,
-        consensus = rules.denv_mapper.output.consensus,
-        temp_call_files = rules.denv_mapper.output.temp_call_files,
+        sample_serotype_calls = expand(os.path.join(config["outdir"], "{sample}.serotype.calls.txt"), sample=config["sample_list"]),
+        # bam_files = rules.denv_mapper.output.bam_files,
+        # alignments = rules.denv_mapper.output.out_alns,
+        # consensus = rules.denv_mapper.output.consensus,
+        temp_call_files = expand(os.path.join(config["outdir"], "tmp.{sample}.serotype.calls.{depth}.txt"), sample=config["sample_list"], depth=config["depth"])
     output:
         denv_serotype_calls = os.path.join(config["outdir"], "DENV.serotype.calls.tsv"),
         all_sample_summary = os.path.join(config["outdir"],"summary.all.samples.tsv"),

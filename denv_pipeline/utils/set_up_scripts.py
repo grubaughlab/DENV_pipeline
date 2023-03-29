@@ -58,9 +58,7 @@ def find_fastq_names(config):
 
     for sample in config["sample_list"]:
         for file in os.listdir(os.path.join(config["indir"], sample)):
-           print(file)
            if "fastq" in file and "R1" in file:
-               print("here")
                config["fastq_filestem_R1"] = file.lstrip(sample)
                config["fastq_filestem_R2"] = file.lstrip(sample).replace("R1", "R2")
 
