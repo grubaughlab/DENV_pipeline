@@ -82,7 +82,8 @@ def main(sysargs = sys.argv[1:]):
     if args.symlink:
         config = set_up_scripts.symlink_setup(config, cwd)
 
-    config=set_up_scripts.get_sample_list(config)
+    config = set_up_scripts.get_sample_list(config)
+    conifg = set_up_scripts.find_fastq_names(config)
     error_checks.check_input_files(config)
     
     if args.primer_directory:

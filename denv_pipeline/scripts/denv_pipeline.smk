@@ -55,9 +55,8 @@ rule all:
 
 rule denv_mapper:
     input:
-        primer1 = expand(os.path.join(config["indir"], {name}, "*R1*"), name=config["sample_list"]),
-        primer2 = expand(os.path.join(config["indir"], {name}, "*R2*"), name=config["sample_list"]),
-        sample_name = expand({name}, name=config["sample_list"])
+        primer1 = expand(os.path.join(config["indir"], "{name}", "{name}{filestem}"), name=config["sample_list"], filestem = {config['fastq_filestem_R1']}),
+        primer2 = expand(os.path.join(config["indir"], "{name}", "{name}{filestem}"), name=config["sample_list"], filestem = {config['fastq_filestem_R2']}),
     output:
         temp_call_files = expand(os.path.join(config["outdir"], "tmp.{sample}.serotype.calls.{depth}.txt"), sample=config["sample_list"], depth=config["depth"]),
         sample_serotype_calls = expand(os.path.join(config["outdir"], "{sample}.serotype.calls.txt"), sample=config["sample_list"]),
@@ -68,13 +67,14 @@ rule denv_mapper:
         mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh"),
         primer_dir = config["primer_directory"],
         depth = config["depth"],
-        outdir = config["outdir"]
+        outdir = config["outdir"],
+        sample_name = expand("{name}", name=config["sample_list"])
     resources:
         partition="general",
         mem_mb_per_cpu="10G",
         cpus_per_task=1
     shell:
-        "{params.mapper_script} {input.sample_name} {input.primer1} {input.primer2} {params.primer_dir} {params.depth} {params.outdir}"
+        "{params.mapper_script} {params.sample_name} {input.primer1} {input.primer2} {params.primer_dir} {params.depth} {params.outdir}"
 
 
 
