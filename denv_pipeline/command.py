@@ -113,7 +113,7 @@ def main(sysargs = sys.argv[1:]):
             print((f" - {k}: ") + f"{config[k]}")
     if config["slurm"]:
         status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
-                                workdir=cwd,config=config,lock=False, slurm=True
+                                workdir=cwd,config=config,lock=False, slurm=True, cores=4
                                 )
     else:
         status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
