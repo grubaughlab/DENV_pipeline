@@ -71,8 +71,8 @@ rule denv_mapper:
         outdir = config["outdir"]
     resources:
         partition="general",
-        mem-per-cpu="10G",
-        cpus-per-task=1
+        mem_mb_per_cpu="10G",
+        cpus_per_task=1
     shell:
         "{params.mapper_script} {input.sample_name} {input.primer1} {input.primer2} {params.primer_dir} {params.depth} {params.outdir}"
 
