@@ -10,11 +10,11 @@ outdir=$7
 #sort out output files - probably mostly change names so they make sense
 #do proper log files - name them by the sample name put them in a folder.
 #currently the log gets written to dsq-jobs-XXXX.out on HPC - either change dsq file or rename jobs file afterwards
-cat ${primer_dir}/refs.txt | while read virustype; do 
+cat ${primer_dir}refs.txt | while read virustype; do 
 
-    fasta=${primer_dir}/${virustype}.fasta
-    bed=${primer_dir}/${virustype}.bed
-    trimbed=${primer_dir}/${virustype}.trim.bed
+    fasta=${primer_dir}${virustype}.fasta
+    bed=${primer_dir}${virustype}.bed
+    trimbed=${primer_dir}${virustype}.trim.bed
 
     echo "----->>>>>Mapping reads against serotype "${virustype}" reference sequence"
     bwa mem -v 1 -t 16 ${fasta} $read1 $read2 | samtools view -bS -F 4 -F 2048 | samtools sort -o ${outdir}/${fname%.*}.${virustype}.bam > /dev/null 2>&1

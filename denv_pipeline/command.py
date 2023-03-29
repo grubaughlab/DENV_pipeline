@@ -87,7 +87,10 @@ def main(sysargs = sys.argv[1:]):
     error_checks.check_input_files(config)
     
     if args.primer_directory:
-        config["primer_directory"] = args.primer_directory
+        if not args.primer_directory.endswith("/"):
+            config["primer_directory"] = f'{args.primer_directory}/'
+        else:
+            config["primer_directory"] = args.primer_directory
     else:
         if config["verbose"]:
             print("Using DENV primers")
