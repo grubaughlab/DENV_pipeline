@@ -12,45 +12,45 @@ cwd = os.getcwd()
 
 rule all: 
     input:
-        os.path.join(config["outdir"], "samples.txt"),
-        os.path.join(config["outdir"], "jobs.txt"),
+        # os.path.join(config["outdir"], "samples.txt"),
+        # os.path.join(config["outdir"], "jobs.txt"),
         os.path.join(config["outdir"], "results", "DENV.serotype.calls.tsv"),
         os.path.join(config["outdir"], "results", "variant_plot.pdf")
 
-rule setup:
-    output:
-        sample_file = os.path.join(config["outdir"], "samples.txt"),
-    params:
-        tempdir = config["tempdir"],
-        indir = config["indir"]
-    run:
-        with open(output.sample_file, "w") as fw:
-            for sample_dir in os.listdir(params.indir):
-                if os.path.isdir(os.path.join(params.indir, sample_dir)):
-                    if sample_dir != "download" and os.path.join(params.indir, sample_dir) != params.tempdir and sample_dir != "results":
-                        fw.write(sample_dir + "\n")
+# rule setup:
+#     output:
+#         sample_file = os.path.join(config["outdir"], "samples.txt"),
+#     params:
+#         tempdir = config["tempdir"],
+#         indir = config["indir"]
+#     run:
+#         with open(output.sample_file, "w") as fw:
+#             for sample_dir in os.listdir(params.indir):
+#                 if os.path.isdir(os.path.join(params.indir, sample_dir)):
+#                     if sample_dir != "download" and os.path.join(params.indir, sample_dir) != params.tempdir and sample_dir != "results":
+#                         fw.write(sample_dir + "\n")
 
-rule prepare_jobs:
-    output:
-        jobs = os.path.join(config["outdir"], "jobs.txt"),
-    input:
-        sample_file = rules.setup.output.sample_file,
-        mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh"),
-        primer_dir = config["primer_directory"],
-        python_script = os.path.join(workflow.current_basedir,"serotypeCaller.py")
-    params:
-        outdir = config["outdir"],
-        indir = config["indir"],
-        depth = config["depth"]
-    run:
-        with open(output.jobs, 'w') as fw:
-            with open(input.sample_file) as f:
-                for l in f:
-                    name = l.strip("\n")
-                    basename = name.split("_")[0]
-                    primer1 = f"{name}/*R1*"
-                    primer2 = f"{name}/*R2*"
-                    fw.write(f'bash {input.mapper_script} {basename} {os.path.join(params.indir, primer1)} {os.path.join(params.indir, primer2)} {input.primer_dir} {input.python_script} {params.depth} {params.outdir}\n')
+# rule prepare_jobs:
+#     output:
+#         jobs = os.path.join(config["outdir"], "jobs.txt"),
+#     input:
+#         sample_file = rules.setup.output.sample_file,
+#         mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh"),
+#         primer_dir = config["primer_directory"],
+#         python_script = os.path.join(workflow.current_basedir,"serotypeCaller.py")
+#     params:
+#         outdir = config["outdir"],
+#         indir = config["indir"],
+#         depth = config["depth"]
+#     run:
+#         with open(output.jobs, 'w') as fw:
+#             with open(input.sample_file) as f:
+#                 for l in f:
+#                     name = l.strip("\n")
+#                     basename = name.split("_")[0]
+#                     primer1 = f"{name}/*R1*"
+#                     primer2 = f"{name}/*R2*"
+#                     fw.write(f'bash {input.mapper_script} {basename} {os.path.join(params.indir, primer1)} {os.path.join(params.indir, primer2)} {input.primer_dir} {input.python_script} {params.depth} {params.outdir}\n')
 
 
 rule denv_mapper:
@@ -70,9 +70,9 @@ rule denv_mapper:
         depth = config["depth"],
         outdir = config["outdir"]
     resources:
-        partition:"general",
-        mem-per-cpu:"10G",
-        cpus-per-task:1
+        partition="general",
+        mem-per-cpu="10G",
+        cpus-per-task=1
     shell:
         "{params.mapper_script} {input.sample_name} {input.primer1} {input.primer2} {params.primer_dir} {params.depth} {params.outdir}"
 
