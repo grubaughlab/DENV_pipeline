@@ -11,7 +11,7 @@ dependencies:
   - samtools
   - bedtools
   - bwa
-  - ivar
+  - ivar=1.4
   - nextalign=2.11.0
   - mafft
   - snakemake-minimal

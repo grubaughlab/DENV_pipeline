@@ -30,7 +30,8 @@ cat ${primer_dir}refs.txt | while read virustype; do
 
 #where the loop for depth starts
     echo "----->>>>>Generating consensus sequence"
-    samtools mpileup -aa --reference ${fasta} -A -d 10000 -Q 0 ${outdir}/${fname%.*}.${virustype}.sort.bam | ivar consensus -t 0.75 -m ${depth} -p ${outdir}/${fname%.*}.${virustype}.${depth}.cons -i ${fname%.*}"/"${fname%.*}.${virustype}.${depth}.cons".fa" > /dev/null 2>&1
+    echo'samtools mpileup -aa --reference ${fasta} -A -d 10000 -Q 0 ${outdir}/${fname%.*}.${virustype}.sort.bam | ivar consensus -t 0.75 -m ${depth} -p ${outdir}/${fname%.*}.${virustype}.${depth}.cons -i ${fname%.*}"/"${fname%.*}.${virustype}.${depth}.cons".fa"'
+    samtools mpileup -aa --reference ${fasta} -A -d 10000 -Q 0 ${outdir}/${fname%.*}.${virustype}.sort.bam | ivar consensus -t 0.75 -m ${depth} -p ${outdir}/${fname%.*}.${virustype}.${depth}.cons -i ${fname%.*}"/"${fname%.*}.${virustype}.${depth}.cons.fa > /dev/null 2>&1
     
     echo "----->>>>>Aligning consensus cps sequence against the reference serotype "${virustype}" cps sequence"
     nextalign run  --reference ${fasta} --output-fasta ${outdir}/${fname%.*}.${virustype}.${depth}.out.aln ${outdir}/${fname%.*}.${virustype}.${depth}.cons.fa
