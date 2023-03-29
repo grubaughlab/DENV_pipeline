@@ -20,7 +20,7 @@ If step 2 fails on a server because of a "bus error", then first run the command
 As a minimum you need fastQ files to analyse. There are two ways you can provide these:
 
 1. If you are running on the Yale cluster using their symlinks, simply provide the symlink emailed to you by YCRC (the second half of the link) using ``--symlink`` and the pipeline will deal with it for you.
-2. Otherwise, must be separately in their own folder named by sample. In each file, must have the forward and reverse fastq files, defined by them containing "R1" and "R2" somewhere in the name. See example input file for more information.
+2. Otherwise, must be separately in their own folder named by sample. In each file, must have the forward and reverse fastq files, defined by them containing "R1" and "R2" somewhere in the name and with the sample name at the start of the file name. See example input file for more information.
 
 
 - For the second option, you can use ``--indir`` to indicate where the folders of samples are kept. Default is the same as the output directory (this is for when you already have a input/output folder where you're working)
