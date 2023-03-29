@@ -55,34 +55,57 @@ rule prepare_jobs:
 
 rule denv_mapper:
     input:
-        jobs = rules.prepare_jobs.output.jobs
+        primer1 = expand(os.path.join(config["indir"], {name}, "*R1*"), name=config["sample_list"]),
+        primer2 = expand(os.path.join(config["indir"], {name}, "*R2*"), name=config["sample_list"]),
+        sample_name = expand({name}, name=config["sample_list"])
     output:
         temp_call_files = expand(os.path.join(config["outdir"], "tmp.{sample}.serotype.calls.{depth}.txt"), sample=config["sample_list"], depth=config["depth"]),
         sample_serotype_calls = expand(os.path.join(config["outdir"], "{sample}.serotype.calls.txt"), sample=config["sample_list"]),
         bam_files = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.sort.bam"), sample=config["sample_list"], virus_type=config["option_list"]),
         out_alns = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.out.aln"), sample=config["sample_list"], virus_type=config["option_list"], depth=config["depth"]),
-        consensus = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.cons.fa"), sample=config["sample_list"], virus_type=config["option_list"], depth=config["depth"]),
-        status = os.path.join(config["outdir"], "status.txt")
+        consensus = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.cons.fa"), sample=config["sample_list"], virus_type=config["option_list"], depth=config["depth"])
     params:
-        outdir = config["outdir"],
-        mapper_script = os.path.join(workflow.current_basedir,"mapper_done_slurm.sh")
-    run:    
-        if config["slurm"]:
-            print("preparing for slurm run")
-            shell("""module load dSQ; 
-            dsq --job-name denv.mapper --job-file {input.jobs:q} --mem-per-cpu=10G --cpus-per-task=1""")
+        mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh"),
+        primer_dir = config["primer_directory"],
+        depth = config["depth"],
+        outdir = config["outdir"]
+    resources:
+        partition:"general",
+        mem-per-cpu:"10G",
+        cpus-per-task:1
+    shell:
+        "{params.mapper_script} {input.sample_name} {input.primer1} {input.primer2} {params.primer_dir} {params.depth} {params.outdir}"
+
+
+
+# rule denv_mapper:
+#     input:
+#         jobs = rules.prepare_jobs.output.jobs
+#     output:
+#         temp_call_files = expand(os.path.join(config["outdir"], "tmp.{sample}.serotype.calls.{depth}.txt"), sample=config["sample_list"], depth=config["depth"]),
+#         sample_serotype_calls = expand(os.path.join(config["outdir"], "{sample}.serotype.calls.txt"), sample=config["sample_list"]),
+#         bam_files = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.sort.bam"), sample=config["sample_list"], virus_type=config["option_list"]),
+#         out_alns = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.out.aln"), sample=config["sample_list"], virus_type=config["option_list"], depth=config["depth"]),
+#         consensus = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.cons.fa"), sample=config["sample_list"], virus_type=config["option_list"], depth=config["depth"])
+#     params:
+#         outdir = config["outdir"],
+#         mapper_script = os.path.join(workflow.current_basedir,"mapper_done_slurm.sh")
+#     run:    
+#         if config["slurm"]:
+#             print("preparing for slurm run")
+#             shell("""module load dSQ; 
+#             dsq --job-name denv.mapper --job-file {input.jobs:q} --mem-per-cpu=10G --cpus-per-task=1""")
              
-            filename = f"dsq-jobs-{dt.datetime.today().date()}.sh"
-            shell("""OUT=$(sbatch --parsable {filename})
-            sbatch --depend=afterok:$OUT {params.mapper_script} {params.outdir}""") 
+#             filename = f"dsq-jobs-{dt.datetime.today().date()}.sh"
+#             shell("sbatch {filename}")
         
-        else:
-            print("running each sample sequentially")
-            with open(input.jobs) as f:
-                for l in f:
-                    command = l.strip("\n")
-                    shell("{command}")
-            shell("touch {output.status}")
+#         else:
+#             print("running each sample sequentially")
+#             with open(input.jobs) as f:
+#                 for l in f:
+#                     command = l.strip("\n")
+#                     shell("{command}")
+#             shell("touch {output.status}")
 
 rule denv_summary:
     input:
