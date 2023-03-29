@@ -1,4 +1,4 @@
-name: denv_pipeline
+name: test
 channels:
   - conda-forge
   - bioconda
@@ -13,7 +13,7 @@ dependencies:
   - bedtools=2.30
   - bwa
   - ivar=1.3.1
-  - nextalign=2.1.1
+  - nextalign
   - mafft
   - snakemake-minimal
   - openssl=1.1.1s
