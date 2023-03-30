@@ -20,7 +20,7 @@ def main(sysargs = sys.argv[1:]):
 
     parser = argparse.ArgumentParser(add_help=False, description=misc.header(__version__))
 
-    parser.add_argument("--symlink", dest="symlink", help="argument for generating symlinks", default=None)
+    parser.add_argument("--symlink", dest="symlink", help="argument for generating symlinks", default=False)
     parser.add_argument("--indir", help="directory containing samples. Each sample must be a folder with the forward and reverse runs in. Default is same as output directory")
     parser.add_argument("--outdir", dest="outdir", help="location where files will be stored.")
     parser.add_argument("--primer-directory", "-pd", help="location where bed files etc for references are")
@@ -35,9 +35,9 @@ def main(sysargs = sys.argv[1:]):
     parser.add_argument("--help", "-h", action="store_true", dest="help")
     parser.add_argument("--overwrite", help="overwrite current results", action="store_true")
 
-    parser.add_argument("--ct-file",dest="ct_file", help="to produce a plot of Ct against coverage, provide a csv file containing Ct information by sample", default=None)
-    parser.add_argument("--ct-column", dest="ct_column", help="Name of Ct column in Ct file for plot", default=None)
-    parser.add_argument("--id-column", dest="id_column", help="Name of ID column in Ct file to make Ct plot", default=None)
+    parser.add_argument("--ct-file",dest="ct_file", help="to produce a plot of Ct against coverage, provide a csv file containing Ct information by sample", default=False)
+    parser.add_argument("--ct-column", dest="ct_column", help="Name of Ct column in Ct file for plot", default=False)
+    parser.add_argument("--id-column", dest="id_column", help="Name of ID column in Ct file to make Ct plot", default=False)
 
     if len(sysargs)<1: 
         parser.print_help()
@@ -114,7 +114,6 @@ def main(sysargs = sys.argv[1:]):
         print("\n**** CONFIG ****")
         for k in sorted(config):
             print((f" - {k}: ") + f"{config[k]}")
-    
     
     if config["slurm"]:
         status = snakemake.snakemake(snakefile, printshellcmds=False, forceall=True, force_incomplete=True,
