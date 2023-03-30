@@ -12,46 +12,8 @@ cwd = os.getcwd()
 
 rule all: 
     input:
-        # os.path.join(config["outdir"], "samples.txt"),
-        # os.path.join(config["outdir"], "jobs.txt"),
         os.path.join(config["outdir"], "results", "DENV.serotype.calls.tsv"),
         os.path.join(config["outdir"], "results", "variant_plot.pdf")
-
-# rule setup:
-#     output:
-#         sample_file = os.path.join(config["outdir"], "samples.txt"),
-#     params:
-#         tempdir = config["tempdir"],
-#         indir = config["indir"]
-#     run:
-#         with open(output.sample_file, "w") as fw:
-#             for sample_dir in os.listdir(params.indir):
-#                 if os.path.isdir(os.path.join(params.indir, sample_dir)):
-#                     if sample_dir != "download" and os.path.join(params.indir, sample_dir) != params.tempdir and sample_dir != "results":
-#                         fw.write(sample_dir + "\n")
-
-# rule prepare_jobs:
-#     output:
-#         jobs = os.path.join(config["outdir"], "jobs.txt"),
-#     input:
-#         sample_file = rules.setup.output.sample_file,
-#         mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh"),
-#         primer_dir = config["primer_directory"],
-#         python_script = os.path.join(workflow.current_basedir,"serotypeCaller.py")
-#     params:
-#         outdir = config["outdir"],
-#         indir = config["indir"],
-#         depth = config["depth"]
-#     run:
-#         with open(output.jobs, 'w') as fw:
-#             with open(input.sample_file) as f:
-#                 for l in f:
-#                     name = l.strip("\n")
-#                     basename = name.split("_")[0]
-#                     primer1 = f"{name}/*R1*"
-#                     primer2 = f"{name}/*R2*"
-#                     fw.write(f'bash {input.mapper_script} {basename} {os.path.join(params.indir, primer1)} {os.path.join(params.indir, primer2)} {input.primer_dir} {input.python_script} {params.depth} {params.outdir}\n')
-
 
 rule denv_mapper:
     input:
@@ -60,22 +22,20 @@ rule denv_mapper:
     output:
         temp_call_files = (os.path.join(config["outdir"], ".".join(["tmp.{sample}.serotype.calls", str(config["depth"]), "txt"]))),
         sample_serotype_calls = (os.path.join(config["outdir"], "{sample}.serotype.calls.txt"))
-        # bam_files = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.sort.bam"), sample=config["sample_list"], virus_type=config["option_list"]),
-        # out_alns = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.out.aln"), sample=config["sample_list"], virus_type=config["option_list"], depth=config["depth"]),
-        # consensus = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.cons.fa"), sample=config["sample_list"], virus_type=config["option_list"], depth=config["depth"])
+    log:
+        os.path.join(config["outdir"], "log_files", "_".join(["{sample}", "mapping.log"]))
     params:
         mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh"),
         primer_dir = config["primer_directory"],
         depth = config["depth"],
         outdir = config["outdir"],
         python_script = os.path.join(workflow.current_basedir,"serotypeCaller.py"),
-        # sample_name = expand("{name}", name=config["sample_list"])
     resources:
         partition="general",
         mem_mb_per_cpu="10G",
         cpus_per_task=1
     shell:
-        "{params.mapper_script} {wildcards.sample} {input.primer1} {input.primer2} {params.primer_dir} {params.python_script} {params.depth} {params.outdir}"
+        "{params.mapper_script} {wildcards.sample} {input.primer1} {input.primer2} {params.primer_dir} {params.python_script} {params.depth} {params.outdir} {log}  >> {log} 2>&1"
 
 
 
@@ -111,9 +71,6 @@ rule denv_mapper:
 rule denv_summary:
     input:
         sample_serotype_calls = expand(os.path.join(config["outdir"], "{sample}.serotype.calls.txt"), sample=config["sample_list"]),
-        # bam_files = rules.denv_mapper.output.bam_files,
-        # alignments = rules.denv_mapper.output.out_alns,
-        # consensus = rules.denv_mapper.output.consensus,
         temp_call_files = expand(os.path.join(config["outdir"], "tmp.{sample}.serotype.calls.{depth}.txt"), sample=config["sample_list"], depth=config["depth"])
     output:
         denv_serotype_calls = os.path.join(config["outdir"], "DENV.serotype.calls.tsv"),
@@ -124,6 +81,8 @@ rule denv_summary:
         results_dir = os.path.join(config["outdir"], "results"),
         outdir = config["outdir"],
         python_script = os.path.join(workflow.current_basedir,"make_summary_files.py")
+    log:
+        os.path.join(config["outdir"], "log_files", "summary.log")
     run:
         make_directory(params.results_dir)
         make_directory(os.path.join(params.results_dir, "bam_files"))
@@ -161,6 +120,8 @@ rule make_qc_plots:
         variant_plot = os.path.join(config["outdir"], "results", "variant_plot.pdf")
     params:
         results_dir = rules.denv_summary.params.results_dir
+    log:
+        os.path.join(config["outdir"], "log_files", "qc_plots.log")
     run:
 
         serotype_dict, colour_dict, patch_list = prepare_for_plots(input.serotype_calls_file)
@@ -183,6 +144,8 @@ rule tidy_up:
         temp_files = ["cons.qual.txt","bam", "sort.bam.bai", "trimmed.bam", "tmp.*.serotype.calls.*.txt", "serotype.calls.txt", "variants.tsv"],
         tempdir = config["tempdir"],
         results_dir = os.path.join(config["outdir"], "results")
+    log:
+        os.path.join(config["outdir"], "log_files", "tidy_up.log")
     run:
         move_temp_files(config, params.temp_files, params.tempdir)
         clean_up_alignment_components(config, params.tempdir)

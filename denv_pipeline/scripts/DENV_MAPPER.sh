@@ -6,10 +6,9 @@ primer_dir=$4
 serotype_caller=$5
 depth=$6
 outdir=$7
+log=$8
 
 #sort out output files - probably mostly change names so they make sense
-#do proper log files - name them by the sample name put them in a folder.
-#currently the log gets written to dsq-jobs-XXXX.out on HPC - either change dsq file or rename jobs file afterwards
 cat ${primer_dir}refs.txt | while read virustype; do 
 
     fasta=${primer_dir}${virustype}.fasta
@@ -17,24 +16,23 @@ cat ${primer_dir}refs.txt | while read virustype; do
     trimbed=${primer_dir}${virustype}.trim.bed
 
     echo "----->>>>>Mapping reads against serotype "${virustype}" reference sequence"
-    bwa mem -v 1 -t 16 ${fasta} $read1 $read2 | samtools view -bS -F 4 -F 2048 | samtools sort -o ${outdir}/${fname%.*}.${virustype}.bam > /dev/null 2>&1
+    bwa mem -v 1 -t 16 ${fasta} $read1 $read2 | samtools view -bS -F 4 -F 2048 | samtools sort -o ${outdir}/${fname%.*}.${virustype}.bam >> ${log} 2>&1
 
     echo "----->>>>>Trimming bam file"
-    ivar trim -e -i ${outdir}/${fname%.*}.${virustype}.bam -b ${bed} -p ${outdir}/${fname%.*}.${virustype}.trimmed.bam > /dev/null 2>&1
+    ivar trim -e -i ${outdir}/${fname%.*}.${virustype}.bam -b ${bed} -p ${outdir}/${fname%.*}.${virustype}.trimmed.bam >> ${log} 2>&1
 
     echo "----->>>>>Sorting bam file"
-    samtools sort ${outdir}/${fname%.*}.${virustype}.trimmed.bam -o ${outdir}/${fname%.*}.${virustype}.sort.bam > /dev/null 2>&1
+    samtools sort ${outdir}/${fname%.*}.${virustype}.trimmed.bam -o ${outdir}/${fname%.*}.${virustype}.sort.bam >> ${log} 2>&1
 
     echo "----->>>>>Indexing bam file"
-    samtools index ${outdir}/${fname%.*}.${virustype}.sort.bam > /dev/null 2>&1
+    samtools index ${outdir}/${fname%.*}.${virustype}.sort.bam >> ${log} 2>&1
 
 #where the loop for depth starts
     echo "----->>>>>Generating consensus sequence"
-    echo'samtools mpileup -aa --reference ${fasta} -A -d 10000 -Q 0 ${outdir}/${fname%.*}.${virustype}.sort.bam | ivar consensus -t 0.75 -m ${depth} -p ${outdir}/${fname%.*}.${virustype}.${depth}.cons -i ${fname%.*}"/"${fname%.*}.${virustype}.${depth}.cons".fa"'
-    samtools mpileup -aa --reference ${fasta} -A -d 10000 -Q 0 ${outdir}/${fname%.*}.${virustype}.sort.bam | ivar consensus -t 0.75 -m ${depth} -p ${outdir}/${fname%.*}.${virustype}.${depth}.cons -i ${fname%.*}"/"${fname%.*}.${virustype}.${depth}.cons.fa > /dev/null 2>&1
+    samtools mpileup -aa --reference ${fasta} -A -d 10000 -Q 0 ${outdir}/${fname%.*}.${virustype}.sort.bam | ivar consensus -t 0.75 -m ${depth} -p ${outdir}/${fname%.*}.${virustype}.${depth}.cons -i ${fname%.*}"/"${fname%.*}.${virustype}.${depth}.cons.fa >> ${log} 2>&1
     
     echo "----->>>>>Aligning consensus cps sequence against the reference serotype "${virustype}" cps sequence"
-    nextalign run  --reference ${fasta} --output-fasta ${outdir}/${fname%.*}.${virustype}.${depth}.out.aln ${outdir}/${fname%.*}.${virustype}.${depth}.cons.fa
+    nextalign run  --reference ${fasta} --output-fasta ${outdir}/${fname%.*}.${virustype}.${depth}.out.aln ${outdir}/${fname%.*}.${virustype}.${depth}.cons.fa >> ${log} 2>&1
     
     if [ -f ${outdir}/${fname%.*}.${virustype}.${depth}.out.aln ]; then
         echo "----->>>>>Aligning with nextalign successful"
@@ -47,14 +45,13 @@ cat ${primer_dir}refs.txt | while read virustype; do
     #to put depth loop back in here, add depth to output name
     echo "----->>>>>Calculating percentage coverage against serotype "${virustype}" cps reference sequence"
     if [ -s ${trimbed} ]; then
-        echo "python ${serotype_caller} --alignment ${outdir}/${fname%.*}.${virustype}.${depth}.out.aln --bed-file ${trimbed} >> ${outdir}/${fname%.*}.serotype.calls.txt"
         python ${serotype_caller} --alignment ${outdir}/${fname%.*}.${virustype}.${depth}.out.aln --bed-file ${trimbed} >> ${outdir}/${fname%.*}.serotype.calls.txt
     else
         python ${serotype_caller}  --alignment ${outdir}/${fname%.*}.${dentype}.${depth}.out.aln  >> ${outdir}/${fname%.*}.serotype.calls.txt
     fi
 
     echo "----->>>>>Identifying variants"
-    samtools mpileup -aa --reference ${fasta} -A -d 0 -Q 0 ${outdir}/${fname%.*}.${virustype}.sort.bam | ivar variants -p ${outdir}/${fname%.*}.${virustype}.${depth}.variants -q 20 -t 0.03 -r ${fasta} 
+    samtools mpileup -aa --reference ${fasta} -A -d 0 -Q 0 ${outdir}/${fname%.*}.${virustype}.sort.bam | ivar variants -p ${outdir}/${fname%.*}.${virustype}.${depth}.variants -q 20 -t 0.03 -r ${fasta} >> ${log} 2>&1
 
     #depth loop finishes here
     

@@ -36,11 +36,8 @@ def overwrite(config):
         shutil.rmtree(config["tempdir"], ignore_errors=True)
     if os.path.exists(os.path.join(config["outdir"], "downloads")):
         shutil.rmtree(os.path.join(config["outdir"], "downloads"), ignore_errors=True)
-    
-    if os.path.exists(os.path.join(config["outdir"], "samples.txt")):
-        os.remove(os.path.join(config["outdir"], "samples.txt"))
-    if os.path.exists(os.path.join(config["outdir"], "jobs.txt")):
-        os.remove(os.path.join(config["outdir"], "jobs.txt"))
+    if os.path.exists(os.path.join(config["outdir"], "log_files")):
+        shutil.rmtree(os.path.join(config["outdir"], "log_files"), ignore_errors=True)
 
 
 def move_temp_files(config, temp_files, dest):

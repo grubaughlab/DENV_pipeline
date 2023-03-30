@@ -54,6 +54,11 @@ def make_folders(config):
             if not os.path.exists(config["tempdir"]):
                 os.mkdir(config["tempdir"])
 
+    if not os.path.exists(os.path.join(config["outdir"], "log_files")):
+        os.mkdir(os.path.join(config["outdir"], "log_files"))
+    
+
+
 def find_fastq_names(config):
 
     for sample in config["sample_list"]:
