@@ -35,7 +35,7 @@ rule denv_mapper:
         mem_mb_per_cpu="10G",
         cpus_per_task=1
     shell:
-        "{params.mapper_script} {wildcards.sample} {input.primer1} {input.primer2} {params.primer_dir} {params.python_script} {params.depth} {params.outdir} {log}  >> {log} 2>&1"
+        "{params.mapper_script} {wildcards.sample} {input.primer1} {input.primer2} {params.primer_dir} {params.python_script} {params.depth} {params.outdir} {log.log}  >> {log.log} 2>&1"
 
 
 
