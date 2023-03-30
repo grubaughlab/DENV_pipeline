@@ -45,9 +45,9 @@ rule denv_mapper:
 #     output:
 #         temp_call_files = expand(os.path.join(config["outdir"], "tmp.{sample}.serotype.calls.{depth}.txt"), sample=config["sample_list"], depth=config["depth"]),
 #         sample_serotype_calls = expand(os.path.join(config["outdir"], "{sample}.serotype.calls.txt"), sample=config["sample_list"]),
-#         bam_files = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.sort.bam"), sample=config["sample_list"], virus_type=config["option_list"]),
-#         out_alns = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.out.aln"), sample=config["sample_list"], virus_type=config["option_list"], depth=config["depth"]),
-#         consensus = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.cons.fa"), sample=config["sample_list"], virus_type=config["option_list"], depth=config["depth"])
+#         bam_files = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.sort.bam"), sample=config["sample_list"], virus_type=config["virus_type_list"]),
+#         out_alns = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.out.aln"), sample=config["sample_list"], virus_type=config["virus_type_list"], depth=config["depth"]),
+#         consensus = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.cons.fa"), sample=config["sample_list"], virus_type=config["virus_type_list"], depth=config["depth"])
 #     params:
 #         outdir = config["outdir"],
 #         mapper_script = os.path.join(workflow.current_basedir,"mapper_done_slurm.sh")
@@ -104,7 +104,7 @@ rule denv_summary:
         shell('ls {input.sample_serotype_calls} | while read i; do cat $i | sort -k8 -n -r | head -1 >> {output.top_serotype_calls_all}; done')
         
         alignment_dir = os.path.join(params.results_dir, "alignments")
-        for virus_type in config["option_list"]:
+        for virus_type in config["virus_type_list"]:
             for file_name in os.listdir(alignment_dir):
                 if virus_type in file_name:
                     if "trim" in file_name:

@@ -100,11 +100,11 @@ def get_right_serotype_files(config, serotypes):
     variant_frequencies = set()    
     alignments = set()
     depth = config["depth"]
-    full_option_list = config["option_list"]
+    full_virus_type_list = config["virus_type_list"]
     
     unwanted = []
     for sample, serotype_lst in serotypes.items():
-        for option in full_option_list:
+        for option in full_virus_type_list:
             
             bam_file = f'{sample}.{option}.sort.bam'
             consensus_file = f'{sample}.{option}.{depth}.cons.fa'

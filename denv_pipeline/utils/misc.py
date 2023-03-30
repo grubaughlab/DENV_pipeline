@@ -29,17 +29,6 @@ def make_directory(dir_path):
         os.mkdir(dir_path)
 
 
-def overwrite(config):
-
-    shutil.rmtree(os.path.join(config["outdir"], "results"), ignore_errors=True)
-    if os.path.exists(config["tempdir"]):
-        shutil.rmtree(config["tempdir"], ignore_errors=True)
-    if os.path.exists(os.path.join(config["outdir"], "downloads")):
-        shutil.rmtree(os.path.join(config["outdir"], "downloads"), ignore_errors=True)
-    if os.path.exists(os.path.join(config["outdir"], "log_files")):
-        shutil.rmtree(os.path.join(config["outdir"], "log_files"), ignore_errors=True)
-
-
 def move_temp_files(config, temp_files, dest):
 
     contains_depth = ["cons.qual.txt", "variants.tsv"]
@@ -58,7 +47,7 @@ def move_temp_files(config, temp_files, dest):
                     os.remove(os.path.join(config["outdir"], name))
             
             else:
-                for option in config["option_list"]:
+                for option in config["virus_type_list"]:
                     if ".bam" in file_pattern:
                         if ".sort" in file_pattern and ".bai" not in file_pattern:
                             pass
@@ -82,7 +71,7 @@ def clean_up_alignment_components(config, temp_dir):
     path = os.path.join(config["outdir"],"results", "alignments")
     depth = config["depth"]
     components = []
-    for option in config["option_list"]:
+    for option in config["virus_type_list"]:
         for sample in config["sample_list"]:
             file1 = f'{sample}.{option}.{depth}.out.aln'
             file2 = f'{sample}.{option}.{depth}.out.trim.aln'

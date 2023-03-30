@@ -1,10 +1,21 @@
 import os 
 import sys
 import shutil
+import pkg_resources
 
 
 from denv_pipeline.utils.misc import *
+from denv_pipeline.utils import error_checks
 
+def overwrite(config):
+
+    shutil.rmtree(os.path.join(config["outdir"], "results"), ignore_errors=True)
+    if os.path.exists(config["tempdir"]):
+        shutil.rmtree(config["tempdir"], ignore_errors=True)
+    if os.path.exists(os.path.join(config["outdir"], "downloads")):
+        shutil.rmtree(os.path.join(config["outdir"], "downloads"), ignore_errors=True)
+    if os.path.exists(os.path.join(config["outdir"], "log_files")):
+        shutil.rmtree(os.path.join(config["outdir"], "log_files"), ignore_errors=True)
 
 def symlink_setup(config, cwd):
 
@@ -56,6 +67,26 @@ def make_folders(config):
 
     if not os.path.exists(os.path.join(config["outdir"], "log_files")):
         os.mkdir(os.path.join(config["outdir"], "log_files"))
+
+def set_up_primer_directory(config, args):
+
+    if args.primer_directory:
+        if not args.primer_directory.endswith("/"):
+            config["primer_directory"] = f'{args.primer_directory}/'
+        else:
+            config["primer_directory"] = args.primer_directory
+        error_checks.check_primer_dir(config)
+    else:
+        if config["verbose"]:
+            print("Using DENV primers")
+        config["primer_directory"] = pkg_resources.resource_filename('denv_pipeline', 'DENV_primers_and_refs/')
+
+    config["virus_type_list"] = []
+    with open(os.path.join(config["primer_directory"], "refs.txt")) as f:
+        for l in f:
+            config["virus_type_list"].append(l.strip("\n"))
+
+    return config
     
 
 

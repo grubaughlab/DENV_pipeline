@@ -78,45 +78,33 @@ def main(sysargs = sys.argv[1:]):
         config["indir"] = args.indir
 
     if config["overwrite"]:
-        misc.overwrite(config)
-
+        set_up_scripts.overwrite(config)
     set_up_scripts.make_folders(config)
     
     if args.symlink:
         config = set_up_scripts.symlink_setup(config, cwd)
+    else:
+        error_checks.check_input_files
 
     config = set_up_scripts.get_sample_list(config)
-    conifg = set_up_scripts.find_fastq_names(config)
+    config = set_up_scripts.find_fastq_names(config)
     error_checks.check_input_files(config)
     
-    if args.primer_directory:
-        if not args.primer_directory.endswith("/"):
-            config["primer_directory"] = f'{args.primer_directory}/'
-        else:
-            config["primer_directory"] = args.primer_directory
-    else:
-        if config["verbose"]:
-            print("Using DENV primers")
-        config["primer_directory"] = pkg_resources.resource_filename('denv_pipeline', 'primers/')
-
-    config["option_list"] = []
-    with open(os.path.join(config["primer_directory"], "refs.txt")) as f:
-        for l in f:
-            config["option_list"].append(l.strip("\n"))
+    config = set_up_scripts.set_up_primer_directory(config, args)
 
     if config["ct_file"] or config["ct_column"] or config["id_column"]:
-        error_checks.check_ct_file(config)
-        
-    
-    ## check for relevant installed stuff
-    ## check for input files - either the symlink is present, or if an "indir" is used then they should be in there already. Also in the right format
-    
+        error_checks.check_ct_file(config)    
 
     snakefile = os.path.join(thisdir,"scripts", "denv_pipeline.smk")
     if config['verbose']:
         print("\n**** CONFIG ****")
         for k in sorted(config):
             print((f" - {k}: ") + f"{config[k]}")
+
+        num_samples = len(config["sample_list"])
+        print(f"\n Analysing {num_samples} samples against reference files for: \n")
+        for k in sorted(config["virus_type_options"]):
+            print(f" - {k}: ")
     
     if config["slurm"]:
         status = snakemake.snakemake(snakefile, printshellcmds=False, forceall=True, force_incomplete=True,
@@ -126,9 +114,6 @@ def main(sysargs = sys.argv[1:]):
         status = snakemake.snakemake(snakefile, printshellcmds=False, forceall=True, force_incomplete=True,
                                 workdir=cwd,config=config,lock=False
                                 )
-
-
-    #QC plots
 
     if status: # translate "success" into shell exit code of 0
         return 0
