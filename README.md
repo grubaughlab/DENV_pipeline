@@ -6,6 +6,8 @@ This pipeline takes raw read data in the form of fastq files, maps them against 
 
 It calls input files as a virus type if it has more than 50% coverage of the reference genome provided.
 
+If running on a server, it is highly recommended to run using screen/tmux or similar.
+
 ### Installation instructions
 
 - Clone this repo
@@ -31,7 +33,6 @@ To get consensus files for dengue, you don't need anything else. If you want to 
 - Here, we provide each of the four dengue virus serotypes as package data, and these are used as default. 
 - Otherwise, please use the same format and provide the stem of the files in a "refs.txt" text file in the same folder. Use the ``--primer-directory`` option to provide the path to the directory.
 
-
 ### Main outputs
 
 Specify the main output directory using ``--outdir``. Default is the generation of a new folder with today's date.
@@ -47,23 +48,36 @@ Within this, there will be:
 	- depth - text files of each position of the genome and their sequencing depth by sample
 	- variants - contains a summary file of the number of variants by sample, and then a file for each sample containing additional information about variants
 
-2. temporary_files (if option ``--temp`` is used):
+2.  Within results, there are some QC plots:
+
+	- variant_plot: plots sample id against the number of variants (i.e. mutations compared to the reference genome) in between 20% and 80% of the reads. Useful for detecting co-infections
+	- ct_plot: plots genome coverage against Ct value coloured by call.
+	
+	 To make the Ct plot, you must provide:
+	 	- File containing the Ct values using ``--ct-file``
+	 	- the name of the column containing Ct values with ``--ct-column``
+	 	- the name of the column containing IDs which match the ID names on the fastq files/directories using ``--id-column``
+
+3. Log_files:
+
+	Log files for each step of the pipeline, named by snakemake rule and sample - mostly useful for debugging.
+
+
+4. temporary_files (if option ``--temp`` is used):
 
 	All files produced in the run of the pipeline that don't make it to results.
 	This includes intermediate files produced by software, and bam/fasta/variant files for virus comparisons which did not meet the threshold for the sample to be called as that virus
 	
 	Mostly for debugging purposes
 	
-3. downloads (if option ``--download`` is used):
+5. downloads (if option ``--download`` is used):
 
 	The same as results, but without the bam files. 
 	
 	For download and storage in places with less data storage capacity (eg dropbox)
 	
-4. Within results, there are optional QC plots produced.
 
-	- ct_plot: plots genome coverage against Ct value coloured by call. Requires additional input of csv or tsv containing sample name and ct value. 
-	- variant_plot: plots sample id against the number of variants (i.e. mutations compared to the reference genome) in between 20% and 80% of the reads. Useful for detecting co-infections
+
 
 
 ### All options
@@ -84,6 +98,8 @@ Within this, there will be:
 
 ``--download`` produce downloads directory (see above)
 
+``--slurm`` parallelise on a cluster which uses slurm. The outer pipeline will run on the login node, but all actual analysis will be submitted to compute nodes.
+
 
 ``--overwrite`` delete old results files and make new ones in the run
 
@@ -95,8 +111,6 @@ Within this, there will be:
 #### Yale specific options
 
 ``--symlink`` for use on Yale's HPC. Provide the second half of the link emailed by genomics core. 
-
-``--slurm`` flag for use on Yale's HPC. This will parallelise the analysis. Uses DSQ, which can be found here: https://github.com/ycrc/dSQ
 
     
     
