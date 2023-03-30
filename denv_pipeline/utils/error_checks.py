@@ -1,6 +1,7 @@
 import os
 import sys
 import csv
+import pkgutil
 
 from denv_pipeline.utils.misc import *
 
@@ -13,6 +14,12 @@ def check_input_files(config):
 
     return
 
+def check_env_activated():
+
+    if pkgutil.find_loader('snakemake') is None:
+        sys.stderr.write(green(f"Error: installation not correct. Ensure that environment is activated and you have run 'pip install .'"))
+        sys.exit(-1)
+    
 
 def check_ct_file(config):
 

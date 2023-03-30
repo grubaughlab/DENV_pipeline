@@ -2,16 +2,19 @@
 
 from denv_pipeline import __version__
 
-import os
-import sys
-import argparse
-import snakemake
-import pkg_resources
-import datetime as dt
-
 from denv_pipeline.utils import misc
 from denv_pipeline.utils import error_checks
 from denv_pipeline.utils import set_up_scripts
+import pkg_resources
+import os
+import sys
+import argparse
+import datetime as dt
+
+error_checks.check_env_activated()
+
+import snakemake
+
 
 cwd = os.getcwd()
 thisdir = os.path.abspath(os.path.dirname(__file__))
