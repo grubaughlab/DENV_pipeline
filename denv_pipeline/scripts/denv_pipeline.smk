@@ -23,7 +23,7 @@ rule denv_mapper:
         temp_call_files = (os.path.join(config["outdir"], ".".join(["tmp.{sample}.serotype.calls", str(config["depth"]), "txt"]))),
         sample_serotype_calls = (os.path.join(config["outdir"], "{sample}.serotype.calls.txt"))
     log:
-        os.path.join(config["outdir"], "log_files", "_".join(["{sample}", "mapping.log"]))
+        log = os.path.join(config["outdir"], "log_files", "_".join(["{sample}", "mapping.log"]))
     params:
         mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh"),
         primer_dir = config["primer_directory"],
