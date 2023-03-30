@@ -30,8 +30,7 @@ def main():
     write_dict["Depth"] = name_elements[2]
 
     #curent ID is formatted Yale-DN00931/Yale-DN00931.DENV1.20.cons.fa 
-    if os.path.exists(args.alignment): #when would .cons.fa not exist? is it only if it breaks? Or no reads?
-
+    if os.path.exists(args.alignment) and os.path.getsize(args.alignment) > 0: 
         for sequence in SeqIO.parse(args.alignment, 'fasta'):
             if sequence.seq:
                 seq_len=len(sequence.seq)
@@ -66,10 +65,13 @@ def main():
                         seq_trim.id = new_header
                         seq_trim.name = new_header
                         seq_trim.description = new_header
-                        with open(args.alignment.replace(".out.aln",".out.trim.aln"), 'w') as new_file:
+                        with open(args.alignment.replace(".out.aln",".out.trim.aln"), 'w') as new_file: #add this somewhere else as well so taht it doesn't break if bed file not present
                             SeqIO.write(seq_trim, new_file, 'fasta')
                     else:
                         sys.stderr.write(f"Bed file {args.bed_file} not found")
+                        with open(args.alignment.replace(".out.aln",".out.trim.aln"), 'w') as new_file:
+                            pass
+
 
                 else:
                     write_dict["CoverageTrimmed"] = "NA"
@@ -79,6 +81,8 @@ def main():
                     else:
                         write_dict["Serotype"] = "NA"
                         write_dict["RefSerotypeSequence"] = "NA"
+                    with open(args.alignment.replace(".out.aln",".out.trim.aln"), 'w') as new_file:
+                        pass
 
             else:
                 write_dict["Serotype"] = "Unknown"
@@ -87,6 +91,8 @@ def main():
                 write_dict["AlignedBases"] = "NA"
                 write_dict["CoverageUntrimmed"] = 0
                 write_dict["CoverageTrimmed"] = 0
+                with open(args.alignment.replace(".out.aln",".out.trim.aln"), 'w') as new_file:
+                    pass 
     else:
         write_dict["Serotype"] = "Unknown"
         write_dict["RefSerotypeSequence"] = "NA"
@@ -94,6 +100,8 @@ def main():
         write_dict["AlignedBases"] = "NA"
         write_dict["CoverageUntrimmed"] = 0
         write_dict["CoverageTrimmed"] = 0
+        with open(args.alignment.replace(".out.aln",".out.trim.aln"), 'w') as new_file:
+            pass
 
     final = []
     for col in headers:

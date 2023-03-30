@@ -34,7 +34,7 @@ cat ${primer_dir}refs.txt | while read virustype; do
     echo "----->>>>>Aligning consensus cps sequence against the reference serotype "${virustype}" cps sequence"
     nextalign run  --reference ${fasta} --output-fasta ${outdir}/${fname%.*}.${virustype}.${depth}.out.aln ${outdir}/${fname%.*}.${virustype}.${depth}.cons.fa >> ${log} 2>&1
     
-    if [ -f ${outdir}/${fname%.*}.${virustype}.${depth}.out.aln ]; then
+    if [ -s ${outdir}/${fname%.*}.${virustype}.${depth}.out.aln ]; then
         echo "----->>>>>Aligning with nextalign successful"
     else
         echo "----->>>>>Aligning with mafft (nextalign not successful)"
