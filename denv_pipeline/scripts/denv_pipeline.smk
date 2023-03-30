@@ -120,8 +120,6 @@ rule make_qc_plots:
         variant_plot = os.path.join(config["outdir"], "results", "variant_plot.pdf")
     params:
         results_dir = rules.denv_summary.params.results_dir
-    log:
-        os.path.join(config["outdir"], "log_files", "qc_plots.log")
     run:
 
         serotype_dict, colour_dict, patch_list = prepare_for_plots(input.serotype_calls_file)
@@ -141,16 +139,14 @@ rule tidy_up:
     output:
         results_serotype_calls = os.path.join(config["outdir"], "results", "DENV.serotype.calls.tsv")
     params:
-        temp_files = ["cons.qual.txt","bam", "sort.bam.bai", "trimmed.bam", "tmp.*.serotype.calls.*.txt", "serotype.calls.txt", "variants.tsv"],
+        temp_files = ["cons.qual.txt","bam", "sort.bam.bai", "bam.bai", "trimmed.bam", "tmp.*.serotype.calls.*.txt", "serotype.calls.txt", "variants.tsv"],
         tempdir = config["tempdir"],
         results_dir = os.path.join(config["outdir"], "results")
-    log:
-        os.path.join(config["outdir"], "log_files", "tidy_up.log")
     run:
         move_temp_files(config, params.temp_files, params.tempdir)
         clean_up_alignment_components(config, params.tempdir)
 
-        remove_multiple_files("ZZ.tmp000.*")
+        remove_multiple_files(os.path.join(config["outdir"], "ZZ.tmp000.*"))
 
         shutil.move(input.serotype_calls, params.results_dir)
         shutil.move(input.all_samples, params.results_dir)
