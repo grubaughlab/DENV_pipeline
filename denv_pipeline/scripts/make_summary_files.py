@@ -192,7 +192,7 @@ def move_temp_files(config, temp_files, dest):
                             name = f"{sample}.{option}.{file_pattern}"
 
                     if config["temp"]:
-                        if ".bam.bai" in file_pattern:
+                        if "bam.bai" in file_pattern:
                             if os.path.exists(os.path.join(config["outdir"], name)):
                                 shutil.move(os.path.join(config["outdir"], name), dest)
                             else:
@@ -200,7 +200,7 @@ def move_temp_files(config, temp_files, dest):
                         else:
                             shutil.move(os.path.join(config["outdir"], name), dest)
                     else:
-                        if ".bam.bai" in file_pattern:
+                        if "bam.bai" in file_pattern:
                             if os.path.exists(os.path.join(config["outdir"], name)):
                                 os.remove(os.path.join(config["outdir"], name))
                             else:
