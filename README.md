@@ -2,6 +2,8 @@
 
 Created by Verity Hill and Chrispin Chaguza, Grubaugh Lab
 
+Still a bit beta - please feel free to have a go and report any issues you get! I need to run more tests before I tag a release.
+
 This pipeline takes raw read data in the form of fastq files, maps them against provided bed files and then provides a series of outputs for further analysis including consensus sequences.
 
 It calls input files as a virus type if it has more than 50% coverage of the reference genome provided.
