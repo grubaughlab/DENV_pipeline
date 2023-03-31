@@ -110,7 +110,7 @@ def main(sysargs = sys.argv[1:]):
                                 workdir=cwd,config=config,lock=False, slurm=True, cores=10
                                 )
     else:
-        status = snakemake.snakemake(snakefile, printshellcmds=False, forceall=True, force_incomplete=True,
+        status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
                                 workdir=cwd,config=config,lock=False
                                 )
 

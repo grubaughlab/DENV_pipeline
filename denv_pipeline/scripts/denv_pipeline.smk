@@ -5,7 +5,7 @@ import shutil
 
 from denv_pipeline.utils import misc
 from denv_pipeline.scripts import visualisations
-from denv_pipeline.scripts.make_summary_files import summarise_files
+from denv_pipeline.scripts import make_summary_files
 
 
 cwd = os.getcwd()
@@ -64,7 +64,7 @@ rule denv_summary:
         shell('cat {input.temp_call_files} >> {output.denv_serotype_calls}')
         
         print("summarising files")
-        summarise_files(config, output.denv_serotype_calls)
+        make_summary_files.summarise_files(config, output.denv_serotype_calls)
         
         shell('echo -e "sample_id\tconsensus_sequence_file\tdepth\tserotype\treference_serotype_name\treference_sequence_length\tnumber_aligned_bases\tcoverage_untrimmed\tcoverage_trimmed" > {output.all_sample_summary}')
         shell('cat {input.sample_serotype_calls} >> {output.all_sample_summary}')
@@ -91,12 +91,12 @@ rule make_qc_plots:
         results_dir = rules.denv_summary.params.results_dir
     run:
 
-        serotype_dict, colour_dict, patch_list = prepare_for_plots(input.serotype_calls_file)
+        serotype_dict, colour_dict, patch_list = visualisations.prepare_for_plots(input.serotype_calls_file)
         
-        variant_plot(params.results_dir, input.variant_summary_file, serotype_dict, colour_dict, patch_list)
+        visualisations.variant_plot(params.results_dir, input.variant_summary_file, serotype_dict, colour_dict, patch_list)
 
         if config["ct_file"] and config["ct_column"] and config["id_column"]:
-            ct_plot(params.results_dir, config["ct_file"], config["ct_column"], config["id_column"], input.serotype_calls_file, serotype_dict, colour_dict, patch_list)
+            visualisations.ct_plot(params.results_dir, config["ct_file"], config["ct_column"], config["id_column"], input.serotype_calls_file, serotype_dict, colour_dict, patch_list)
 
 
 rule tidy_up:
