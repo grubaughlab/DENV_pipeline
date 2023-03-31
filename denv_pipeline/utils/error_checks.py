@@ -20,7 +20,7 @@ def check_input_files(config):
                 if os.path.join(config['indir'], item) != config["tempdir"] and item != "results" and item != "temporary_files" and item != "log_files":
                     found_sample = True
                     fastq_found = 0
-                    for possible in item:
+                    for possible in os.listdir(os.path.join(config['indir'], item)):
                         if "fastq" in possible:
                             fastq_found += 1
                         
@@ -41,7 +41,7 @@ def check_input_files(config):
 def check_primer_dir(config):
 
     all_files = []
-    for file in config["primer_directory"]:
+    for file in os.listdir(config["primer_directory"]):
         all_files.append(file)
 
     if "refs.txt" not in all_files:

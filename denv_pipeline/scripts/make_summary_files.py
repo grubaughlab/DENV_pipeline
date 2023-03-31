@@ -161,3 +161,69 @@ def get_right_serotype_files(config, serotypes):
             os.remove(os.path.join(config['outdir'], i))
 
 
+def move_temp_files(config, temp_files, dest):
+
+    contains_depth = ["cons.qual.txt", "variants.tsv"]
+    depth = config["depth"]
+    for file_pattern in temp_files:
+        for sample in config["sample_list"]:
+            if "serotype.calls" in file_pattern:
+                if "tmp" in file_pattern:
+                    name = f"tmp.{sample}.serotype.calls.{depth}.txt"
+                else:
+                    name = f"{sample}.serotype.calls.txt"
+
+                if config["temp"]:
+                    shutil.move(os.path.join(config["outdir"], name), dest)
+                else:
+                    os.remove(os.path.join(config["outdir"], name))
+            
+            else:
+                for option in config["virus_type_list"]:
+                    if ".bam" in file_pattern:
+                        if ".sort" in file_pattern and ".bai" not in file_pattern:
+                            pass
+                        else:
+                            name = f"{sample}.{option}.{file_pattern}"
+                    else:
+                        if file_pattern in contains_depth:
+                            name = f"{sample}.{option}.{depth}.{file_pattern}"
+                        else:
+                            name = f"{sample}.{option}.{file_pattern}"
+
+                    if config["temp"]:
+                        if ".bam.bai" in file_pattern:
+                            if os.path.exists(os.path.join(config["outdir"], name)):
+                                shutil.move(os.path.join(config["outdir"], name), dest)
+                            else:
+                                pass
+                        else:
+                            shutil.move(os.path.join(config["outdir"], name), dest)
+                    else:
+                        if ".bam.bai" in file_pattern:
+                            if os.path.exists(os.path.join(config["outdir"], name)):
+                                os.remove(os.path.join(config["outdir"], name))
+                            else:
+                                pass
+                        else:
+                            os.remove(os.path.join(config["outdir"], name))
+
+    
+
+def clean_up_alignment_components(config, temp_dir):
+
+    path = os.path.join(config["outdir"],"results", "alignments")
+    depth = config["depth"]
+    components = []
+    for option in config["virus_type_list"]:
+        for sample in config["sample_list"]:
+            file1 = f'{sample}.{option}.{depth}.out.aln'
+            file2 = f'{sample}.{option}.{depth}.out.trim.aln'
+
+            if os.path.exists(os.path.join(path, file1)):
+                if config["temp"]:
+                    shutil.move(os.path.join(path, file1), temp_dir)
+                    shutil.move(os.path.join(path, file2), temp_dir)
+                else:
+                    os.remove(os.path.join(path, file1))
+                    os.remove(os.path.join(path, file2))

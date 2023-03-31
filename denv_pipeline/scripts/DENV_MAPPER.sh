@@ -37,7 +37,7 @@ cat ${primer_dir}refs.txt | while read virustype; do
     if [ -s ${outdir}/${fname%.*}.${virustype}.${depth}.out.aln ]; then
         echo "----->>>>>Aligning with nextalign successful"
     else
-        echo "----->>>>>Aligning with mafft (nextalign not successful)"
+        echo "----->>>>>Aligning with mafft (nextalign not successful)" #to do with the outdir thing? it might be making temp files in cwd
         mafft --quiet --6merpair --maxambiguous 0.99 --addfragments --keeplength --addfragments ${outdir}/${fname%.*}.${virustype}.${depth}.cons.fa ${ref} > ${outdir}/ZZ.tmp000.${fname%.*}.${virustype}.${depth}
         grep -A 30000000 `grep ">" ${fname%.*}.${virustype}.${depth}.cons.fa` ${outdir}/ZZ.tmp000.${fname%.*}.${virustype}.${depth} > ${outdir}/${fname%.*}.${virustype}.${depth}.out.aln
     fi

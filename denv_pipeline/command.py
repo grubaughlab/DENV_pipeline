@@ -88,7 +88,6 @@ def main(sysargs = sys.argv[1:]):
 
     config = set_up_scripts.get_sample_list(config)
     config = set_up_scripts.find_fastq_names(config)
-    error_checks.check_input_files(config)
     
     config = set_up_scripts.set_up_primer_directory(config, args)
 
@@ -103,8 +102,8 @@ def main(sysargs = sys.argv[1:]):
 
         num_samples = len(config["sample_list"])
         print(f"\n Analysing {num_samples} samples against reference files for: \n")
-        for k in sorted(config["virus_type_options"]):
-            print(f" - {k}: ")
+        for k in sorted(config["virus_type_list"]):
+            print(f" - {k} ")
     
     if config["slurm"]:
         status = snakemake.snakemake(snakefile, printshellcmds=False, forceall=True, force_incomplete=True,

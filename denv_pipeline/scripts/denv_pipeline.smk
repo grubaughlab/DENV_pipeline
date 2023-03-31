@@ -3,8 +3,8 @@ import sys
 import datetime as dt
 import shutil
 
-from denv_pipeline.utils.misc import *
-from denv_pipeline.scripts.visualisations import *
+from denv_pipeline.utils import misc
+from denv_pipeline.scripts import visualisations
 from denv_pipeline.scripts.make_summary_files import summarise_files
 
 
@@ -37,37 +37,6 @@ rule denv_mapper:
     shell:
         "{params.mapper_script} {wildcards.sample} {input.primer1} {input.primer2} {params.primer_dir} {params.python_script} {params.depth} {params.outdir} {log.log}  >> {log.log} 2>&1"
 
-
-
-# rule denv_mapper:
-#     input:
-#         jobs = rules.prepare_jobs.output.jobs
-#     output:
-#         temp_call_files = expand(os.path.join(config["outdir"], "tmp.{sample}.serotype.calls.{depth}.txt"), sample=config["sample_list"], depth=config["depth"]),
-#         sample_serotype_calls = expand(os.path.join(config["outdir"], "{sample}.serotype.calls.txt"), sample=config["sample_list"]),
-#         bam_files = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.sort.bam"), sample=config["sample_list"], virus_type=config["virus_type_list"]),
-#         out_alns = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.out.aln"), sample=config["sample_list"], virus_type=config["virus_type_list"], depth=config["depth"]),
-#         consensus = expand(os.path.join(config["outdir"], "{sample}.{virus_type}.{depth}.cons.fa"), sample=config["sample_list"], virus_type=config["virus_type_list"], depth=config["depth"])
-#     params:
-#         outdir = config["outdir"],
-#         mapper_script = os.path.join(workflow.current_basedir,"mapper_done_slurm.sh")
-#     run:    
-#         if config["slurm"]:
-#             print("preparing for slurm run")
-#             shell("""module load dSQ; 
-#             dsq --job-name denv.mapper --job-file {input.jobs:q} --mem-per-cpu=10G --cpus-per-task=1""")
-             
-#             filename = f"dsq-jobs-{dt.datetime.today().date()}.sh"
-#             shell("sbatch {filename}")
-        
-#         else:
-#             print("running each sample sequentially")
-#             with open(input.jobs) as f:
-#                 for l in f:
-#                     command = l.strip("\n")
-#                     shell("{command}")
-#             shell("touch {output.status}")
-
 rule denv_summary:
     input:
         sample_serotype_calls = expand(os.path.join(config["outdir"], "{sample}.serotype.calls.txt"), sample=config["sample_list"]),
@@ -84,12 +53,12 @@ rule denv_summary:
     log:
         os.path.join(config["outdir"], "log_files", "summary.log")
     run:
-        make_directory(params.results_dir)
-        make_directory(os.path.join(params.results_dir, "bam_files"))
-        make_directory(os.path.join(params.results_dir, "variants"))
-        make_directory(os.path.join(params.results_dir, "depth"))
-        make_directory(os.path.join(params.results_dir, "consensus_sequences"))
-        make_directory(os.path.join(params.results_dir, "alignments"))
+        misc.make_directory(params.results_dir)
+        misc.make_directory(os.path.join(params.results_dir, "bam_files"))
+        misc.make_directory(os.path.join(params.results_dir, "variants"))
+        misc.make_directory(os.path.join(params.results_dir, "depth"))
+        misc.make_directory(os.path.join(params.results_dir, "consensus_sequences"))
+        misc.make_directory(os.path.join(params.results_dir, "alignments"))
 
         shell('echo -e "sample_id\tconsensus_sequence_file\tdepth\tserotype\treference_serotype_name\treference_sequence_length\tnumber_aligned_bases\tcoverage_untrimmed\tcoverage_trimmed" > {output.denv_serotype_calls}')
         shell('cat {input.temp_call_files} >> {output.denv_serotype_calls}')
@@ -143,17 +112,17 @@ rule tidy_up:
         tempdir = config["tempdir"],
         results_dir = os.path.join(config["outdir"], "results")
     run:
-        move_temp_files(config, params.temp_files, params.tempdir)
-        clean_up_alignment_components(config, params.tempdir)
+        make_summary_files.move_temp_files(config, params.temp_files, params.tempdir)
+        make_summary_files.clean_up_alignment_components(config, params.tempdir)
 
-        remove_multiple_files(os.path.join(config["outdir"], "ZZ.tmp000.*"))
+        misc.remove_multiple_files(os.path.join(config["outdir"], "ZZ.tmp000.*"))
 
         shutil.move(input.serotype_calls, params.results_dir)
         shutil.move(input.all_samples, params.results_dir)
         shutil.move(input.top_calls_all, params.results_dir)  
 
         if config["download"]:
-            make_directory(os.path.join(config["outdir"], "downloads")) 
+            misc.make_directory(os.path.join(config["outdir"], "downloads")) 
             for directory in os.listdir(params.results_dir):
                 if directory != "bam_files":
                     source = os.path.join(params.results_dir, directory)
