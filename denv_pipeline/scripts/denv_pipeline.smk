@@ -17,8 +17,8 @@ rule all:
 
 rule denv_mapper:
     input:
-        primer1 = (os.path.join(config["indir"], "{sample}", "".join(["{sample}", config["fastq_filestem_R1"]]))),
-        primer2 = (os.path.join(config["indir"], "{sample}", "".join(["{sample}", config["fastq_filestem_R1"]])))
+        read_forward = (os.path.join(config["indir"], "{sample}", "".join(["{sample}", config["fastq_filestem_R1"]]))),
+        read_backward = (os.path.join(config["indir"], "{sample}", "".join(["{sample}", config["fastq_filestem_R2"]])))
     output:
         temp_call_files = (os.path.join(config["outdir"], ".".join(["tmp.{sample}.serotype.calls", str(config["depth"]), "txt"]))),
         sample_serotype_calls = (os.path.join(config["outdir"], "{sample}.serotype.calls.txt"))
@@ -35,7 +35,7 @@ rule denv_mapper:
         mem_mb_per_cpu="10G",
         cpus_per_task=1
     shell:
-        "{params.mapper_script} {wildcards.sample} {input.primer1} {input.primer2} {params.primer_dir} {params.python_script} {params.depth} {params.outdir} {log.log}  >> {log.log} 2>&1"
+        "{params.mapper_script} {wildcards.sample} {input.read_forward} {input.read_backward} {params.primer_dir} {params.python_script} {params.depth} {params.outdir} {log.log}  >> {log.log} 2>&1"
 
 rule denv_summary:
     input:

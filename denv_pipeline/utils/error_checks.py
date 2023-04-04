@@ -50,22 +50,18 @@ def check_primer_dir(config):
     
     bed = False
     trim_bed = False
-    fasta_stuff = 0
+    fasta_present = False
     for file in all_files:
         if file.endswith(".bed"):
-            if file.endswith(".trim.bed"):
-                trim_bed = True
-            else:
-                bed = True
+            bed = True
+        if file.endswith(".fasta") or file.endswith(".fa"):
+            fasta_present = True
 
-        if "fasta" in file:
-            fasta_stuff += 1
-
-    if not trim_bed or not bed:
-        sys.stderr.write(green(f"Error: Missing bed files at {config['primer_directory']}.\n"))
+    if not bed:
+        sys.stderr.write(green(f"Error: Missing bed file at {config['primer_directory']}.\n"))
         sys.exit(-1)
-    if fasta_stuff != 7:
-        sys.stderr.write(green(f"Error: Some reference file information missing. There should be a *.fasta, *.fasta.amb, *.fasta.ann, *.fasta.bwt, *.fasta.fai, *.fasta.pac and *.fasta.sa\n"))
+    if not fasta_present:
+        sys.stderr.write(green(f"Error: Missing reference file at {config['primer_directory']}. \n"))
         sys.exit(-1)
 
     return

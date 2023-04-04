@@ -15,6 +15,11 @@ cat ${primer_dir}refs.txt | while read virustype; do
     bed=${primer_dir}${virustype}.bed
     trimbed=${primer_dir}${virustype}.trim.bed
 
+    if ! [ ${primer_dir}/${virustype}.fasta.ann ]; then
+        echo "----->>>> making index files for ${virustype}"
+        bwa index ${primer_dir}/${virustype}.fasta
+    fi
+
     echo "----->>>>>Mapping reads against serotype "${virustype}" reference sequence"
     bwa mem -v 1 -t 16 ${fasta} $read1 $read2 | samtools view -bS -F 4 -F 2048 | samtools sort -o ${outdir}/${fname%.*}.${virustype}.bam >> ${log} 2>&1
 

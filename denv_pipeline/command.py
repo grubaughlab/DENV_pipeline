@@ -71,6 +71,7 @@ def main(sysargs = sys.argv[1:]):
     
     config["outdir"] = outdir
     config["tempdir"] = os.path.join(outdir, args.tempdir)
+    config = set_up_scripts.set_up_primer_directory(config, args)
 
     if not args.indir:
         config["indir"] = config["outdir"]
@@ -89,8 +90,6 @@ def main(sysargs = sys.argv[1:]):
     config = set_up_scripts.get_sample_list(config)
     config = set_up_scripts.find_fastq_names(config)
     
-    config = set_up_scripts.set_up_primer_directory(config, args)
-
     if config["ct_file"] or config["ct_column"] or config["id_column"]:
         error_checks.check_ct_file(config)    
 
