@@ -92,11 +92,13 @@ def set_up_primer_directory(config, args):
 
 def find_fastq_names(config):
 
+    config["fastq_R1"] = {}
+    config["fastq_R2"] = {}
     for sample in config["sample_list"]:
         for file in os.listdir(os.path.join(config["indir"], sample)):
            if "fastq" in file and "R1" in file:
-               config["fastq_filestem_R1"] = file.lstrip(sample)
-               config["fastq_filestem_R2"] = file.lstrip(sample).replace("R1", "R2")
+               config["fastq_R1"][sample] = file
+               config["fastq_R2"][sample] = file.replace("R1", "R2")
 
     return config
                    

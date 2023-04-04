@@ -15,9 +15,9 @@ cat ${primer_dir}refs.txt | while read virustype; do
     bed=${primer_dir}${virustype}.bed
     trimbed=${primer_dir}${virustype}.trim.bed
 
-    if ! [ ${primer_dir}/${virustype}.fasta.ann ]; then
+    if ! [ -f ${primer_dir}${virustype}.fasta.ann ]; then
         echo "----->>>> making index files for ${virustype}"
-        bwa index ${primer_dir}/${virustype}.fasta
+        bwa index ${fasta}
     fi
 
     echo "----->>>>>Mapping reads against serotype "${virustype}" reference sequence"

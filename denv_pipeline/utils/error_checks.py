@@ -54,8 +54,11 @@ def check_primer_dir(config):
     for file in all_files:
         if file.endswith(".bed"):
             bed = True
-        if file.endswith(".fasta") or file.endswith(".fa"):
+        if file.endswith(".fasta"):
             fasta_present = True
+        elif file.endswith(".fa"):
+            sys.stderr.write(green(f"Error: Please rename {config['primer_directory']}/{file} to end with '.fasta'.\n"))
+            sys.exit(-1)
 
     if not bed:
         sys.stderr.write(green(f"Error: Missing bed file at {config['primer_directory']}.\n"))

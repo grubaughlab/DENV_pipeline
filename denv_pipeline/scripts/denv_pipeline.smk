@@ -17,8 +17,7 @@ rule all:
 
 rule denv_mapper:
     input:
-        read_forward = (os.path.join(config["indir"], "{sample}", "".join(["{sample}", config["fastq_filestem_R1"]]))),
-        read_backward = (os.path.join(config["indir"], "{sample}", "".join(["{sample}", config["fastq_filestem_R2"]])))
+        read_location = os.path.join(config["indir"], "{sample}")
     output:
         temp_call_files = (os.path.join(config["outdir"], ".".join(["tmp.{sample}.serotype.calls", str(config["depth"]), "txt"]))),
         sample_serotype_calls = (os.path.join(config["outdir"], "{sample}.serotype.calls.txt"))
@@ -29,13 +28,13 @@ rule denv_mapper:
         primer_dir = config["primer_directory"],
         depth = config["depth"],
         outdir = config["outdir"],
-        python_script = os.path.join(workflow.current_basedir,"serotypeCaller.py"),
+        python_script = os.path.join(workflow.current_basedir,"serotypeCaller.py")
     resources:
         partition="general",
         mem_mb_per_cpu="10G",
         cpus_per_task=1
     shell:
-        "{params.mapper_script} {wildcards.sample} {input.read_forward} {input.read_backward} {params.primer_dir} {params.python_script} {params.depth} {params.outdir} {log.log}  >> {log.log} 2>&1"
+        "{params.mapper_script} {wildcards.sample} {input.read_location}/*R1* {input.read_location}/*R2* {params.primer_dir} {params.python_script} {params.depth} {params.outdir} {log.log}  >> {log.log} 2>&1"
 
 rule denv_summary:
     input:
