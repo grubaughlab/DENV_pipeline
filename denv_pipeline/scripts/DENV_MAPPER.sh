@@ -29,7 +29,7 @@ cat ${primer_dir}refs.txt | while read virustype; do
     if ! [ -s  ${outdir}/${fname%.*}.${virustype}.trimmed.bam]; then
         echo "no trimmed bam file found, likely because no reads mapped successfully, exiting shell script"
         exit
-    done
+    fi
 
     echo "----->>>>>Sorting bam file"
     samtools sort ${outdir}/${fname%.*}.${virustype}.trimmed.bam -o ${outdir}/${fname%.*}.${virustype}.sort.bam >> ${log} 2>&1
