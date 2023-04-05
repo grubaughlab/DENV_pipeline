@@ -88,18 +88,5 @@ def set_up_primer_directory(config, args):
 
     return config
     
-
-
-def find_fastq_names(config):
-
-    config["fastq_R1"] = {}
-    config["fastq_R2"] = {}
-    for sample in config["sample_list"]:
-        for file in os.listdir(os.path.join(config["indir"], sample)):
-           if "fastq" in file and "R1" in file:
-               config["fastq_R1"][sample] = file
-               config["fastq_R2"][sample] = file.replace("R1", "R2")
-
-    return config
                    
             
