@@ -26,9 +26,9 @@ cat ${primer_dir}refs.txt | while read virustype; do
     echo "----->>>>>Trimming bam file"
     ivar trim -e -i ${outdir}/${fname%.*}.${virustype}.bam -b ${bed} -p ${outdir}/${fname%.*}.${virustype}.trimmed.bam >> ${log} 2>&1
 
-    if ! [ -s  ${outdir}/${fname%.*}.${virustype}.trimmed.bam]; then
+    if ! [ -s  ${outdir}/${fname%.*}.${virustype}.trimmed.bam ]; then
         echo "no trimmed bam file found, likely because no reads mapped successfully, exiting shell script"
-        exit
+        continue
     fi
 
     echo "----->>>>>Sorting bam file"
