@@ -16,6 +16,9 @@ def overwrite(config):
         shutil.rmtree(os.path.join(config["outdir"], "downloads"), ignore_errors=True)
     if os.path.exists(os.path.join(config["outdir"], "log_files")):
         shutil.rmtree(os.path.join(config["outdir"], "log_files"), ignore_errors=True)
+    if os.path.exists(os.path.join(config["outdir"], ".snakemake")):
+        shutil.rmtree(os.path.join(config["outdir"], ".snakemake"), ignore_errors=True)
+    
 
 def symlink_setup(config, cwd):
 
