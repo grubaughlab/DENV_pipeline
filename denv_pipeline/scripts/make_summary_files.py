@@ -6,13 +6,6 @@ import shutil
 
 def summarise_files(config, serotype_calls):
 
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument("--serotype-calls", dest="serotype_calls")
-    # parser.add_argument("--config")
-
-    # args = parser.parse_args()
-    # config = args.config
-
     min_coverage = []
     serotypes = defaultdict(list)
     with open(serotype_calls) as f:
@@ -227,3 +220,11 @@ def clean_up_alignment_components(config, temp_dir):
                 else:
                     os.remove(os.path.join(path, file1))
                     os.remove(os.path.join(path, file2))
+
+    #if there's no trimmed bedfile then delete the empty trimmed alignment
+    for alignment in path:
+        if alignment.endswith(".trim.aln") and os.stat(os.path.join(path, alignment)).st_size == 0:
+            if config["temp"]:
+                shutil.move(os.path.join(path, alignment), temp_dir)
+            else:
+                os.remove(os.path.join(path, alignment))

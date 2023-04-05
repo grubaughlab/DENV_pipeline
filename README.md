@@ -45,7 +45,7 @@ Within this, there will be:
 	- DENV.serotype.calls.final.tsv: Contains virus calls per sample which have more than 50% coverage
 	- DENV.top.serotype.cals.all.samples.tsv: Contains all top calls per sample, regardless of coverage
 	- summary.all.samples.tsv: contains information about all possible options provided per sample
-	- alignment - contains trimmed and untrimmed alignments by virus type NB not to be used for phylogenetics because it is only rough for estimating coverage
+	- alignment - contains alignments by virus type NB not to be used for phylogenetics because it is only rough for estimating coverage. If a trimmed bed file was provided then these are trimmed down, otherwise they are only untrimmed.
 	- consensus - consensus sequences of the called virus for each sample
 	- depth - text files of each position of the genome and their sequencing depth by sample
 	- variants - contains a summary file of the number of variants by sample, and then a file for each sample containing additional information about variants
