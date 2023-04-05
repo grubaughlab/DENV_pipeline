@@ -71,6 +71,12 @@ done
 
 
 #other depth loop here
+
+#if none of the reads sucessfully map to a reference
+if ! [ -s  ${outdir}/${fname%.*}.serotype.calls.txt ]; then
+    touch ${outdir}/${fname%.*}.serotype.calls.txt
+fi
+
 #takes the top call if it's over 50% coverage
 cat ${outdir}/${fname%.*}.serotype.calls.txt | sort -k8 -n -r | awk '{ if( $8>=50 ){ print } }' >> ${outdir}/tmp.${fname%.*}.serotype.calls.${depth}.txt
 
