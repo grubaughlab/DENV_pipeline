@@ -27,7 +27,7 @@ def symlink_setup(config, cwd):
     
     for sample_dir in os.listdir(config["indir"]):
         upper_path = os.path.join(config["indir"], sample_dir)
-        if os.path.isdir(upper_path) and sample_dir != "results" and os.path.join(config["indir"], sample_dir) != config["tempdir"]:
+        if os.path.isdir(upper_path) and sample_dir != "results" and sample_dir != "log_files" and os.path.join(config["indir"], sample_dir) != config["tempdir"]:
             lower_path = os.path.join(upper_path, "Unaligned")
             for file in os.listdir(lower_path):
                 if file.endswith(".fastq.gz"):
