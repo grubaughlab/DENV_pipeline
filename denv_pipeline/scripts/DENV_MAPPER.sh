@@ -52,7 +52,7 @@ cat ${primer_dir}refs.txt | while read virustype; do
     if [ -s ${trimbed} ]; then
         python ${serotype_caller} --alignment ${outdir}/${fname%.*}.${virustype}.${depth}.out.aln --bed-file ${trimbed} >> ${outdir}/${fname%.*}.serotype.calls.txt
     else
-        python ${serotype_caller}  --alignment ${outdir}/${fname%.*}.${dentype}.${depth}.out.aln  >> ${outdir}/${fname%.*}.serotype.calls.txt
+        python ${serotype_caller}  --alignment ${outdir}/${fname%.*}.${virustype}.${depth}.out.aln  >> ${outdir}/${fname%.*}.serotype.calls.txt
     fi
 
     echo "----->>>>>Identifying variants"
