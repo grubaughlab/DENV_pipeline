@@ -88,7 +88,6 @@ def main(sysargs = sys.argv[1:]):
         error_checks.check_input_files
 
     config = set_up_scripts.get_sample_list(config)
-    config = set_up_scripts.find_fastq_names(config)
     
     if config["ct_file"] or config["ct_column"] or config["id_column"]:
         error_checks.check_ct_file(config)    
