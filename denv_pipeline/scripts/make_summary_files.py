@@ -148,10 +148,13 @@ def get_right_serotype_files(config, serotypes):
         shutil.move(source, dest)
 
     for i in unwanted:
-        if config["temp"]:
-            shutil.move(os.path.join(config['outdir'], i), config['tempdir'])
+        if os.path.exists(os.path.join(config['outdir'], i)):
+            if config["temp"]:
+                shutil.move(os.path.join(config['outdir'], i), config['tempdir'])
+            else:
+                os.remove(os.path.join(config['outdir'], i))
         else:
-            os.remove(os.path.join(config['outdir'], i))
+            print(f"{i} does not exist, skipping")
 
 
 def move_temp_files(config, temp_files, dest):
@@ -166,10 +169,11 @@ def move_temp_files(config, temp_files, dest):
                 else:
                     name = f"{sample}.serotype.calls.txt"
 
-                if config["temp"]:
-                    shutil.move(os.path.join(config["outdir"], name), dest)
-                else:
-                    os.remove(os.path.join(config["outdir"], name))
+                if os.path.exists(os.path.join(config["outdir"], name)):
+                    if config["temp"]:
+                        shutil.move(os.path.join(config["outdir"], name), dest)
+                    else:
+                        os.remove(os.path.join(config["outdir"], name))
             
             else:
                 for option in config["virus_type_list"]:
@@ -193,13 +197,10 @@ def move_temp_files(config, temp_files, dest):
                         else:
                             shutil.move(os.path.join(config["outdir"], name), dest)
                     else:
-                        if "bam.bai" in file_pattern:
-                            if os.path.exists(os.path.join(config["outdir"], name)):
-                                os.remove(os.path.join(config["outdir"], name))
-                            else:
-                                pass
-                        else:
+                        if os.path.exists(os.path.join(config["outdir"], name)):
                             os.remove(os.path.join(config["outdir"], name))
+                        else:
+                            print(f"{name} does not exist")
 
     
 
