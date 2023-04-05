@@ -1,34 +1,36 @@
 import os
-import matplotlib
-matplotlib.use('Agg')
+import matplotlib as mpl
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 import csv
 import matplotlib.patches as mpatches
+from matplotlib.colors import rgb2hex
 import numpy as np
 
 
 
 def prepare_for_plots(final_serotype_calls):
 
-    serotype_dict = {}
+    virus_dict = {}
+    all_viruses = set()
     with open(final_serotype_calls) as f:
         data = csv.DictReader(f, delimiter="\t")
         for l in data:
-            serotype_dict[l['sample_id']] = l['serotype']
+            virus_dict[l['sample_id']] = l['serotype']
+            all_viruses.add(l['serotype'])
 
-    colour_dict = {"DENV1": "#2E9680",
-                "DENV2": "#E1A900",
-                "DENV3":"#DC810B",
-                "DENV4":"#75B7D5"}
+    colour_dict = {}
+    lst = mpl.colormaps['viridis'](range(len(all_viruses)))
+    for i,j in enumerate(all_viruses):
+        colour_dict[j] = rgb2hex(lst[i])
 
     patch_list = []
     for serotype,hexc in colour_dict.items():
         patch_list.append(mpatches.Patch(color=hexc, label=serotype))
 
+    return virus_dict, colour_dict, patch_list
 
-    return serotype_dict, colour_dict, patch_list
-
-def variant_plot(results_dir, variants_summary_file, serotype_dict, colour_dict, patch_list):
+def variant_plot(results_dir, variants_summary_file, virus_dict, colour_dict, patch_list):
     
     variant_num = {}
     with open(variants_summary_file) as f:
@@ -47,7 +49,7 @@ def variant_plot(results_dir, variants_summary_file, serotype_dict, colour_dict,
     for sample, variants in variant_num.items():
         x.append(sample)
         y.append(variants)
-        colours.append(colour_dict[serotype_dict[sample]])
+        colours.append(colour_dict[virus_dict[sample]])
 
     plt.xticks(rotation=90, size=15)
     plt.yticks(size=15)
@@ -61,14 +63,14 @@ def variant_plot(results_dir, variants_summary_file, serotype_dict, colour_dict,
     plt.savefig(os.path.join(results_dir, "variant_plot.pdf"), bbox_inches="tight")
 
 
-def ct_plot(results_dir, ct_file, ct_column, id_column, final_serotype_calls, serotype_dict, colour_dict, patch_list):
+def ct_plot(results_dir, ct_file, ct_column, id_column, final_serotype_calls, virus_dict, colour_dict, patch_list):
 
     ct_dict = {}
 
     with open(ct_file) as f:
         data = csv.DictReader(f)
         for l in data:
-            if l[id_column] in serotype_dict:
+            if l[id_column] in virus_dict:
                 try:
                     value = float(l[ct_column])
                     if np.isnan(value):
@@ -99,7 +101,7 @@ def ct_plot(results_dir, ct_file, ct_column, id_column, final_serotype_calls, se
     for sample, ct in ct_dict.items():
         x.append(ct)
         y.append(coverage_dict[sample])
-        colours.append(colour_dict[serotype_dict[sample]])
+        colours.append(colour_dict[virus_dict[sample]])
         
     plt.xticks(rotation=90, size=15)
     plt.yticks(size=15)
