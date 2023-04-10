@@ -88,6 +88,7 @@ def clean_depth_file(config, depth_file):
 def get_right_serotype_files(config, serotypes):
 
     bam_files = set()
+    bam_indices = set()
     consensus = set()
     depths = set()
     variant_frequencies = set()    
@@ -100,6 +101,7 @@ def get_right_serotype_files(config, serotypes):
         for option in full_virus_type_list:
             
             bam_file = f'{sample}.{option}.sort.bam'
+            bam_index = f'{sample}.{option}.sort.bam.bai'
             consensus_file = f'{sample}.{option}.{depth}.cons.fa'
             depth_file = f'{sample}.{option}.depth.txt'
             variant_frequency = f'{sample}.{option}.{depth}.variants_frequency.tsv'
@@ -108,6 +110,7 @@ def get_right_serotype_files(config, serotypes):
 
             if option in serotype_lst:
                 bam_files.add(bam_file)
+                bam_indices.add(bam_index)
                 consensus.add(consensus_file)
                 depths.add(depth_file)
                 variant_frequencies.add(variant_frequency)
@@ -115,6 +118,7 @@ def get_right_serotype_files(config, serotypes):
                 alignments.add(untrimmed)
             else:
                 unwanted.append(bam_file)
+                unwanted.append(bam_index)
                 unwanted.append(consensus_file)
                 unwanted.append(depth_file)
                 unwanted.append(variant_frequency)
@@ -122,6 +126,11 @@ def get_right_serotype_files(config, serotypes):
                 unwanted.append(untrimmed)
 
     for bam in bam_files:
+        source = os.path.join(config['outdir'], bam)
+        dest = os.path.join(config["outdir"], "results", "bam_files")
+        shutil.move(source, dest)
+    
+    for bam in bam_indices:
         source = os.path.join(config['outdir'], bam)
         dest = os.path.join(config["outdir"], "results", "bam_files")
         shutil.move(source, dest)
@@ -178,7 +187,7 @@ def move_temp_files(config, temp_files, dest):
             else:
                 for option in config["virus_type_list"]:
                     if ".bam" in file_pattern:
-                        if ".sort" in file_pattern and ".bai" not in file_pattern:
+                        if ".sort" in file_pattern:
                             pass
                         else:
                             name = f"{sample}.{option}.{file_pattern}"

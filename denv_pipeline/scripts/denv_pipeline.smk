@@ -107,7 +107,7 @@ rule tidy_up:
     output:
         results_serotype_calls = os.path.join(config["outdir"], "results", "DENV.serotype.calls.tsv")
     params:
-        temp_files = ["cons.qual.txt","bam", "sort.bam.bai", "bam.bai", "trimmed.bam", "tmp.*.serotype.calls.*.txt", "serotype.calls.txt", "variants.tsv"],
+        temp_files = ["cons.qual.txt","bam", "bam.bai", "trimmed.bam", "tmp.*.serotype.calls.*.txt", "serotype.calls.txt", "variants.tsv"],
         tempdir = config["tempdir"],
         results_dir = os.path.join(config["outdir"], "results")
     run:
