@@ -23,6 +23,8 @@ def main(sysargs = sys.argv[1:]):
 
     parser = argparse.ArgumentParser(add_help=False, description=misc.header(__version__))
 
+    parser.add_argument("--config", help="config file containing all relevant arguments")
+
     parser.add_argument("--symlink", dest="symlink", help="argument for generating symlinks", default=False)
     parser.add_argument("--indir", help="directory containing samples. Each sample must be a folder with the forward and reverse runs in. Default is same as output directory")
     parser.add_argument("--outdir", dest="outdir", help="location where files will be stored.")
@@ -53,36 +55,24 @@ def main(sysargs = sys.argv[1:]):
 
 
     config = {}
-    config['verbose'] = args.verbose
-    config["symlink"] = args.symlink
-    config["slurm"] = args.slurm
-    config["temp"] = args.temp
-    config["download"] = args.download
-    config["overwrite"] = args.overwrite
-    config["depth"] = args.depth
-    config["ct_file"] = args.ct_file
-    config["ct_column"] = args.ct_column
-    config["id_column"] = args.id_column
-    
-    if not args.outdir:
-        outdir = f'seq_analysis_{dt.datetime.today().date()}'
-    else:
-        outdir = (args.outdir).rstrip("/")
-    
-    config["outdir"] = outdir
-    config["tempdir"] = os.path.join(outdir, args.tempdir)
-    config = set_up_scripts.set_up_primer_directory(config, args)
+    config = set_up_scripts.get_defaults()
 
-    if not args.indir:
-        config["indir"] = config["outdir"]
-    else:
-        config["indir"] = args.indir
+    if args.config:
+        configfile = error_checks.check_configfile(cwd,args.config)
+        config = set_up_scripts.parse_yaml_file(configfile,config)
+
+    for arg_name, arg_value in vars(args).items():
+        config = misc.add_arg_to_config(arg_name, arg_value, config)
+    
+    config["outdir"] = config["outdir"].rstrip("/")
+    config["tempdir"] = os.path.join(config["outdir"], config["tempdir"])
+    config = set_up_scripts.set_up_primer_directory(config)
 
     if config["overwrite"]:
         set_up_scripts.overwrite(config)
     set_up_scripts.make_folders(config)
     
-    if args.symlink:
+    if config["symlink"]:
         config = set_up_scripts.symlink_setup(config, cwd)
     else:
         error_checks.check_input_files

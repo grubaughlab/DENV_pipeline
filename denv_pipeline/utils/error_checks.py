@@ -5,7 +5,23 @@ import pkgutil
 
 from denv_pipeline.utils.misc import *
 
+def check_configfile(cwd,config_arg):
+    
+    configfile = os.path.join(cwd,config_arg)
+    ending = configfile.split(".")[-1]
 
+    if ending not in ["yaml","yml"]:
+        sys.stderr.write(cyan(f'Error: config file {configfile} must be in yaml format.\n'))
+        sys.exit(-1)
+    
+    elif not os.path.isfile(configfile):
+        sys.stderr.write(cyan(f'Error: cannot find config file at {configfile}\n'))
+        sys.exit(-1)
+   
+    else:    
+        print(green(f"Input config file:") + f" {configfile}")
+        return configfile
+    
 
 def check_input_files(config):
 

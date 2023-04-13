@@ -13,6 +13,11 @@ def header(v):
     
     """)
 
+def add_arg_to_config(key,arg,config):
+    if arg:
+        config[key] = arg
+
+    return config
 
 def remove_file(file):
     if os.path.exists(file):
