@@ -55,7 +55,7 @@ def main(sysargs = sys.argv[1:]):
 
 
     config = {}
-    config = set_up_scripts.get_defaults()
+    config = set_up_scripts.get_defaults(config)
 
     if args.config:
         configfile = error_checks.check_configfile(cwd,args.config)

@@ -49,13 +49,11 @@ def parse_yaml_file(configfile,configdict):
             else:
                 clean_key = key.lstrip("-").replace("-","_").rstrip(" ").lstrip(" ").lower()
 
-                if clean_key in valid_keys:
-                    clean_key = valid_keys[clean_key]
-                else:
+                if not clean_key in valid_keys:
                     invalid_keys.append(key)
                     break
                     
-                configdict[valid_keys[clean_key]] = value
+                configdict[clean_key] = value
                 overwriting += 1
 
     if len(invalid_keys)==1:
@@ -167,6 +165,7 @@ def get_valid_keys():
 
     valid_keys.append("verbose")
     valid_keys.append("symlink")
+    valid_keys.append("indir")
     valid_keys.append("outdir")
     valid_keys.append("primer_directory")
     valid_keys.append("depth")
