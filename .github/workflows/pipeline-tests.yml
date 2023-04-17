@@ -1,6 +1,6 @@
 name: denv_pipeline
 on: [push, pull_request]
-	
+
 jobs:
 	run_pipeline_tests:
 		name: analysis_pipeline test on ${{ matrix.os }}
