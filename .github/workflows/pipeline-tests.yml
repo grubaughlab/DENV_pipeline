@@ -1,0 +1,24 @@
+name: denv_pipeline
+on: [push, pull_request]
+defaults:
+	run:
+		bash -l {0}
+		
+jobs:
+	run_pipeline_tests:
+		name: analysis_pipeline test on ${{ matrix.os }}
+		runs-on: ${{ matrix.os }}
+		strategy:
+      		matrix:
+        		os: ["ubuntu-latest", "macos-latest"]
+            steps:
+			  - uses: actions/checkout@v2
+			  - uses: conda-incubator/setup-miniconda@v2
+				with:
+				  environment-file: environment.yml
+				  activate-environment: analysis_env
+				  channels: conda-forge,bioconda,defaults
+				  mamba-version: "*"
+			  - name: install pipeline
+			    run: pip install -e .
+			
