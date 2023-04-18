@@ -23,7 +23,7 @@ NB If step 3 fails on a server because of a "bus error", then first run the comm
 
 # Running the pipeline
 
-```denv_pipeline -h``` will give you all of the usage instructions as follows (information on these options at the bottom of this readme)
+```denv_pipeline -h``` will give you all of the usage instructions (information on these options at the bottom of this readme)
 
 
 ### Example commands
