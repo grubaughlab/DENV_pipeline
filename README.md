@@ -68,15 +68,20 @@ If you want to use your own bed files and reference sequences:
 
 ### Main inputs
 
+
+#### 1. Fastq files
 As a minimum you need fastQ files to analyse. There are two ways you can provide these:
 
-Option A (most people!): The fastq files must be separately in their own folder named by sample. In each file, must have the forward and reverse fastq files, defined by them containing "R1" and "R2" somewhere in the name and with the sample name at the start of the file name. See example input file for more information.
+**Option A** (most people!): The fastq files must be separately in their own folder named by sample. In each file, must have the forward and reverse fastq files, defined by them containing "R1" and "R2" somewhere in the name and with the sample name at the start of the file name. See example input file for more information.
 
-Option B (for Yale users) If you are running on the Yale cluster using their symlinks, simply provide the symlink emailed to you by YCRC (the second half of the link) using ``--symlink`` and the pipeline will deal with it for you.
+For the second option, you can use ``--indir`` to indicate where the folders of samples are kept. Default is the same as the output directory (this is for when you already have a input/output folder where you're working)
 
-- For the second option, you can use ``--indir`` to indicate where the folders of samples are kept. Default is the same as the output directory (this is for when you already have a input/output folder where you're working)
-- NB sample names are found by looping through directories in the input directory. The script ignores temporary and download folders, but will get confused if there are non-sample directories in there other than that.
+NB sample names are found by looping through directories in the input directory. The script ignores temporary and download folders, but will get confused if there are non-sample directories in there other than that.
 
+**Option B** (for Yale users): If you are running on the Yale cluster using their symlinks, simply provide the symlink emailed to you by YCRC (the second half of the link) using ``--symlink`` and the pipeline will deal with it for you.
+
+
+#### 2. Reference sequences and bed files
 To get consensus files for dengue if you are using our sequencing protocol (https://www.protocols.io/view/dengueseq-a-pan-serotype-whole-genome-amplicon-seq-kqdg39xxeg25/v2), you don't need anything else. 
 
 If you want to try other viruses, or use your own reference and bed files:
@@ -86,6 +91,7 @@ If you want to try other viruses, or use your own reference and bed files:
 - Use the ``--reference-directory`` option to provide the path to the directory. 
 
 
+#### 3. Config file
 You can also provide all of your arguments using a config file. This is specified using the ```--config``` option. An template can be found in the main repository. Any command line arguments you specify will overwrite config file arguments.
 
 
