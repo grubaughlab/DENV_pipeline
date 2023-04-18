@@ -10,7 +10,7 @@ It calls input files as a virus type if it has more than 50% coverage of the ref
 
 If running on a server, it is highly recommended to run using screen/tmux or similar.
 
-### Installation instructions
+## Installation instructions
 
 1. Clone this repo by going to your command line interface and typing ```git clone https://github.com/grubaughlab/DENV_pipeline.git```
 2. Navigate to your local copy of the repo by typing ```cd DENV_pipeline```
@@ -21,7 +21,7 @@ If running on a server, it is highly recommended to run using screen/tmux or sim
 
 NB If step 3 fails on a server because of a "bus error", then first run the command "salloc" to request more memory. If this also fails, I've found that mamba works well so if that's installed on your server give that a go
 
-### Running the pipeline
+## Running the pipeline
 
 ```denv_pipeline -h``` will give you all of the usage instructions as follows:
 
