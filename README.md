@@ -69,13 +69,26 @@ Option B (for Yale users) If you are running on the Yale cluster using their sym
 - For the second option, you can use ``--indir`` to indicate where the folders of samples are kept. Default is the same as the output directory (this is for when you already have a input/output folder where you're working)
 - NB sample names are found by looping through directories in the input directory. The script ignores temporary and download folders, but will get confused if there are non-sample directories in there other than that.
 
-To get consensus files for dengue if you are using our sequencing protocol, you don't need anything else. If you want to try other viruses you need some bed files to compare the sequencing data to:
+To get consensus files for dengue if you are using our sequencing protocol (https://www.protocols.io/view/dengueseq-a-pan-serotype-whole-genome-amplicon-seq-kqdg39xxeg25/v2), you don't need anything else. 
 
-- Here, we provide each of the four dengue virus serotypes as package data, and these are used as default. 
-- Otherwise, please use the same format and provide the stem of the files in a "refs.txt" text file in the same folder. Use the ``--primer-directory`` option to provide the path to the directory.
+If you want to try other viruses, or use your own reference and bed files:
+
+- Look at our directory "DENV_primers_and_refs" for formatting file names etc
+- Provide the stem of each file in the "refs.txt" tesxt file in the same folder
+- Use the ``--reference-directory`` option to provide the path to the directory. 
+
 
 You can also provide all of your arguments using a config file. This is specified using the ```--config``` option. An template can be found in the main repository. Any command line arguments you specify will overwrite config file arguments.
 
+### Example commands
+
+If you are using our bed files and reference sequences, the following command is the simplest way to run a sample:
+
+```denv_pipeline --indir <input-directory>```
+
+If you want to use your own bed files and reference sequences:
+
+```denv_pipeline --indir <input-directory> --reference-directory <reference-directory>```
 
 ### Main outputs
 
