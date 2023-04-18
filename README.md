@@ -15,7 +15,8 @@ If running on a server, it is highly recommended to run using screen/tmux or sim
 1. Clone this repo by going to your command line interface and typing ```git clone https://github.com/grubaughlab/DENV_pipeline.git```
 2. Navigate to your local copy of the repo by typing ```cd DENV_pipeline```
 3. Create the conda environment by typing ```conda env create -f environment.yml``` You will need conda to be installed first, installation instructions found here: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html
-4. Install packages from the repo by typing ```pip install .```
+4. Activate the environment by typing ```conda activate analysis_env```
+5. Install packages from the repo by typing ```pip install .```
 
 
 NB If step 3 fails on a server because of a "bus error", then first run the command "salloc" to request more memory. If this also fails, I've found that mamba works well so if that's installed on your server give that a go
