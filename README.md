@@ -23,39 +23,9 @@ NB If step 3 fails on a server because of a "bus error", then first run the comm
 
 # Running the pipeline
 
-```denv_pipeline -h``` will give you all of the usage instructions as follows:
+```denv_pipeline -h``` will give you all of the usage instructions as follows (information on these options at the bottom of this readme)
 
-```    
-            DENVseq pipeline
-                Version 0.1
-        Chrispin Chaguza & Verity Hill
-                Grubaugh Lab
-    
-    
-usage: denv_pipeline [--config CONFIG] [--symlink SYMLINK] [--indir INDIR] [--outdir OUTDIR] [--primer-directory PRIMER_DIRECTORY] [--depth DEPTH] [--temp] [--tempdir TEMPDIR] [--download] [--slurm]
-                     [--verbose] [--help] [--overwrite] [--ct-file CT_FILE] [--ct-column CT_COLUMN] [--id-column ID_COLUMN]
 
-optional arguments:
-  --config CONFIG       config file containing all relevant arguments
-  --symlink SYMLINK     argument for generating symlinks
-  --indir INDIR         directory containing samples. Each sample must be a folder with the forward and reverse runs in. Default is same as output directory
-  --outdir OUTDIR       location where files will be stored.
-  --primer-directory PRIMER_DIRECTORY, -pd PRIMER_DIRECTORY
-                        location where bed files etc for references are
-  --depth DEPTH         depth to map sequences to. Default=20
-  --temp                keep intermediate files
-  --tempdir TEMPDIR     where the temporary files go
-  --download            make a folder without bam files for download
-  --slurm               flag for if running on HPC with slurm
-  --verbose, -v
-  --help, -h
-  --overwrite           overwrite current results
-  --ct-file CT_FILE     to produce a plot of Ct against coverage, provide a csv file containing Ct information by sample
-  --ct-column CT_COLUMN
-                        Name of Ct column in Ct file for plot
-  --id-column ID_COLUMN
-                        Name of ID column in Ct file to make Ct plot
-```
 ### Example commands
 
 If you are using our bed files and reference sequences, the following command is the simplest way to run a sample:
@@ -149,7 +119,7 @@ Within this, there will be:
 ``--indir`` directory containing samples. Each sample must be a folder with the forward and reverse runs in. Default is same as output directory.
 
 
-``--primer-directory`` or ``-pd`` location where bed files etc for references are. Default is the dengue directory provided as package information
+``--reference-directory`` or ``-rd`` location where the bed files for primer trimming and associated reference sequences are. Default is the dengue directory provided as package information
 
 ``--depth`` minimum depth to call consensus. Default is 20
 
