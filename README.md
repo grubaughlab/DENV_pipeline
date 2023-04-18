@@ -38,6 +38,9 @@ To get consensus files for dengue, you don't need anything else. If you want to 
 - Here, we provide each of the four dengue virus serotypes as package data, and these are used as default. 
 - Otherwise, please use the same format and provide the stem of the files in a "refs.txt" text file in the same folder. Use the ``--primer-directory`` option to provide the path to the directory.
 
+You can also provide all of your arguments using a config file. This is specified using the ```--config``` option. An template can be found in the main repository. Any command line arguments you specify will overwrite config file arguments.
+
+
 ### Main outputs
 
 Specify the main output directory using ``--outdir``. Default is the generation of a new folder with today's date.
