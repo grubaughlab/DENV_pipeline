@@ -10,7 +10,7 @@ It calls input files as a virus type if it has more than 50% coverage of the ref
 
 If running on a server, it is highly recommended to run using screen/tmux or similar.
 
-## Installation instructions
+# Installation instructions
 
 1. Clone this repo by going to your command line interface and typing ```git clone https://github.com/grubaughlab/DENV_pipeline.git```
 2. Navigate to your local copy of the repo by typing ```cd DENV_pipeline```
@@ -21,7 +21,7 @@ If running on a server, it is highly recommended to run using screen/tmux or sim
 
 NB If step 3 fails on a server because of a "bus error", then first run the command "salloc" to request more memory. If this also fails, I've found that mamba works well so if that's installed on your server give that a go
 
-## Running the pipeline
+# Running the pipeline
 
 ```denv_pipeline -h``` will give you all of the usage instructions as follows:
 
@@ -56,7 +56,15 @@ optional arguments:
   --id-column ID_COLUMN
                         Name of ID column in Ct file to make Ct plot
 ```
+### Example commands
 
+If you are using our bed files and reference sequences, the following command is the simplest way to run a sample:
+
+```denv_pipeline --indir <input-directory>```
+
+If you want to use your own bed files and reference sequences:
+
+```denv_pipeline --indir <input-directory> --reference-directory <reference-directory>```
 
 ### Main inputs
 
@@ -80,15 +88,6 @@ If you want to try other viruses, or use your own reference and bed files:
 
 You can also provide all of your arguments using a config file. This is specified using the ```--config``` option. An template can be found in the main repository. Any command line arguments you specify will overwrite config file arguments.
 
-### Example commands
-
-If you are using our bed files and reference sequences, the following command is the simplest way to run a sample:
-
-```denv_pipeline --indir <input-directory>```
-
-If you want to use your own bed files and reference sequences:
-
-```denv_pipeline --indir <input-directory> --reference-directory <reference-directory>```
 
 ### Main outputs
 
