@@ -1,5 +1,8 @@
 name: denv_pipeline
 on: [push, pull_request]
+defaults:
+  run:
+    shell: bash -el {0}
 
 jobs:
   run_pipeline_tests:
