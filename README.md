@@ -21,19 +21,55 @@ If running on a server, it is highly recommended to run using screen/tmux or sim
 
 NB If step 3 fails on a server because of a "bus error", then first run the command "salloc" to request more memory. If this also fails, I've found that mamba works well so if that's installed on your server give that a go
 
+### Running the pipeline
+
+```denv_pipeline -h``` will give you all of the usage instructions as follows:
+
+```    
+            DENVseq pipeline
+                Version 0.1
+        Chrispin Chaguza & Verity Hill
+                Grubaugh Lab
+    
+    
+usage: denv_pipeline [--config CONFIG] [--symlink SYMLINK] [--indir INDIR] [--outdir OUTDIR] [--primer-directory PRIMER_DIRECTORY] [--depth DEPTH] [--temp] [--tempdir TEMPDIR] [--download] [--slurm]
+                     [--verbose] [--help] [--overwrite] [--ct-file CT_FILE] [--ct-column CT_COLUMN] [--id-column ID_COLUMN]
+
+optional arguments:
+  --config CONFIG       config file containing all relevant arguments
+  --symlink SYMLINK     argument for generating symlinks
+  --indir INDIR         directory containing samples. Each sample must be a folder with the forward and reverse runs in. Default is same as output directory
+  --outdir OUTDIR       location where files will be stored.
+  --primer-directory PRIMER_DIRECTORY, -pd PRIMER_DIRECTORY
+                        location where bed files etc for references are
+  --depth DEPTH         depth to map sequences to. Default=20
+  --temp                keep intermediate files
+  --tempdir TEMPDIR     where the temporary files go
+  --download            make a folder without bam files for download
+  --slurm               flag for if running on HPC with slurm
+  --verbose, -v
+  --help, -h
+  --overwrite           overwrite current results
+  --ct-file CT_FILE     to produce a plot of Ct against coverage, provide a csv file containing Ct information by sample
+  --ct-column CT_COLUMN
+                        Name of Ct column in Ct file for plot
+  --id-column ID_COLUMN
+                        Name of ID column in Ct file to make Ct plot
+```
+
 
 ### Main inputs
 
 As a minimum you need fastQ files to analyse. There are two ways you can provide these:
 
-1. If you are running on the Yale cluster using their symlinks, simply provide the symlink emailed to you by YCRC (the second half of the link) using ``--symlink`` and the pipeline will deal with it for you.
-2. Otherwise, must be separately in their own folder named by sample. In each file, must have the forward and reverse fastq files, defined by them containing "R1" and "R2" somewhere in the name and with the sample name at the start of the file name. See example input file for more information.
+Option A (most people!): The fastq files must be separately in their own folder named by sample. In each file, must have the forward and reverse fastq files, defined by them containing "R1" and "R2" somewhere in the name and with the sample name at the start of the file name. See example input file for more information.
 
+Option B (for Yale users) If you are running on the Yale cluster using their symlinks, simply provide the symlink emailed to you by YCRC (the second half of the link) using ``--symlink`` and the pipeline will deal with it for you.
 
 - For the second option, you can use ``--indir`` to indicate where the folders of samples are kept. Default is the same as the output directory (this is for when you already have a input/output folder where you're working)
 - NB sample names are found by looping through directories in the input directory. The script ignores temporary and download folders, but will get confused if there are non-sample directories in there other than that.
 
-To get consensus files for dengue, you don't need anything else. If you want to try other viruses you need some bed files to compare the sequencing data to:
+To get consensus files for dengue if you are using our sequencing protocol, you don't need anything else. If you want to try other viruses you need some bed files to compare the sequencing data to:
 
 - Here, we provide each of the four dengue virus serotypes as package data, and these are used as default. 
 - Otherwise, please use the same format and provide the stem of the files in a "refs.txt" text file in the same folder. Use the ``--primer-directory`` option to provide the path to the directory.
