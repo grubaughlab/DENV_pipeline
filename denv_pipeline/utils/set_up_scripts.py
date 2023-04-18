@@ -27,7 +27,7 @@ def get_defaults(config):
     config["outdir"] = f'seq_analysis_{dt.datetime.today().date()}' 
     config["indir"] = config["outdir"]
 
-    config["primer_directory"] = pkg_resources.resource_filename('denv_pipeline', 'DENV_primers_and_refs/')
+    config["reference_directory"] = pkg_resources.resource_filename('denv_pipeline', 'DENV_primers_and_refs/')
 
     return config
 
@@ -142,17 +142,17 @@ def make_folders(config):
     if not os.path.exists(os.path.join(config["outdir"], "log_files")):
         os.mkdir(os.path.join(config["outdir"], "log_files"))
 
-def set_up_primer_directory(config):
+def set_up_reference_directory(config):
 
-    primer_directory = config["primer_directory"]
+    reference_directory = config["reference_directory"]
 
-    if primer_directory:
-        if not primer_directory.endswith("/"):
-            config["primer_directory"] = f'{primer_directory}/'
+    if reference_directory:
+        if not reference_directory.endswith("/"):
+            config["reference_directory"] = f'{reference_directory}/'
         error_checks.check_primer_dir(config)
         
     config["virus_type_list"] = []
-    with open(os.path.join(config["primer_directory"], "refs.txt")) as f:
+    with open(os.path.join(config["reference_directory"], "refs.txt")) as f:
         for l in f:
             config["virus_type_list"].append(l.strip("\n"))
 
@@ -167,7 +167,7 @@ def get_valid_keys():
     valid_keys.append("symlink")
     valid_keys.append("indir")
     valid_keys.append("outdir")
-    valid_keys.append("primer_directory")
+    valid_keys.append("reference_directory")
     valid_keys.append("depth")
     valid_keys.append("temp")
     valid_keys.append("tempdir")

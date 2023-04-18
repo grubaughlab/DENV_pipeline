@@ -28,7 +28,7 @@ def main(sysargs = sys.argv[1:]):
     parser.add_argument("--symlink", dest="symlink", help="argument for generating symlinks", default=False)
     parser.add_argument("--indir", help="directory containing samples. Each sample must be a folder with the forward and reverse runs in. Default is same as output directory")
     parser.add_argument("--outdir", dest="outdir", help="location where files will be stored.")
-    parser.add_argument("--primer-directory", "-pd", help="location where bed files etc for references are")
+    parser.add_argument("--reference-directory", "-rd", help="location where bed files and reference genomes are")
     parser.add_argument("--depth", help="depth to map sequences to. Default=20", default=20)
     
     parser.add_argument("--temp", dest="temp", action="store_true", help="keep intermediate files")
@@ -66,7 +66,7 @@ def main(sysargs = sys.argv[1:]):
     
     config["outdir"] = config["outdir"].rstrip("/")
     config["tempdir"] = os.path.join(config["outdir"], config["tempdir"])
-    config = set_up_scripts.set_up_primer_directory(config)
+    config = set_up_scripts.set_up_reference_directory(config)
 
     if config["overwrite"]:
         set_up_scripts.overwrite(config)

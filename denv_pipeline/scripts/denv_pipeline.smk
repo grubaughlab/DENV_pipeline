@@ -25,7 +25,7 @@ rule denv_mapper:
         log = os.path.join(config["outdir"], "log_files", "_".join(["{sample}", "mapping.log"]))
     params:
         mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh"),
-        primer_dir = config["primer_directory"],
+        primer_dir = config["reference_directory"],
         depth = config["depth"],
         outdir = config["outdir"],
         python_script = os.path.join(workflow.current_basedir,"serotypeCaller.py")

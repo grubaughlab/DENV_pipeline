@@ -57,7 +57,7 @@ def check_input_files(config):
 def check_primer_dir(config):
 
     all_files = []
-    for file in os.listdir(config["primer_directory"]):
+    for file in os.listdir(config["reference_directory"]):
         all_files.append(file)
 
     if "refs.txt" not in all_files:
@@ -73,14 +73,14 @@ def check_primer_dir(config):
         if file.endswith(".fasta"):
             fasta_present = True
         elif file.endswith(".fa"):
-            sys.stderr.write(green(f"Error: Please rename {config['primer_directory']}/{file} to end with '.fasta'.\n"))
+            sys.stderr.write(green(f"Error: Please rename {config['reference_directory']}/{file} to end with '.fasta'.\n"))
             sys.exit(-1)
 
     if not bed:
-        sys.stderr.write(green(f"Error: Missing bed file at {config['primer_directory']}.\n"))
+        sys.stderr.write(green(f"Error: Missing bed file at {config['reference_directory']}.\n"))
         sys.exit(-1)
     if not fasta_present:
-        sys.stderr.write(green(f"Error: Missing reference file at {config['primer_directory']}. \n"))
+        sys.stderr.write(green(f"Error: Missing reference file at {config['reference_directory']}. \n"))
         sys.exit(-1)
 
     return
