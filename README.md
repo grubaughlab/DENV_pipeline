@@ -4,36 +4,70 @@ Created by Verity Hill and Chrispin Chaguza, Grubaugh Lab
 
 Still a bit beta - please feel free to have a go and report any issues you get! I need to run more tests before I tag a release.
 
-This pipeline takes raw read data in the form of fastq files, maps them against provided bed files and then provides a series of outputs for further analysis including consensus sequences. IMPORTANT: the bed files must correspond to the wet lab protocol that you used and the reference sequence used to generate them otherwise the sequences generated will be incorrect. 
+**This pipeline is still in active development including argument names and input files. Use ```git pull``` and reinstall using ```pip install .``` every time you run it**
+
+This pipeline takes raw read data in the form of fastq files, maps them against provided bed files and then provides a series of outputs for further analysis including consensus sequences. 
+
+IMPORTANT: the bed files must correspond to the wet lab protocol that you used and the reference sequence used to generate them otherwise the sequences generated will be incorrect. 
 
 It calls input files as a virus type if it has more than 50% coverage of the reference genome provided.
 
 If running on a server, it is highly recommended to run using screen/tmux or similar.
 
-### Installation instructions
+# Installation instructions
 
-- Clone this repo
-- conda env create -f environment.yml
-- pip install .
+1. Clone this repo by going to your command line interface and typing ```git clone https://github.com/grubaughlab/DENV_pipeline.git```
+2. Navigate to your local copy of the repo by typing ```cd DENV_pipeline```
+3. Create the conda environment by typing ```conda env create -f environment.yml``` You will need conda to be installed first, installation instructions found here: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html
+4. Activate the environment by typing ```conda activate analysis_env```
+5. Install packages from the repo by typing ```pip install .```
 
-If step 2 fails on a server because of a "bus error", then first run the command "salloc" to request more memory. If this also fails, I've found that mamba works well so if that's installed on your server give that a go
 
+NB If step 3 fails on a server because of a "bus error", then first run the command "salloc" to request more memory. If this also fails, I've found that mamba works well so if that's installed on your server give that a go
+
+# Running the pipeline
+
+```denv_pipeline -h``` will give you all of the usage instructions (information on these options at the bottom of this readme)
+
+
+### Example commands
+
+If you are using our bed files and reference sequences, the following command is the simplest way to run a sample:
+
+```denv_pipeline --indir <input-directory>```
+
+If you want to use your own bed files and reference sequences:
+
+```denv_pipeline --indir <input-directory> --reference-directory <reference-directory>```
 
 ### Main inputs
 
+
+#### 1. Fastq files
 As a minimum you need fastQ files to analyse. There are two ways you can provide these:
 
-1. If you are running on the Yale cluster using their symlinks, simply provide the symlink emailed to you by YCRC (the second half of the link) using ``--symlink`` and the pipeline will deal with it for you.
-2. Otherwise, must be separately in their own folder named by sample. In each file, must have the forward and reverse fastq files, defined by them containing "R1" and "R2" somewhere in the name and with the sample name at the start of the file name. See example input file for more information.
+**Option A** (most people!): The fastq files must be separately in their own folder named by sample. In each file, must have the forward and reverse fastq files, defined by them containing "R1" and "R2" somewhere in the name and with the sample name at the start of the file name. See example input file for more information.
+
+For the second option, you can use ``--indir`` to indicate where the folders of samples are kept. Default is the same as the output directory (this is for when you already have a input/output folder where you're working)
+
+NB sample names are found by looping through directories in the input directory. The script ignores temporary and download folders, but will get confused if there are non-sample directories in there other than that.
+
+**Option B** (for Yale users): If you are running on the Yale cluster using their symlinks, simply provide the symlink emailed to you by YCRC (the second half of the link) using ``--symlink`` and the pipeline will deal with it for you.
 
 
-- For the second option, you can use ``--indir`` to indicate where the folders of samples are kept. Default is the same as the output directory (this is for when you already have a input/output folder where you're working)
-- NB sample names are found by looping through directories in the input directory. The script ignores temporary and download folders, but will get confused if there are non-sample directories in there other than that.
+#### 2. Reference sequences and bed files
+To get consensus files for dengue if you are using our sequencing protocol (https://www.protocols.io/view/dengueseq-a-pan-serotype-whole-genome-amplicon-seq-kqdg39xxeg25/v2), you don't need anything else. 
 
-To get consensus files for dengue, you don't need anything else. If you want to try other viruses you need some bed files to compare the sequencing data to:
+If you want to try other viruses, or use your own reference and bed files:
 
-- Here, we provide each of the four dengue virus serotypes as package data, and these are used as default. 
-- Otherwise, please use the same format and provide the stem of the files in a "refs.txt" text file in the same folder. Use the ``--primer-directory`` option to provide the path to the directory.
+- Look at our directory "DENV_primers_and_refs" for formatting file names etc
+- Provide the stem of each file in the "refs.txt" tesxt file in the same folder
+- Use the ``--reference-directory`` option to provide the path to the directory. 
+
+
+#### 3. Config file
+You can also provide all of your arguments using a config file. This is specified using the ```--config``` option. An template can be found in the main repository. Any command line arguments you specify will overwrite config file arguments.
+
 
 ### Main outputs
 
@@ -89,7 +123,7 @@ Within this, there will be:
 ``--indir`` directory containing samples. Each sample must be a folder with the forward and reverse runs in. Default is same as output directory.
 
 
-``--primer-directory`` or ``-pd`` location where bed files etc for references are. Default is the dengue directory provided as package information
+``--reference-directory`` or ``-rd`` location where the bed files for primer trimming and associated reference sequences are. Default is the dengue directory provided as package information
 
 ``--depth`` minimum depth to call consensus. Default is 20
 
