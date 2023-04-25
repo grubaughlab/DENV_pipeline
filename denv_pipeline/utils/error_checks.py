@@ -56,6 +56,10 @@ def check_input_files(config):
 
 def check_primer_dir(config):
 
+    if not os.path.exists(config["reference_directory"]):
+        sys.stderr.write(green(f"Error: reference directory not found at {config['reference_directory']}"))
+        sys.exit(-1)
+
     all_files = []
     for file in os.listdir(config["reference_directory"]):
         all_files.append(file)
