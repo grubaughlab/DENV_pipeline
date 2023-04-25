@@ -63,27 +63,29 @@ def check_primer_dir(config):
     if "refs.txt" not in all_files:
         sys.stderr.write(green(f"Error: Please provide a file called 'refs.txt' containing the name of all the virus types you have references/bed files for.\n"))
         sys.exit(-1)
-    
-    bed = False
-    trim_bed = False
-    fasta_present = False
-    for file in all_files:
-        if file.endswith(".bed"):
-            bed = True
-        if file.endswith(".fasta"):
-            fasta_present = True
-        elif file.endswith(".fa"):
-            sys.stderr.write(green(f"Error: Please rename {config['reference_directory']}/{file} to end with '.fasta'.\n"))
-            sys.exit(-1)
+    else:
+        virus_types = []
+        with open(os.path.join(config["reference_directory"], "refs.txt")) as f:
+            for l in f:
+                virus_types.append(l.strip("\n"))
 
-    if not bed:
-        sys.stderr.write(green(f"Error: Missing bed file at {config['reference_directory']}.\n"))
-        sys.exit(-1)
-    if not fasta_present:
-        sys.stderr.write(green(f"Error: Missing reference file at {config['reference_directory']}. \n"))
-        sys.exit(-1)
+        for virus_type in virus_types:
+            if virus_type != "":
 
-    return
+                bed_file = f'{virus_type}.bed'
+                fasta_file = f'{virus_type}.fasta'
+
+                if not bed_file in all_files:
+                    sys.stderr.write(green(f"Error: Missing bed file for {virus_type} in {config['reference_directory']}. I am expecting it to be called {bed_file}\n"))
+                    sys.exit(-1)
+                if not fasta_file in all_files:
+                    sys.stderr.write(green(f"Error: Missing reference file for {virus_type} in {config['reference_directory']}. I am expecting it to be called {fasta_file}\n"))
+                    sys.exit(-1)
+            else:
+                sys.stderr.write(green(f"Error: Empty line in refs.txt. Please remove.\n"))
+                sys.exit(-1)
+
+        return
 
 def check_env_activated():
 
