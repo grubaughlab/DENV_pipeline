@@ -2,7 +2,7 @@
 
 Created by Verity Hill and Chrispin Chaguza, Grubaugh Lab
 
-Still a bit beta - please feel free to have a go and report any issues you get! I need to run more tests before I tag a release.
+Still a bit beta - please feel free to have a go and report any issues you get! Please provide a screenshot of the error and all log files produced so that I can see what's gone wrong.
 
 **This pipeline is still in active development including argument names and input files. Use ```git pull``` and reinstall using ```pip install .``` every time you run it**
 
