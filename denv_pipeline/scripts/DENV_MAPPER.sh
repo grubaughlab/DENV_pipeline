@@ -9,7 +9,7 @@ outdir=$7
 log=$8
 
 #sort out output files - probably mostly change names so they make sense
-cat ${primer_dir}refs.txt | while read virustype; do 
+while IFS= read -r virustype || [[ -n "$virustype" ]]; do 
 
     fasta=${primer_dir}${virustype}.fasta
     bed=${primer_dir}${virustype}.bed
@@ -67,7 +67,7 @@ cat ${primer_dir}refs.txt | while read virustype; do
     
     bedtools genomecov -d -ibam ${outdir}/${fname%.*}.${virustype}.sort.bam > ${outdir}/${fname%.*}.${virustype}.depth.txt; 
 
-done
+done < "${primer_dir}refs.txt"
 
 
 #other depth loop here
