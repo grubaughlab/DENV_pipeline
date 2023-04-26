@@ -19,6 +19,7 @@ def get_defaults(config):
     
     config["verbose"] = False
     config["slurm"] = False
+    config["slurm_cores"] = 10
     config["download"] = False
     config["temp"] = False
     config["overwrite"] = False
@@ -173,6 +174,7 @@ def get_valid_keys():
     valid_keys.append("tempdir")
     valid_keys.append("download")
     valid_keys.append("slurm")
+    valid_keys.append("slurm_cores")
     valid_keys.append("verbose")
     valid_keys.append("overwrite")
     valid_keys.append("ct_file")
