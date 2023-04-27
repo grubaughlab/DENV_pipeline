@@ -76,7 +76,7 @@ def main(sysargs = sys.argv[1:]):
     if config["symlink"]:
         config = set_up_scripts.symlink_setup(config, cwd)
     else:
-        error_checks.check_input_files
+        error_checks.check_input_files(config)
 
     config = set_up_scripts.get_sample_list(config)
     

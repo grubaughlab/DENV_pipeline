@@ -28,11 +28,11 @@ def check_input_files(config):
     found_sample = False
 
     if not os.path.exists(config["indir"]):
-        sys.stderr.write(green(f"Error: cannot find samples at {config['indir']}. Please provide the input directory using `--indir`, or put them in the directory specific by `--outdir`, or (if using Yale HPC) provide the second half of the symlink provided by Yale genomics\n"))
+        sys.stderr.write(green(f"Error: cannot find {config['indir']}. Please provide the input directory using `--indir`, or put them in the directory specific by `--outdir`, or (if using Yale HPC) provide the second half of the symlink provided by Yale genomics\n"))
         sys.exit(-1)
     else:
         for item in os.listdir(config["indir"]):
-            if os.isdir(item):
+            if os.path.isdir(item):
                 if os.path.join(config['indir'], item) != config["tempdir"] and item != "results" and item != "temporary_files" and item != "log_files":
                     found_sample = True
                     fastq_found = 0
