@@ -97,7 +97,8 @@ def symlink_setup(config, cwd):
     symlink = config["symlink"]
     
     os.chdir(config["indir"])
-    os.system(f"/home/bioinfo/software/knightlab/bin_Mar2018/ycgaFastq {symlink}")
+    os.system("module load ycga-public")
+    os.system(f"ycgaFastq {symlink}")
     os.chdir(cwd)
     
     for sample_dir in os.listdir(config["indir"]):
