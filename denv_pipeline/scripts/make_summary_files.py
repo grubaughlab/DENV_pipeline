@@ -203,7 +203,8 @@ def move_temp_files(config, temp_files, dest):
                         else:
                             os.remove(os.path.join(config["outdir"], name))
                     else:
-                        print(f"{name} does not exist")
+                        if config["verbose"]:
+                            print(f"{name} does not exist")
 
     
 
