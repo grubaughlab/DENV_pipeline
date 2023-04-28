@@ -32,7 +32,7 @@ def check_input_files(config):
         sys.exit(-1)
     else:
         for item in os.listdir(config["indir"]):
-            if os.path.isdir(item):
+            if os.path.isdir(os.path.join(config["indir"], item)):
                 if os.path.join(config['indir'], item) != config["tempdir"] and item != "results" and item != "temporary_files" and item != "log_files":
                     found_sample = True
                     fastq_found = 0
