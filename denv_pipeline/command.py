@@ -65,14 +65,15 @@ def main(sysargs = sys.argv[1:]):
     for arg_name, arg_value in vars(args).items():
         config = misc.add_arg_to_config(arg_name, arg_value, config)
     
+    error_checks.check_paths(config)
     config["outdir"] = config["outdir"].rstrip("/")
     config["tempdir"] = os.path.join(config["outdir"], config["tempdir"])
     config = set_up_scripts.set_up_reference_directory(config)
-
+    
     if config["overwrite"]:
         set_up_scripts.overwrite(config)
     set_up_scripts.make_folders(config)
-    
+
     if config["symlink"]:
         config = set_up_scripts.symlink_setup(config, cwd)
     else:

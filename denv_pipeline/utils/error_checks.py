@@ -22,12 +22,23 @@ def check_configfile(cwd,config_arg):
         print(green(f"Input config file:") + f" {configfile}")
         return configfile
     
+def fix_paths(config):
+
+    path_args = ["outdir", "indir", "tempdir", "reference_directory", "config"]
+    
+    for arg in path_args:
+        if config[arg] and " " in config[arg]:
+            sys.stderr.write(green(f"Error: space in {arg} path name. Please change directory to where there is no spaces. NB dropbox paths always have a spcae in\n"))
+            sys.exit(-1)
+        
+
+    return config
 
 def check_input_files(config):
 
     found_sample = False
 
-    if not os.path.exists(config["indir"]):
+    if not os.path.exists(config['indir']):
         sys.stderr.write(green(f"Error: cannot find {config['indir']}. Please provide the input directory using `--indir`, or put them in the directory specific by `--outdir`, or (if using Yale HPC) provide the second half of the symlink provided by Yale genomics\n"))
         sys.exit(-1)
     else:

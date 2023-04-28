@@ -10,6 +10,8 @@ from denv_pipeline.utils import error_checks
 
 def get_defaults(config):
 
+    config["config"] = False
+    
     config["depth"] = 20
     config["tempdir"] = "temporary_files"
     
@@ -148,7 +150,7 @@ def set_up_reference_directory(config):
 
     reference_directory = config["reference_directory"]
 
-    if reference_directory:
+    if reference_directory != pkg_resources.resource_filename('denv_pipeline', 'DENV_primers_and_refs/'):
         if not reference_directory.endswith("/"):
             config["reference_directory"] = f'{reference_directory}/'
         error_checks.check_primer_dir(config)
