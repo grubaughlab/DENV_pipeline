@@ -31,7 +31,6 @@ def fix_paths(config):
             sys.stderr.write(green(f"Error: space in {arg} path name. Please change directory to where there is no spaces. NB dropbox paths always have a spcae in\n"))
             sys.exit(-1)
         
-
     return config
 
 def check_input_files(config):
