@@ -33,7 +33,7 @@ rule denv_mapper:
         partition="general",
         mem_mb_per_cpu="10G",
         cpus_per_task=1,
-        runtime=5:00:00
+        runtime=300
     shell:
         "{params.mapper_script} {wildcards.sample} {input.read_location}/*R1* {input.read_location}/*R2* {params.primer_dir} {params.python_script} {params.depth} {params.outdir} {log.log}  >> {log.log} 2>&1"
 
