@@ -2,6 +2,7 @@ import os
 import sys
 import csv
 import pkgutil
+import re
 
 from denv_pipeline.utils.misc import *
 
@@ -95,6 +96,18 @@ def check_primer_dir(config):
                 if not fasta_file in all_files:
                     sys.stderr.write(green(f"Error: Missing reference file for {virus_type} in {config['reference_directory']}. I am expecting it to be called {fasta_file}\n"))
                     sys.exit(-1)
+            
+                with open(fasta_file) as f:
+                    seq_count = 0
+                    for l in f:
+                        if l.startswith(">"):
+                            seq_count += 1
+                if seq_count != 1:
+                    sys.stderr.write(green(f"Error: Wrong number of sequences in reference file {fasta_file} - there should only be one.\n"))
+                    sys.exit(-1)
+
+            
+            
             else:
                 sys.stderr.write(green(f"Error: Empty line in refs.txt. Please remove.\n"))
                 sys.exit(-1)
