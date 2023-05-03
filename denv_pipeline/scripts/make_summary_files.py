@@ -21,32 +21,32 @@ def summarise_files(config, per_sample_files, serotype_call_file, top_call_file,
                 all_lines.append(l)
 
                 if l['coverage_untrimmed'] != "NA":
-                    if int(l['coverage_untrimmed']) >= 50:
+                    if float(l['coverage_untrimmed']) >= 50:
                         serotype_call.append(l)
                         top_calls.append(l)
                         found_top = True
                         serotypes[l['sample_id']] = l['serotype']
             
             if not found_top:
-                top = sorted(possible_tops, key=lambda x:int(x['coverage_untrimmed']), reverse=True)[0]
+                top = sorted(possible_tops, key=lambda x:float(x['coverage_untrimmed']), reverse=True)[0]
                 top_calls.append(top)
 
     headers = ["sample_id","consensus_sequence_file","depth","serotype","reference_serotype_name","reference_sequence_length","number_aligned_bases","coverage_untrimmed","coverage_trimmed"]
     
     with open(serotype_call_file, 'w') as fw:
-        writer = csv.DictWriter(delimiter="\t", fieldnames=headers)
+        writer = csv.DictWriter(fw,delimiter="\t", fieldnames=headers)
         writer.writeheader()
         for line in serotype_call:
             writer.writerow(line)
 
     with open(top_call_file, 'w') as fw:
-        writer = csv.DictWriter(delimiter="\t", fieldnames=headers)
+        writer = csv.DictWriter(fw,delimiter="\t", fieldnames=headers)
         writer.writeheader()
         for line in top_calls:
             writer.writerow(line)
 
     with open(all_info_file, 'w') as fw:
-        writer = csv.DictWriter(delimiter="\t", fieldnames=headers)
+        writer = csv.DictWriter(fw,delimiter="\t", fieldnames=headers)
         writer.writeheader()
         for line in all_lines:
             writer.writerow(line)

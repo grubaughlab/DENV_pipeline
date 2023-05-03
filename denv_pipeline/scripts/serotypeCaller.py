@@ -20,18 +20,18 @@ def main():
 
     if not os.path.exists(args.outfile):
         with open(args.outfile, 'w') as fw:
-            writer = csv.DictWriter(fw, fieldnames=headers)
+            writer = csv.DictWriter(fw, delimiter = "\t", fieldnames=headers)
             writer.writeheader()
             write_dict = populate_line(args)
 
             writer.writerow(write_dict)
         
     else:        
-        with open(args.outfile, 'r') as fw:
-            writer = csv.DictWriter(fw, fieldnames=headers)
+        with open(args.outfile, 'a') as fw:
+            writer = csv.DictWriter(fw, delimiter = "\t", fieldnames=headers)
             write_dict = populate_line(args)
             writer.writerow(write_dict)
-            
+
 
 def populate_line(args):
 
