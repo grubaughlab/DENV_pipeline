@@ -3,6 +3,7 @@
 import os
 import sys
 import argparse
+import csv
 from Bio import SeqIO
 from Bio import SeqRecord
 
@@ -12,13 +13,30 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--alignment")
     parser.add_argument("--bed-file", dest="bed_file")
+    parser.add_argument("--outfile")
 
     args = parser.parse_args()
+    headers = ["sample_id","consensus_sequence_file","depth","serotype","reference_serotype_name","reference_sequence_length","number_aligned_bases","coverage_untrimmed","coverage_trimmed"]
+
+    if not os.path.exists(args.outfile):
+        with open(args.outfile, 'w') as fw:
+            writer = csv.DictWriter(fw, fieldnames=headers)
+            writer.writeheader()
+            write_dict = populate_line(args)
+
+            writer.writerow(write_dict)
+        
+    else:        
+        with open(args.outfile, 'r') as fw:
+            writer = csv.DictWriter(fw, fieldnames=headers)
+            write_dict = populate_line(args)
+            writer.writerow(write_dict)
+            
+
+def populate_line(args):
 
     min_coverage=50
     amb_list = {"n", "-", "N"}
-
-    headers = ["sample_id","consensus_sequence_file","depth","serotype","reference_serotype_name","reference_sequence_length","number_aligned_bases","coverage_untrimmed","coverage_trimmed"]
 
     name_elements = args.alignment.split("/")[-1].split(".")
     serotype = name_elements[1]
@@ -65,7 +83,7 @@ def main():
                         seq_trim.id = new_header
                         seq_trim.name = new_header
                         seq_trim.description = new_header
-                        with open(args.alignment.replace(".out.aln",".out.trim.aln"), 'w') as new_file: #add this somewhere else as well so taht it doesn't break if bed file not present
+                        with open(args.alignment.replace(".out.aln",".out.trim.aln"), 'w') as new_file: 
                             SeqIO.write(seq_trim, new_file, 'fasta')
                     else:
                         sys.stderr.write(f"Bed file {args.bed_file} not found")
@@ -103,11 +121,7 @@ def main():
         with open(args.alignment.replace(".out.aln",".out.trim.aln"), 'w') as new_file:
             pass
 
-    final = []
-    for col in headers:
-        final.append(str(write_dict[col]))
-    
-    print("\t".join(final))
+    return write_dict
 
 if __name__=="__main__":
     main()
