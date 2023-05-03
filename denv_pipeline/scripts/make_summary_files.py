@@ -4,30 +4,56 @@ import argparse
 from collections import defaultdict
 import shutil
 
-def summarise_files(config, serotype_calls):
+def summarise_files(config, per_sample_files, serotype_call_file, top_call_file, all_info_file):
 
-    min_coverage = []
     serotypes = defaultdict(list)
-    with open(serotype_calls) as f:
-        data = csv.DictReader(f, delimiter="\t")
-        for l in data:
-            if float(l['coverage_untrimmed']) >= 50:
-                min_coverage.append(l)
-                serotypes[l['sample_id']].append(l['serotype'])
+    all_lines = []
+    top_calls = []
+    serotype_call = []
+
+    for file in per_sample_files:
+        found_top = False
+        possible_tops = []
+        with open(file) as f:
+            data = csv.DictReader(f, delimiter="\t")
+            for l in data:
+                possible_tops.append(l)
+                all_lines.append(l)
+
+                if l['coverage_untrimmed'] != "NA":
+                    if int(l['coverage_untrimmed']) >= 50:
+                        serotype_call.append(l)
+                        top_calls.append(l)
+                        found_top = True
+                        serotypes[l['sample_id']] = l['serotype']
+            
+            if not found_top:
+                top = sorted(possible_tops, key=lambda x:int(x['coverage_untrimmed']), reverse=True)[0]
+                top_calls.append(top)
+
+    headers = ["sample_id","consensus_sequence_file","depth","serotype","reference_serotype_name","reference_sequence_length","number_aligned_bases","coverage_untrimmed","coverage_trimmed"]
     
+    with open(serotype_call_file, 'w') as fw:
+        writer = csv.DictWriter(delimiter="\t", fieldnames=headers)
+        writer.writeheader()
+        for line in serotype_call:
+            writer.writerow(line)
+
+    with open(top_call_file, 'w') as fw:
+        writer = csv.DictWriter(delimiter="\t", fieldnames=headers)
+        writer.writeheader()
+        for line in top_calls:
+            writer.writerow(line)
+
+    with open(all_info_file, 'w') as fw:
+        writer = csv.DictWriter(delimiter="\t", fieldnames=headers)
+        writer.writeheader()
+        for line in all_lines:
+            writer.writerow(line)
+
+
     sort_variant_files(config, serotypes)
     get_right_serotype_files(config, serotypes)
-    
-    if config["temp"]:
-        with open(os.path.join(config["tempdir"], "DENV.serotype.calls.mincov50.final.tsv"), 'w') as fw:
-            headers = ["sample_id", "consensus_sequence_file", "depth", "serotype", "reference_serotype_name", "reference_sequence_length", "number_aligned_bases", "coverage_untrimmed", "coverage_trimmed"]
-            writer = csv.DictWriter(fw, headers, delimiter="\t")
-            writer.writeheader()
-            write_dict = {}
-            for i in min_coverage:
-                for k,v in i.items():
-                    write_dict[k] = v
-                writer.writerow(write_dict)
 
     return
 

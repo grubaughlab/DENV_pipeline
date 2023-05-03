@@ -18,16 +18,16 @@ def main():
     min_coverage=50
     amb_list = {"n", "-", "N"}
 
-    headers = ["SampleID", "ConsSequence", "Depth", "Serotype", "RefSerotypeSequence", "RefSeqLength", "AlignedBases", "CoverageUntrimmed", "CoverageTrimmed"]
+    headers = ["sample_id","consensus_sequence_file","depth","serotype","reference_serotype_name","reference_sequence_length","number_aligned_bases","coverage_untrimmed","coverage_trimmed"]
 
     name_elements = args.alignment.split("/")[-1].split(".")
     serotype = name_elements[1]
     ref_sequence = f'{serotype}.fasta'
     
     write_dict = {}
-    write_dict["SampleID"] = name_elements[0]
-    write_dict["ConsSequence"] = f'{".".join(name_elements[0:3])}.cons.fa'
-    write_dict["Depth"] = name_elements[2]
+    write_dict["sample_id"] = name_elements[0]
+    write_dict["consensus_sequence_file"] = f'{".".join(name_elements[0:3])}.cons.fa'
+    write_dict["depth"] = name_elements[2]
 
     #curent ID is formatted Yale-DN00931/Yale-DN00931.DENV1.20.cons.fa 
     if os.path.exists(args.alignment) and os.path.getsize(args.alignment) > 0: 
@@ -37,9 +37,9 @@ def main():
                 seq_len_no_amb = len([i for i in sequence.seq if i not in amb_list])
                 perc_cov=round(seq_len_no_amb/seq_len*100,2)
 
-                write_dict["RefSeqLength"] = seq_len
-                write_dict["AlignedBases"] = seq_len_no_amb
-                write_dict["CoverageUntrimmed"] = perc_cov
+                write_dict["reference_sequence_length"] = seq_len
+                write_dict["number_aligned_bases"] = seq_len_no_amb
+                write_dict["coverage_untrimmed"] = perc_cov
 
                 if args.bed_file:
                     if os.path.exists(args.bed_file):
@@ -51,14 +51,14 @@ def main():
                         seq_len_no_amb_trim=len([i for i in seq_trim if i not in amb_list])
                         perc_cov_trim=round(seq_len_no_amb_trim/seq_len_trim*100,2)
 
-                        write_dict["CoverageTrimmed"] = perc_cov_trim
+                        write_dict["coverage_trimmed"] = perc_cov_trim
 
                         if perc_cov_trim>=min_coverage:
-                            write_dict["Serotype"] = serotype
-                            write_dict["RefSerotypeSequence"] = ref_sequence
+                            write_dict["serotype"] = serotype
+                            write_dict["reference_serotype_name"] = ref_sequence
                         else:
-                            write_dict["Serotype"] = "NA"
-                            write_dict["RefSerotypeSequence"] = "NA"
+                            write_dict["serotype"] = "NA"
+                            write_dict["reference_serotype_name"] = "NA"
                     
                         new_header = sequence.id.split("/")[0]
                         seq_trim = SeqRecord.SeqRecord(seq_trim)
@@ -74,32 +74,32 @@ def main():
 
 
                 else:
-                    write_dict["CoverageTrimmed"] = "NA"
+                    write_dict["coverage_trimmed"] = "NA"
                     if perc_cov>=min_coverage:
-                        write_dict["Serotype"] = serotype
-                        write_dict["RefSerotypeSequence"] = ref_sequence
+                        write_dict["serotype"] = serotype
+                        write_dict["reference_serotype_name"] = ref_sequence
                     else:
-                        write_dict["Serotype"] = "NA"
-                        write_dict["RefSerotypeSequence"] = "NA"
+                        write_dict["serotype"] = "NA"
+                        write_dict["reference_serotype_name"] = "NA"
                     with open(args.alignment.replace(".out.aln",".out.trim.aln"), 'w') as new_file:
                         pass
 
             else:
-                write_dict["Serotype"] = "Unknown"
-                write_dict["RefSerotypeSequence"] = "NA"
-                write_dict["RefSeqLength"] = "NA"
-                write_dict["AlignedBases"] = "NA"
-                write_dict["CoverageUntrimmed"] = 0
-                write_dict["CoverageTrimmed"] = 0
+                write_dict["serotype"] = "Unknown"
+                write_dict["reference_serotype_name"] = "NA"
+                write_dict["reference_sequence_length"] = "NA"
+                write_dict["number_aligned_bases"] = "NA"
+                write_dict["coverage_untrimmed"] = 0
+                write_dict["coverage_trimmed"] = 0
                 with open(args.alignment.replace(".out.aln",".out.trim.aln"), 'w') as new_file:
                     pass 
     else:
-        write_dict["Serotype"] = "Unknown"
-        write_dict["RefSerotypeSequence"] = "NA"
-        write_dict["RefSeqLength"] = "NA"
-        write_dict["AlignedBases"] = "NA"
-        write_dict["CoverageUntrimmed"] = 0
-        write_dict["CoverageTrimmed"] = 0
+        write_dict["serotype"] = "Unknown"
+        write_dict["reference_serotype_name"] = "NA"
+        write_dict["reference_sequence_length"] = "NA"
+        write_dict["number_aligned_bases"] = "NA"
+        write_dict["coverage_untrimmed"] = 0
+        write_dict["coverage_trimmed"] = 0
         with open(args.alignment.replace(".out.aln",".out.trim.aln"), 'w') as new_file:
             pass
 

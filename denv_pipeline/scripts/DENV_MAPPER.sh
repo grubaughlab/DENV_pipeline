@@ -65,14 +65,6 @@ while IFS= read -r virustype || [[ -n "$virustype" ]]; do
 
 done < "${primer_dir}refs.txt"
 
-#if none of the reads sucessfully map to a reference
-if ! [ -s  ${outdir}/${fname%.*}_all_virustype_info.txt ]; then
-    touch ${outdir}/${fname%.*}_all_virustype_info.txt
-fi
-
-#takes the top call if it's over 50% coverage
-cat ${outdir}/${fname%.*}_all_virustype_info.txt | sort -k8 -n -r | awk '{ if( $8>=50 ){ print } }' >> ${outdir}/${fname%.*}_calls.txt
-
 
 
 
