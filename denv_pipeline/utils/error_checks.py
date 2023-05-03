@@ -97,7 +97,7 @@ def check_primer_dir(config):
                     sys.stderr.write(green(f"Error: Missing reference file for {virus_type} in {config['reference_directory']}. I am expecting it to be called {fasta_file}\n"))
                     sys.exit(-1)
             
-                with open(fasta_file) as f:
+                with open(os.path.join(config["reference_directory"],fasta_file)) as f:
                     seq_count = 0
                     for l in f:
                         if l.startswith(">"):
