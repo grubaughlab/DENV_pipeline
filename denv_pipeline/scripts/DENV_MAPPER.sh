@@ -37,7 +37,6 @@ while IFS= read -r virustype || [[ -n "$virustype" ]]; do
     echo "----->>>>>Indexing bam file"
     samtools index ${outdir}/${fname%.*}.${virustype}.sort.bam >> ${log} 2>&1
 
-#where the loop for depth starts
     echo "----->>>>>Generating consensus sequence"
     samtools mpileup -aa --reference ${fasta} -A -d 10000 -Q 0 ${outdir}/${fname%.*}.${virustype}.sort.bam | ivar consensus -t 0.75 -m ${depth} -p ${outdir}/${fname%.*}.${virustype}.${depth}.cons -i ${fname%.*}"/"${fname%.*}.${virustype}.${depth}.cons.fa >> ${log} 2>&1
     
@@ -47,41 +46,33 @@ while IFS= read -r virustype || [[ -n "$virustype" ]]; do
     if [ -s ${outdir}/${fname%.*}.${virustype}.${depth}.out.aln ]; then
         echo "----->>>>>Aligning with nextalign successful"
     else
-        echo "----->>>>>Aligning with mafft (nextalign not successful)" #to do with the outdir thing? it might be making temp files in cwd
+        echo "----->>>>>Aligning with mafft (nextalign not successful)" 
         mafft --quiet --6merpair --keeplength  --addfragments ${outdir}/${fname%.*}.${virustype}.${depth}.cons.fa ${fasta} > ${outdir}/ZZ.tmp000.${fname%.*}.${virustype}.${depth}
         grep -A 30000000 `grep ">" ${outdir}/${fname%.*}.${virustype}.${depth}.cons.fa` ${outdir}/ZZ.tmp000.${fname%.*}.${virustype}.${depth} > ${outdir}/${fname%.*}.${virustype}.${depth}.out.aln
     fi
 
-    #to put depth loop back in here, add depth to output name
     echo "----->>>>>Calculating percentage coverage against serotype "${virustype}" cps reference sequence"
     if [ -s ${trimbed} ]; then
-        python ${serotype_caller} --alignment ${outdir}/${fname%.*}.${virustype}.${depth}.out.aln --bed-file ${trimbed} >> ${outdir}/${fname%.*}.serotype.calls.txt
+        python ${serotype_caller} --alignment ${outdir}/${fname%.*}.${virustype}.${depth}.out.aln --bed-file ${trimbed} >> ${outdir}/${fname%.*}_all_virustype_info.txt
     else
-        python ${serotype_caller}  --alignment ${outdir}/${fname%.*}.${virustype}.${depth}.out.aln  >> ${outdir}/${fname%.*}.serotype.calls.txt
+        python ${serotype_caller}  --alignment ${outdir}/${fname%.*}.${virustype}.${depth}.out.aln  >> ${outdir}/${fname%.*}_all_virustype_info.txt
     fi
 
     echo "----->>>>>Identifying variants"
     samtools mpileup -aa --reference ${fasta} -A -d 0 -Q 0 ${outdir}/${fname%.*}.${virustype}.sort.bam | ivar variants -p ${outdir}/${fname%.*}.${virustype}.${depth}.variants -q 20 -t 0.03 -r ${fasta} >> ${log} 2>&1
-
-    #depth loop finishes here
     
     bedtools genomecov -d -ibam ${outdir}/${fname%.*}.${virustype}.sort.bam > ${outdir}/${fname%.*}.${virustype}.depth.txt; 
 
 done < "${primer_dir}refs.txt"
 
-
-#other depth loop here
-
 #if none of the reads sucessfully map to a reference
-if ! [ -s  ${outdir}/${fname%.*}.serotype.calls.txt ]; then
-    touch ${outdir}/${fname%.*}.serotype.calls.txt
+if ! [ -s  ${outdir}/${fname%.*}_all_virustype_info.txt ]; then
+    touch ${outdir}/${fname%.*}_all_virustype_info.txt
 fi
 
 #takes the top call if it's over 50% coverage
-cat ${outdir}/${fname%.*}.serotype.calls.txt | sort -k8 -n -r | awk '{ if( $8>=50 ){ print } }' >> ${outdir}/tmp.${fname%.*}.serotype.calls.${depth}.txt
+cat ${outdir}/${fname%.*}_all_virustype_info.txt | sort -k8 -n -r | awk '{ if( $8>=50 ){ print } }' >> ${outdir}/${fname%.*}_calls.txt
 
-#if depth loop goes back in, need this at the end - and change the outputs of the python script to be name.depth.serotype.txt
-#cat ${outdir}/${fname%.*}.*.serotype.txt > ${outdir}/${fname%.*}.serotype.calls.txt
 
 
 

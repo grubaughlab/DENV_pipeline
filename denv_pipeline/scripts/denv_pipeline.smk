@@ -19,8 +19,8 @@ rule denv_mapper:
     input:
         read_location = os.path.join(config["indir"], "{sample}")
     output:
-        temp_call_files = (os.path.join(config["outdir"], ".".join(["tmp.{sample}.serotype.calls", str(config["depth"]), "txt"]))),
-        sample_serotype_calls = (os.path.join(config["outdir"], "{sample}.serotype.calls.txt"))
+        individual_call_files = temp(os.path.join(config["outdir"], "{sample}_calls.txt")),
+        individual_all_virustype_info = temp(os.path.join(config["outdir"], "{sample}_all_virustype_info.txt"))
     log:
         log = os.path.join(config["outdir"], "log_files", "_".join(["{sample}", "mapping.log"]))
     params:
@@ -39,8 +39,9 @@ rule denv_mapper:
 
 rule denv_summary:
     input:
-        sample_serotype_calls = expand(os.path.join(config["outdir"], "{sample}.serotype.calls.txt"), sample=config["sample_list"]),
-        temp_call_files = expand(os.path.join(config["outdir"], "tmp.{sample}.serotype.calls.{depth}.txt"), sample=config["sample_list"], depth=config["depth"])
+    #these have to be like this (ie not rules.output) otherwise the wildcards don't work
+        individual_all_virustype_info = expand(os.path.join(config["outdir"], "{sample}_all_virustype_info.txt"), sample=config["sample_list"]),
+        individual_call_files =  expand(os.path.join(config["outdir"], "{sample}_calls.txt"), sample=config["sample_list"])
     output:
         denv_serotype_calls = os.path.join(config["outdir"], "DENV.serotype.calls.tsv"),
         all_sample_summary = os.path.join(config["outdir"],"summary.all.samples.tsv"),
@@ -54,16 +55,16 @@ rule denv_summary:
         os.path.join(config["outdir"], "log_files", "summary.log")
     run:
         shell('echo -e "sample_id\tconsensus_sequence_file\tdepth\tserotype\treference_serotype_name\treference_sequence_length\tnumber_aligned_bases\tcoverage_untrimmed\tcoverage_trimmed" > {output.denv_serotype_calls}')
-        shell('cat {input.temp_call_files} >> {output.denv_serotype_calls}')
+        shell('cat {input.individual_call_files} >> {output.denv_serotype_calls}')
         
         print("summarising files")
         make_summary_files.summarise_files(config, output.denv_serotype_calls)
         
         shell('echo -e "sample_id\tconsensus_sequence_file\tdepth\tserotype\treference_serotype_name\treference_sequence_length\tnumber_aligned_bases\tcoverage_untrimmed\tcoverage_trimmed" > {output.all_sample_summary}')
-        shell('cat {input.sample_serotype_calls} >> {output.all_sample_summary}')
+        shell('cat {input.individual_all_virustype_info} >> {output.all_sample_summary}')
 
         shell('echo -e "sample_id\tconsensus_sequence_file\tdepth\tserotype\treference_serotype_name\treference_sequence_length\tnumber_aligned_bases\tcoverage_untrimmed\tcoverage_trimmed" > {output.top_serotype_calls_all};')
-        shell('ls {input.sample_serotype_calls} | while read i; do cat $i | sort -k8 -n -r | head -1 >> {output.top_serotype_calls_all}; done')
+        shell('ls {input.individual_all_virustype_info} | while read i; do cat $i | sort -k8 -n -r | head -1 >> {output.top_serotype_calls_all}; done')
         
         alignment_dir = os.path.join(params.results_dir, "alignments")
         for virus_type in config["virus_type_list"]:
