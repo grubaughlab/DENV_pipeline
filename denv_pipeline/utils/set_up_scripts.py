@@ -5,7 +5,7 @@ import pkg_resources
 import yaml
 import datetime as dt
 
-from denv_pipeline.utils.misc import *
+from denv_pipeline.utils import misc
 from denv_pipeline.utils import error_checks
 
 def get_defaults(config):
@@ -60,15 +60,15 @@ def parse_yaml_file(configfile,configdict):
                 overwriting += 1
 
     if len(invalid_keys)==1:
-        sys.stderr.write(cyan(f'Error: invalid key in config file.\n') + f'\t- {invalid_keys[0]}\n')
+        sys.stderr.write(misc.cyan(f'Error: invalid key in config file.\n') + f'\t- {invalid_keys[0]}\n')
         sys.exit(-1)
     elif len(invalid_keys) >1:
         keys = ""
         for i in invalid_keys:
             keys += f"\t- {i}\n"
-        sys.stderr.write(cyan(f'Error: invalid keys in config file.\n') + f'{keys}')
+        sys.stderr.write(misc.cyan(f'Error: invalid keys in config file.\n') + f'{keys}')
         sys.exit(-1)
-    print(green(f"Adding {overwriting} arguments to internal config."))
+    print(misc.green(f"Adding {overwriting} arguments to internal config."))
 
     return configdict
 
@@ -76,7 +76,7 @@ def load_yaml(f):
     try:
         input_config = yaml.load(f, Loader=yaml.FullLoader)
     except:
-        sys.stderr.write(cyan(f'Error: failed to read config file. Ensure your file in correct yaml format.\n'))
+        sys.stderr.write(misc.cyan(f'Error: failed to read config file. Ensure your file in correct yaml format.\n'))
         sys.exit(-1)
     return input_config
 
@@ -130,22 +130,30 @@ def get_sample_list(config):
 
 def make_folders(config):
 
-    outdir = config["outdir"]
+    out_dir = config["outdir"]
+    temp_dir = config["tempdir"]
+    results_dir = os.path.join(config["outdir"], "results")
+    log_dir = os.path.join(config["outdir"], "log_files")
 
-    if not os.path.exists(outdir):
-        os.mkdir(outdir)
+    if not os.path.exists(out_dir):
+        os.mkdir(out_dir)
         
-    if os.path.exists(os.path.join(outdir, "results")) and not config["overwrite"]:
-        sys.stderr.write(green(f"Error: results files already exist at {outdir}. Use --overwrite flag to delete and regenerate results."))
+    if os.path.exists(os.path.join(out_dir, "results")) and not config["overwrite"]:
+        sys.stderr.write(misc.green(f"Error: results files already exist at {out_dir}. Use --overwrite flag to delete and regenerate results."))
         sys.exit(-1)
     else:
-        os.mkdir(os.path.join(outdir, "results"))
-        if config["temp"]:
-            if not os.path.exists(config["tempdir"]):
-                os.mkdir(config["tempdir"])
+        misc.make_directory(results_dir)
+        misc.make_directory(temp_dir)
+        misc.make_directory(log_dir)
 
-    if not os.path.exists(os.path.join(config["outdir"], "log_files")):
-        os.mkdir(os.path.join(config["outdir"], "log_files"))
+        misc.make_directory(os.path.join(results_dir, "bam_files"))
+        misc.make_directory(os.path.join(results_dir, "variants"))
+        misc.make_directory(os.path.join(results_dir, "depth"))
+        misc.make_directory(os.path.join(results_dir, "consensus_sequences"))
+        misc.make_directory(os.path.join(results_dir, "alignments"))
+
+        if config["download"]:
+            misc.make_directory(os.path.join(config["outdir"], "downloads")) 
 
 def set_up_reference_directory(config):
 

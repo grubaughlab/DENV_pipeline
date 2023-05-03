@@ -53,13 +53,6 @@ rule denv_summary:
     log:
         os.path.join(config["outdir"], "log_files", "summary.log")
     run:
-        misc.make_directory(params.results_dir)
-        misc.make_directory(os.path.join(params.results_dir, "bam_files"))
-        misc.make_directory(os.path.join(params.results_dir, "variants"))
-        misc.make_directory(os.path.join(params.results_dir, "depth"))
-        misc.make_directory(os.path.join(params.results_dir, "consensus_sequences"))
-        misc.make_directory(os.path.join(params.results_dir, "alignments"))
-
         shell('echo -e "sample_id\tconsensus_sequence_file\tdepth\tserotype\treference_serotype_name\treference_sequence_length\tnumber_aligned_bases\tcoverage_untrimmed\tcoverage_trimmed" > {output.denv_serotype_calls}')
         shell('cat {input.temp_call_files} >> {output.denv_serotype_calls}')
         
@@ -122,7 +115,6 @@ rule tidy_up:
         shutil.move(input.top_calls_all, params.results_dir)  
 
         if config["download"]:
-            misc.make_directory(os.path.join(config["outdir"], "downloads")) 
             for directory in os.listdir(params.results_dir):
                 if directory != "bam_files":
                     source = os.path.join(params.results_dir, directory)

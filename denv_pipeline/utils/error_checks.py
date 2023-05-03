@@ -105,8 +105,6 @@ def check_primer_dir(config):
                 if seq_count != 1:
                     sys.stderr.write(green(f"Error: Wrong number of sequences in reference file {fasta_file} - there should only be one.\n"))
                     sys.exit(-1)
-
-            
             
             else:
                 sys.stderr.write(green(f"Error: Empty line in refs.txt. Please remove.\n"))
