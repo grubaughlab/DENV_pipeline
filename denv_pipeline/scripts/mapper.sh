@@ -63,4 +63,6 @@ while IFS= read -r virustype || [[ -n "$virustype" ]]; do
     
     bedtools genomecov -d -ibam ${tempdir}/${fname%.*}.${virustype}.sort.bam > ${tempdir}/${fname%.*}.${virustype}.depth.txt; 
 
+    echo "--->>>>> Finished"
+
 done < "${primer_dir}refs.txt"

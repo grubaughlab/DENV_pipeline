@@ -15,7 +15,7 @@ rule all:
         os.path.join(config["outdir"], "results", "DENV.serotype.calls.tsv"),
         os.path.join(config["outdir"], "results", "variant_plot.pdf")
 
-rule denv_mapper:
+rule mapper:
     input:
         read_location = os.path.join(config["indir"], "{sample}")
     output:
@@ -23,11 +23,11 @@ rule denv_mapper:
     log:
         log = os.path.join(config["outdir"], "log_files", "_".join(["{sample}", "mapping.log"]))
     params:
-        mapper_script = os.path.join(workflow.current_basedir,"DENV_MAPPER.sh"),
+        mapper_script = os.path.join(workflow.current_basedir,"mapper.sh"),
         primer_dir = config["reference_directory"],
         depth = config["depth"],
         tempdir = config["tempdir"],
-        python_script = os.path.join(workflow.current_basedir,"serotypeCaller.py")
+        python_script = os.path.join(workflow.current_basedir,"serotype_caller.py")
     resources:
         partition="general",
         mem_mb_per_cpu="10G",
@@ -39,7 +39,7 @@ rule denv_mapper:
         if not os.path.exists(os.path.join(params.tempdir,f"{wildcards.sample}_all_virustype_info.txt")):
             shell("touch {params.tempdir}/{wildcards.sample}_all_virustype_info.txt")
 
-rule denv_summary:
+rule summary:
     input:
     #have to be like this (ie not rules.output) otherwise the wildcards don't work
         individual_all_virustype_info = expand(os.path.join(config["tempdir"], "{sample}_all_virustype_info.txt"), sample=config["sample_list"])
@@ -69,12 +69,12 @@ rule denv_summary:
 
 rule make_qc_plots:
     input:
-        serotype_calls_file = rules.denv_summary.output.serotype_calls,
-        variant_summary_file = rules.denv_summary.output.variant_summary_file
+        serotype_calls_file = rules.summary.output.serotype_calls,
+        variant_summary_file = rules.summary.output.variant_summary_file
     output:
         variant_plot = os.path.join(config["outdir"], "results", "variant_plot.pdf")
     params:
-        results_dir = rules.denv_summary.params.results_dir
+        results_dir = rules.summary.params.results_dir
     run:
         serotype_dict, colour_dict, patch_list = visualisations.prepare_for_plots(input.serotype_calls_file)
         

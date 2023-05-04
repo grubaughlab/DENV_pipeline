@@ -11,7 +11,7 @@ setup(name='denv_pipeline',
       packages=find_packages(),
       scripts=[
             "denv_pipeline/scripts/denv_pipeline.smk",
-            "denv_pipeline/scripts/DENV_MAPPER.sh"
+            "denv_pipeline/scripts/mapper.sh"
             ],
       description='Bioinformatic pipeline to generate reads and consensus sequences for DENV',
       package_data={"denv_pipeline":["DENV_primers_and_refs/*"]},
