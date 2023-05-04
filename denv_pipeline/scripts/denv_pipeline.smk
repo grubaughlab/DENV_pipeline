@@ -12,7 +12,7 @@ cwd = os.getcwd()
 
 rule all: 
     input:
-        os.path.join(config["outdir"], "results", "DENV.serotype.calls.tsv"),
+        os.path.join(config["outdir"], "results", "virus_calls.tsv"),
         os.path.join(config["outdir"], "results", "variant_plot.pdf")
 
 rule mapper:
@@ -44,9 +44,9 @@ rule summary:
     #have to be like this (ie not rules.output) otherwise the wildcards don't work
         individual_all_virustype_info = expand(os.path.join(config["tempdir"], "{sample}_all_virustype_info.txt"), sample=config["sample_list"])
     output:
-        serotype_calls = os.path.join(config["outdir"], "results", "DENV.serotype.calls.tsv"),
-        all_serotype_summary = os.path.join(config["outdir"], "results", "summary.all.samples.tsv"),
-        top_serotype_summary = os.path.join(config["outdir"], "results", "DENV.top.serotype.calls.all.samples.tsv"),
+        serotype_calls = os.path.join(config["outdir"], "results", "virus_calls.tsv"),
+        all_serotype_summary = os.path.join(config["outdir"], "results", "summary_all_samples.tsv"),
+        top_serotype_summary = os.path.join(config["outdir"], "results", "top_virus_all_samples.tsv"),
         variant_summary_file = os.path.join(config["outdir"], "results", "variants", "variants_summary.tsv")
     params:
         results_dir = os.path.join(config["outdir"], "results"),
