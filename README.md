@@ -23,7 +23,7 @@ If running on a server, it is highly recommended to run using screen/tmux or sim
 5. Install packages from the repo by typing ```pip install .```
 
 
-NB If step 3 fails on a server because of a "bus error", then first run the command "salloc" to request more memory. If this also fails, I've found that mamba works well so if that's installed on your server give that a go
+NB If step 3 fails on a server because of a "bus error", then first run the command "salloc" to request more memory. If this also fails, I've found that mamba works well so if that's installed on your server give that a go.
 
 # Running the pipeline
 
@@ -53,7 +53,7 @@ For the second option, you can use ``--indir`` to indicate where the folders of 
 NB sample names are found by looping through directories in the input directory. The script ignores temporary and download folders, but will get confused if there are non-sample directories in there other than that.
 
 **Option B** (for Yale users): If you are running on the Yale cluster using their symlinks, simply provide the symlink emailed to you by YCRC (the second half of the link) using ``--symlink`` and the pipeline will deal with it for you.
-
+NB you must run ```module load ycga-public``` in the command line before using this option
 
 #### 2. Reference sequences and bed files
 To get consensus files for dengue if you are using our sequencing protocol (https://www.protocols.io/view/dengueseq-a-pan-serotype-whole-genome-amplicon-seq-kqdg39xxeg25/v2), you don't need anything else. 

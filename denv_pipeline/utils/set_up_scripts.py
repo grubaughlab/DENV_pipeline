@@ -99,7 +99,6 @@ def symlink_setup(config, cwd):
     symlink = config["symlink"]
     
     os.chdir(config["indir"])
-    os.system("module load ycga-public")
     os.system(f"ycgaFastq {symlink}")
     os.chdir(cwd)
     
@@ -139,7 +138,7 @@ def make_folders(config):
         os.mkdir(out_dir)
         
     if os.path.exists(os.path.join(out_dir, "results")) and not config["overwrite"]:
-        sys.stderr.write(misc.green(f"Error: results files already exist at {out_dir}. Use --overwrite flag to delete and regenerate results."))
+        sys.stderr.write(misc.green(f"Error: results files already exist at {out_dir}. Use --overwrite flag to delete and regenerate results.\n"))
         sys.exit(-1)
     else:
         misc.make_directory(results_dir)
