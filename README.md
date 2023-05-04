@@ -23,7 +23,7 @@ If running on a server, it is highly recommended to run using screen/tmux or sim
 5. Install packages from the repo by typing ```pip install .```
 
 
-NB If step 3 fails on a server because of a "bus error", then first run the command "salloc" to request more memory. If this also fails, I've found that mamba works well so if that's installed on your server give that a go.
+NB If step 3 fails on a server because of a "bus error", then first run the command "salloc" to request more memory. If this also fails, I've found that mamba works well so if that's installed on your server give that a go. For Yale HPCs, you may need to run "module load miniconda" before running step 3.
 
 # Running the pipeline
 
