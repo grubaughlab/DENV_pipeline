@@ -7,7 +7,6 @@ import csv
 from Bio import SeqIO
 from Bio import SeqRecord
 
-#all the names want to come out as Yale-XXXX/Yale-XXXX.DENVX.20.cons.fa at this point
 def main():
 
     parser = argparse.ArgumentParser()
@@ -47,7 +46,6 @@ def populate_line(args):
     write_dict["consensus_sequence_file"] = f'{".".join(name_elements[0:3])}.cons.fa'
     write_dict["depth"] = name_elements[2]
 
-    #curent ID is formatted Yale-DN00931/Yale-DN00931.DENV1.20.cons.fa 
     if os.path.exists(args.alignment) and os.path.getsize(args.alignment) > 0: 
         for sequence in SeqIO.parse(args.alignment, 'fasta'):
             if sequence.seq:
@@ -78,11 +76,7 @@ def populate_line(args):
                             write_dict["serotype"] = "NA"
                             write_dict["reference_serotype_name"] = "NA"
                     
-                        new_header = sequence.id.split("/")[0]
                         seq_trim = SeqRecord.SeqRecord(seq_trim)
-                        seq_trim.id = new_header
-                        seq_trim.name = new_header
-                        seq_trim.description = new_header
                         with open(args.alignment.replace(".out.aln",".out.trim.aln"), 'w') as new_file: 
                             SeqIO.write(seq_trim, new_file, 'fasta')
                     else:

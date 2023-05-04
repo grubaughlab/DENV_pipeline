@@ -38,7 +38,7 @@ while IFS= read -r virustype || [[ -n "$virustype" ]]; do
     samtools index ${tempdir}/${fname%.*}.${virustype}.sort.bam >> ${log} 2>&1
 
     echo "----->>>>>Generating consensus sequence"
-    samtools mpileup -aa --reference ${fasta} -A -d 10000 -Q 0 ${tempdir}/${fname%.*}.${virustype}.sort.bam | ivar consensus -t 0.75 -m ${depth} -p ${tempdir}/${fname%.*}.${virustype}.${depth}.cons -i ${fname%.*}"/"${fname%.*}.${virustype}.${depth}.cons.fa >> ${log} 2>&1
+    samtools mpileup -aa --reference ${fasta} -A -d 10000 -Q 0 ${tempdir}/${fname%.*}.${virustype}.sort.bam | ivar consensus -t 0.75 -m ${depth} -p ${tempdir}/${fname%.*}.${virustype}.${depth}.cons -i ${fname%.*} >> ${log} 2>&1
     
     echo "----->>>>>Aligning consensus cps sequence against the reference serotype "${virustype}" cps sequence"
     nextalign run  --reference ${fasta} --output-fasta ${tempdir}/${fname%.*}.${virustype}.${depth}.out.aln ${tempdir}/${fname%.*}.${virustype}.${depth}.cons.fa >> ${log} 2>&1
@@ -48,7 +48,7 @@ while IFS= read -r virustype || [[ -n "$virustype" ]]; do
     else
         echo "----->>>>>Aligning with mafft (nextalign not successful)" 
         mafft --quiet --6merpair --keeplength  --addfragments ${tempdir}/${fname%.*}.${virustype}.${depth}.cons.fa ${fasta} > ${tempdir}/${fname%.*}.${virustype}.${depth}.alignment_intermediate.fasta
-        grep -A 30000000 `grep ">" ${tempdir}/${fname%.*}.${virustype}.${depth}.cons.fa` ${tempdir}/${fname%.*}.${virustype}.${depth}.alignment_intermediate.fasta > ${tempdir}/${fname%.*}.${virustype}.${depth}.out.aln
+        grep -A 30000000 'grep ">" ${tempdir}' ${tempdir}/${fname%.*}.${virustype}.${depth}.alignment_intermediate.fasta > ${tempdir}/${fname%.*}.${virustype}.${depth}.out.aln
     fi
 
     echo "----->>>>>Calculating percentage coverage against serotype "${virustype}" cps reference sequence"

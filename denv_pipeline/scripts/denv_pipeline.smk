@@ -53,8 +53,6 @@ rule denv_summary:
         outdir = config["outdir"],
         tempdir = config["tempdir"],
         python_script = os.path.join(workflow.current_basedir,"make_summary_files.py")
-    log:
-        os.path.join(config["outdir"], "log_files", "summary.log")
     run:        
         print("summarising files")
         make_summary_files.summarise_files(config, input.individual_all_virustype_info, output.serotype_calls, output.top_serotype_summary, output.all_serotype_summary)
