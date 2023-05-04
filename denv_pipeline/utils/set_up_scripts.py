@@ -12,7 +12,7 @@ def get_defaults(config):
 
     config["config"] = False
     
-    config["depth"] = 20
+    config["depth"] = 10
     config["tempdir"] = "temporary_files"
     
     config['ct_file'] = False

@@ -29,7 +29,7 @@ def main(sysargs = sys.argv[1:]):
     parser.add_argument("--indir", help="directory containing samples. Each sample must be a folder with the forward and reverse runs in. Default is same as output directory")
     parser.add_argument("--outdir", dest="outdir", help="location where files will be stored.")
     parser.add_argument("--reference-directory", "-rd", help="location where bed files and reference genomes are")
-    parser.add_argument("--depth", help="depth to map sequences to. Default=20", default=20)
+    parser.add_argument("--depth", help="depth to map sequences to. Default=10")
     
     parser.add_argument("--temp", dest="temp", action="store_true", help="keep intermediate files")
     parser.add_argument("--tempdir", dest="tempdir", help="where the temporary files go", default="temporary_files")
