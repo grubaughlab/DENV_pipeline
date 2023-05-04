@@ -8,7 +8,7 @@ def header(v):
     
             DENVseq pipeline
                 Version {v}
-        Chrispin Chaguza & Verity Hill
+        Verity Hill & Chrispin Chaguza
                 Grubaugh Lab
     
     """)
