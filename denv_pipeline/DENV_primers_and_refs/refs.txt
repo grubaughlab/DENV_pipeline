@@ -3,3 +3,4 @@ DENV2
 DENV3
 DENV4
 DENV2_sylvatic
+DENV4_sylvatic

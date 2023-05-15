@@ -91,7 +91,7 @@ def check_primer_dir(config):
                 fasta_file = f'{virus_type}.fasta'
 
                 if not bed_file in all_files:
-                    sys.stderr.write(green(f"Error: Missing bed file for {virus_type} in {config['reference_directory']}. I am expecting it to be called {bed_file}\n"))
+                    sys.stderr.write(green(f"Error: Missing bed file for {virus_type} in {config['reference_directory']}. I am expecting it to be called {bed_file} and the '.bed' has to be lower case.\n"))
                     sys.exit(-1)
                 if not fasta_file in all_files:
                     sys.stderr.write(green(f"Error: Missing reference file for {virus_type} in {config['reference_directory']}. I am expecting it to be called {fasta_file}\n"))
