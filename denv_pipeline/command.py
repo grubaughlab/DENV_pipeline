@@ -64,6 +64,8 @@ def main(sysargs = sys.argv[1:]):
 
     for arg_name, arg_value in vars(args).items():
         config = misc.add_arg_to_config(arg_name, arg_value, config)
+    if "indir" not in config:
+        config["indir"] = config["outdir"]
     
     config["outdir"] = config["outdir"].rstrip("/")
     config["tempdir"] = os.path.join(config["outdir"], config["tempdir"])
