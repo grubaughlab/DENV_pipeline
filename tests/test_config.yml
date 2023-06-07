@@ -10,6 +10,6 @@ download: True
 temp: True
 overwrite: True
 symlink: False
-outdir: "test_output"
+outdir: "tests/test_output"
 reference_directory: "tests/test_refs" 
 indir: "tests/one_sample"
