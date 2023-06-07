@@ -3,8 +3,10 @@ import sys
 import csv
 import pkgutil
 import re
+import yaml
 
 from denv_pipeline.utils.misc import *
+from denv_pipeline.utils import set_up_scripts
 
 def check_configfile(cwd,config_arg):
     
@@ -33,6 +35,46 @@ def fix_paths(config):
             sys.exit(-1)
         
     return config
+
+def check_arg_addition(config, args, configfile):
+
+    test_dict = {}
+    test_dict = set_up_scripts.get_defaults(test_dict)
+    
+    valid_keys = set_up_scripts.get_valid_keys()
+
+    if config["config"]:
+        #reduced version of the check and read-in 
+        with open(configfile,"r") as f:
+            input_config = yaml.load(f, Loader=yaml.FullLoader)
+            for key in input_config:
+                value = input_config[key]
+                if value == None: # dont count blank entries
+                    pass
+                else:
+                    clean_key = key.lstrip("-").replace("-","_").rstrip(" ").lstrip(" ").lower()
+                    test_dict[clean_key] = value
+
+    for arg_name, arg_value in vars(args).items():
+        test_dict = add_arg_to_config(arg_name, arg_value, test_dict)
+
+    for k,v in test_dict.items():
+        if v != config[k]:
+            sys.stderr.write(green(f"Error: arguments incorrectly written to internal dictionary. Please file a github issue and in the mean time try writing arguments in a config file (if you have written them on the command line) or providing them on the command line (if you provided a config file)\n"))
+            for k in sorted(config):
+                print((f" - {k}: ") + f"{config[k]}" + f" against {test_dict[k]}")
+            sys.exit(-1)
+
+    for key in valid_keys:
+        if key not in config:
+            sys.stderr.write(green(f"Error: missing arguments in internal dictionary. Please file a github issue and in the mean time try writing arguments in a config file (if you have written them on the command line) or providing them on the command line (if you provided a config file)\n"))
+            sys.exit(-1)
+
+    for key in config:
+        if key not in valid_keys:
+            sys.stderr.write(green(f"Error: invalid argument {key}. Please check the arguments using denv_pipeline -h.\n"))
+            sys.exit(-1)
+
 
 def check_input_files(config):
 
@@ -133,12 +175,17 @@ def check_ct_file(config):
         sys.stderr.write(green(f"Error: ct_column or id_column specified but no ct_file for ct vs coverage plot. Please provide file containing Ct information."))
         sys.exit(-1)
 
+    if not os.path.exists(config["ct_file"]):
+        sys.stderr.write(green(f"Error: Ct file not found at {config['ct_file']}"))
+        sys.exit(-1)
+
+
     with open(config["ct_file"]) as f:
         data = csv.DictReader(f)
         headers = data.fieldnames
         if config["ct_column"] not in headers:
-            sys.stderr.write(green(f"Error: ct_column not found in ct_file"))
+            sys.stderr.write(green(f"Error: {config['ct_column']} not found in ct_file"))
             sys.exit(-1)
         if config["id_column"] not in headers:
-            sys.stderr.write(green(f"Error: id_column not found in ct_file"))
+            sys.stderr.write(green(f"Error: {config['id_column']} not found in ct_file"))
             sys.exit(-1)

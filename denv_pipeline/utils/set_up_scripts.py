@@ -9,7 +9,7 @@ from denv_pipeline.utils import misc
 from denv_pipeline.utils import error_checks
 
 def get_defaults(config):
-
+       
     config["config"] = False
     
     config["depth"] = 10
@@ -26,6 +26,7 @@ def get_defaults(config):
     config["temp"] = False
     config["overwrite"] = False
     config["symlink"] = False
+    config["dry_run"] = False
 
     config["outdir"] = f'seq_analysis_{dt.datetime.today().date()}' 
 
@@ -186,6 +187,8 @@ def get_valid_keys():
     valid_keys.append("slurm")
     valid_keys.append("slurm_cores")
     valid_keys.append("verbose")
+    valid_keys.append("config")
+    valid_keys.append("dry_run")
     valid_keys.append("overwrite")
     valid_keys.append("ct_file")
     valid_keys.append("ct_column")
