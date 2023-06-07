@@ -21,3 +21,5 @@ jobs:
           mamba-version: "*"
       - name: install pipeline
         run: pip install -e .	
+      - name: test_setup
+        run: denv_pipeline --config tests/test_config.yml --dry-run
