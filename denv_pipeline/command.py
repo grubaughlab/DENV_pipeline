@@ -123,7 +123,7 @@ def main(sysargs = sys.argv[1:]):
 
     else:
         sys.stderr.write("Dry run complete")
-        sys.exit(-1)
+        return 0
 
 
 if __name__ == '__main__':
