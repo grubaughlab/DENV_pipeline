@@ -37,7 +37,7 @@ def main(sysargs = sys.argv[1:]):
     parser.add_argument("--download", action="store_true", help="make a folder without bam files for download")
 
     parser.add_argument("--slurm", help="flag for if running on HPC with slurm", action="store_true")
-    parser.add_argument("--slurm-cores", help="number of slurm cores to assign. Default is 10", dest="slurm_cores")
+    parser.add_argument("--slurm-cores", help="number of slurm cores to assign. Default is 10", dest="slurm_cores", type=int)
     parser.add_argument("--verbose", "-v", dest="verbose", action="store_true")
     parser.add_argument("--help", "-h", action="store_true", dest="help")
     parser.add_argument("--overwrite", help="overwrite current results", action="store_true")
@@ -77,8 +77,6 @@ def main(sysargs = sys.argv[1:]):
     config["tempdir"] = os.path.join(config["outdir"], config["tempdir"])
 
     config = set_up_scripts.set_up_reference_directory(config)
-
-    print(config)
 
     if config["overwrite"]:
         set_up_scripts.overwrite(config)
