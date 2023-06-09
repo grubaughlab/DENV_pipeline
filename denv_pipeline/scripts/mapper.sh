@@ -28,6 +28,7 @@ while IFS= read -r virustype || [[ -n "$virustype" ]]; do
 
     if ! [ -s  ${tempdir}/${fname%.*}.${virustype}.trimmed.bam ]; then
         echo "no trimmed bam file found, likely because no reads mapped successfully, exiting shell script"
+        python -c "import denv_pipeline.scripts.make_summary_files; denv_pipeline.scripts.make_summary_files.make_empty_file('${tempdir}', '${depth}', '${fname%.*}', '${virustype}')"
         continue
     fi
 

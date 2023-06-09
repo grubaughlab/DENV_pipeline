@@ -33,7 +33,7 @@ def main(sysargs = sys.argv[1:]):
     parser.add_argument("--depth", help="depth to map sequences to. Default=10")
     
     parser.add_argument("--temp", dest="temp", action="store_true", help="keep intermediate files")
-    parser.add_argument("--tempdir", dest="tempdir", help="where the temporary files go", default="temporary_files")
+    parser.add_argument("--tempdir", dest="tempdir", help="where the temporary files go")
     parser.add_argument("--download", action="store_true", help="make a folder without bam files for download")
 
     parser.add_argument("--slurm", help="flag for if running on HPC with slurm", action="store_true")
@@ -42,7 +42,7 @@ def main(sysargs = sys.argv[1:]):
     parser.add_argument("--help", "-h", action="store_true", dest="help")
     parser.add_argument("--overwrite", help="overwrite current results", action="store_true")
 
-    parser.add_argument("--ct-file",dest="ct_file", help="to produce a plot of Ct against coverage, provide a csv file containing Ct information by sample", default=False)
+    parser.add_argument("--ct-file",dest="ct_file", help="to produce a plot of Ct against coverage, provide a csv file containing Ct information by sample")
     parser.add_argument("--ct-column", dest="ct_column", help="Name of Ct column in Ct file for plot")
     parser.add_argument("--id-column", dest="id_column", help="Name of ID column in Ct file to make Ct plot")
 
