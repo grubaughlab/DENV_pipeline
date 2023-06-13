@@ -1,0 +1,13 @@
+depth: 10
+tempdir: "test_temp"
+ct_file: False
+ct_column: False
+id_column: False
+verbose: True
+download: True
+temp: True
+overwrite: True
+symlink: False
+outdir: "tests/test_output"
+reference_directory: "tests/test_refs" 
+indir: "tests/test_inputs"
