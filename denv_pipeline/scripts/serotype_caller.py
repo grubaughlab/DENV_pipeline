@@ -15,7 +15,7 @@ def main():
     parser.add_argument("--outfile")
 
     args = parser.parse_args()
-    headers = ["sample_id","consensus_sequence_file","depth","serotype","reference_serotype_name","reference_sequence_length","number_aligned_bases","coverage_untrimmed","coverage_trimmed"]
+    headers = ["sample_id","consensus_sequence_file","depth","serotype","reference_sequence_name","reference_sequence_length","number_aligned_bases","coverage_untrimmed","coverage_trimmed"]
 
     if not os.path.exists(args.outfile):
         with open(args.outfile, 'w') as fw:
@@ -39,12 +39,13 @@ def populate_line(args):
 
     name_elements = args.alignment.split("/")[-1].split(".")
     serotype = name_elements[1]
-    ref_sequence = f'{serotype}.fasta'
+    ref_sequence = serotype
     
     write_dict = {}
     write_dict["sample_id"] = name_elements[0]
     write_dict["consensus_sequence_file"] = f'{".".join(name_elements[0:3])}.cons.fa'
     write_dict["depth"] = name_elements[2]
+    write_dict["reference_sequence_name"] = ref_sequence
 
     if os.path.exists(args.alignment) and os.path.getsize(args.alignment) > 0: 
         for sequence in SeqIO.parse(args.alignment, 'fasta'):
@@ -71,10 +72,8 @@ def populate_line(args):
 
                         if perc_cov_trim>=min_coverage:
                             write_dict["serotype"] = serotype
-                            write_dict["reference_serotype_name"] = ref_sequence
                         else:
                             write_dict["serotype"] = "NA"
-                            write_dict["reference_serotype_name"] = "NA"
                     
                         seq_trim = SeqRecord.SeqRecord(seq_trim)
                         with open(args.alignment.replace(".out.aln",".out.trim.aln"), 'w') as new_file: 
@@ -86,34 +85,28 @@ def populate_line(args):
 
 
                 else:
-                    write_dict["coverage_trimmed"] = "NA"
+                    write_dict["coverage_trimmed"] = 0
                     if perc_cov>=min_coverage:
                         write_dict["serotype"] = serotype
-                        write_dict["reference_serotype_name"] = ref_sequence
                     else:
                         write_dict["serotype"] = "NA"
-                        write_dict["reference_serotype_name"] = "NA"
                     with open(args.alignment.replace(".out.aln",".out.trim.aln"), 'w') as new_file:
                         pass
 
             else:
-                write_dict["serotype"] = "Unknown"
-                write_dict["reference_serotype_name"] = "NA"
+                write_dict["serotype"] = "NA"
                 write_dict["reference_sequence_length"] = "NA"
-                write_dict["number_aligned_bases"] = "NA"
+                write_dict["number_aligned_bases"] = 0
                 write_dict["coverage_untrimmed"] = 0
                 write_dict["coverage_trimmed"] = 0
-                with open(args.alignment.replace(".out.aln",".out.trim.aln"), 'w') as new_file:
-                    pass 
+                
     else:
-        write_dict["serotype"] = "Unknown"
-        write_dict["reference_serotype_name"] = "NA"
+        write_dict["serotype"] = "NA"
         write_dict["reference_sequence_length"] = "NA"
-        write_dict["number_aligned_bases"] = "NA"
+        write_dict["number_aligned_bases"] = 0
         write_dict["coverage_untrimmed"] = 0
         write_dict["coverage_trimmed"] = 0
-        with open(args.alignment.replace(".out.aln",".out.trim.aln"), 'w') as new_file:
-            pass
+
 
     return write_dict
 

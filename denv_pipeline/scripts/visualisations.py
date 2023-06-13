@@ -85,7 +85,7 @@ def ct_plot(results_dir, ct_file, ct_column, id_column, final_serotype_calls, vi
     with open(final_serotype_calls) as f:
         data = csv.DictReader(f, delimiter="\t")
         for l in data:
-            if l['coverage_trimmed'] != "NA":
+            if l['coverage_trimmed'] != "0":
                 cov = l['coverage_trimmed']
             else:
                 cov = l['coverage_untrimmed']

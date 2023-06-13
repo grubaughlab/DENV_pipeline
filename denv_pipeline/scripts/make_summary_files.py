@@ -20,7 +20,7 @@ def summarise_files(config, per_sample_files, serotype_call_file, top_call_file,
                 possible_tops.append(l)
                 all_lines.append(l)
 
-                if l['coverage_untrimmed'] != "NA":
+                if l['coverage_untrimmed'] != "0":
                     if float(l['coverage_untrimmed']) >= 50:
                         serotype_call.append(l)
                         top_calls.append(l)
@@ -34,7 +34,7 @@ def summarise_files(config, per_sample_files, serotype_call_file, top_call_file,
             else:
                 continue
 
-    headers = ["sample_id","consensus_sequence_file","depth","serotype","reference_serotype_name","reference_sequence_length","number_aligned_bases","coverage_untrimmed","coverage_trimmed"]
+    headers = ["sample_id","consensus_sequence_file","depth","serotype","reference_sequence_name","reference_sequence_length","number_aligned_bases","coverage_untrimmed","coverage_trimmed"]
     
     with open(serotype_call_file, 'w') as fw:
         writer = csv.DictWriter(fw,delimiter="\t", fieldnames=headers)
@@ -193,7 +193,7 @@ def make_alignments(config, alignments):
 
 def make_empty_file(tempdir, depth, sample_name, serotype):
     
-    headers = ["sample_id","consensus_sequence_file","depth","serotype","reference_serotype_name","reference_sequence_length","number_aligned_bases","coverage_untrimmed","coverage_trimmed"]
+    headers = ["sample_id","consensus_sequence_file","depth","serotype","reference_sequence_name","reference_sequence_length","number_aligned_bases","coverage_untrimmed","coverage_trimmed"]
 
     outfile = os.path.join(tempdir, f'{sample_name}_all_virustype_info.txt')
 
@@ -203,7 +203,7 @@ def make_empty_file(tempdir, depth, sample_name, serotype):
     write_dict['depth'] = depth
 
     write_dict["serotype"] = "NA"
-    write_dict["reference_serotype_name"] = serotype
+    write_dict["reference_sequence_name"] = serotype
     write_dict["reference_sequence_length"] = "NA"
     write_dict["number_aligned_bases"] = 0
     write_dict["coverage_untrimmed"] = 0
@@ -220,7 +220,4 @@ def make_empty_file(tempdir, depth, sample_name, serotype):
             writer = csv.DictWriter(fw, delimiter = "\t", fieldnames=headers)
             writer.writerow(write_dict)
 
-
-# if __name__=="__main__":
-#     make_empty_file()
 
