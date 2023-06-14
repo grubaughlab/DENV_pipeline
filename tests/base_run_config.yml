@@ -9,5 +9,4 @@ temp: True
 overwrite: True
 symlink: False
 outdir: "tests/test_output"
-reference_directory: "tests/test_refs" 
 indir: "tests/test_inputs"
