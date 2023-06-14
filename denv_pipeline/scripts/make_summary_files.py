@@ -69,16 +69,20 @@ def sort_variant_files(config, serotypes):
     summary_file = open(os.path.join(config["outdir"], "results", "variants", "variants_summary.tsv"), 'w')
     summary_file.write("sample_id\tserotype\tvariant_count\n")
 
-    for file in os.listdir(config["tempdir"]):
-        if file.endswith(".variants.tsv"):
+    full_virus_type_list = config["virus_type_list"]
+    depth = config["depth"]
+    for sample, serotype_lst in serotypes.items():
+        for option in full_virus_type_list:
+            input_file = os.path.join(config["tempdir"], f"{sample}.{option}.{depth}.variants.tsv")
+            output_file = os.path.join(config["tempdir"], f"{sample}.{option}.{depth}.variants_frequency.tsv")
+
             count = 0
-            new_file_name = file.replace(".variants.tsv", ".variants_frequency.tsv")
-            new_file = os.path.join(config['tempdir'], new_file_name)
-            with open(new_file, 'w') as fw:
+            with open(output_file, 'w') as fw:
                 headers = list(old_to_new.values())
                 writer = csv.DictWriter(fw, headers, delimiter="\t")
                 writer.writeheader()
-                with open(os.path.join(config['tempdir'], file)) as f:
+
+                with open(input_file) as f:
                     data = csv.DictReader(f, delimiter="\t")
                     for l in data: 
                         write_dict = {}
@@ -88,10 +92,8 @@ def sort_variant_files(config, serotypes):
                             writer.writerow(write_dict)
                             count += 1
 
-            sero = file.split(".")[1]
-            sample = file.split(".")[0]
-            if sero in serotypes[sample]:
-                summary_file.write(f"{sample}\t{sero}\t{count}\n")
+            if option in serotype_lst:
+                summary_file.write(f"{sample}\t{option}\t{count}\n")
 
     summary_file.close()
     
