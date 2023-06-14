@@ -25,7 +25,7 @@ def summarise_files(config, per_sample_files, serotype_call_file, top_call_file,
                         serotype_call.append(l)
                         top_calls.append(l)
                         found_top = True
-                        serotypes[l['sample_id']] = l['serotype_called']
+                        serotypes[l['sample_id']].append(l['serotype_called'])
             
         if not found_top:
             if len(possible_tops) > 0:

@@ -97,7 +97,6 @@ def main(sysargs = sys.argv[1:]):
     with open(os.path.join(config["outdir"], "output_config.yml"), 'w') as file:
         documents = yaml.dump(config, file)
 
-
     snakefile = os.path.join(thisdir,"scripts", "denv_pipeline.smk")
     if config['verbose'] or config["dry_run"]:
         print("\n**** CONFIG ****")
