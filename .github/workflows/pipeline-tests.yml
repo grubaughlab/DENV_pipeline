@@ -22,4 +22,4 @@ jobs:
       - name: install pipeline
         run: pip install -e .	
       - name: test_setup
-        run: denv_pipeline --config tests/test_config.yml --dry-run
+        run: denv_pipeline --config tests/dry_run_config.yml --dry-run
