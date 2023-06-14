@@ -16,8 +16,8 @@ def prepare_for_plots(final_serotype_calls):
     with open(final_serotype_calls) as f:
         data = csv.DictReader(f, delimiter="\t")
         for l in data:
-            virus_dict[l['sample_id']] = l['serotype']
-            all_viruses.add(l['serotype'])
+            virus_dict[l['sample_id']] = l['serotype_called']
+            all_viruses.add(l['serotype_called'])
 
     colour_dict = {}
     lst = mpl.colormaps['viridis'](range(len(all_viruses)))
@@ -85,7 +85,7 @@ def ct_plot(results_dir, ct_file, ct_column, id_column, final_serotype_calls, vi
     with open(final_serotype_calls) as f:
         data = csv.DictReader(f, delimiter="\t")
         for l in data:
-            if l['coverage_trimmed'] != "0":
+            if l['coverage_trimmed'] != "0" and l['coverage_trimmed'] != "NA":
                 cov = l['coverage_trimmed']
             else:
                 cov = l['coverage_untrimmed']
