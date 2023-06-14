@@ -93,9 +93,7 @@ def main(sysargs = sys.argv[1:]):
     if config["ct_file"] or config["ct_column"] or config["id_column"]:
         error_checks.check_ct_file(config)    
 
-    
-    with open(os.path.join(config["outdir"], "output_config.yml"), 'w') as file:
-        documents = yaml.dump(config, file)
+    set_up_scripts.output_config(config)
 
     snakefile = os.path.join(thisdir,"scripts", "denv_pipeline.smk")
     if config['verbose'] or config["dry_run"]:

@@ -195,3 +195,15 @@ def get_valid_keys():
     valid_keys.append("id_column")
 
     return valid_keys
+
+def output_config(config):
+
+    valid_keys = get_valid_keys()
+
+    new_config = {}
+    for k,v in config.items():
+        if k in valid_keys:
+            new_config[k] = v
+
+    with open(os.path.join(config["outdir"], "output_config.yml"), 'w') as file:
+        documents = yaml.dump(new_config, file)
