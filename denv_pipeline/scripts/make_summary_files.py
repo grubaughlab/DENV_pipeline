@@ -56,8 +56,8 @@ def summarise_files(config, per_sample_files, serotype_call_file, top_call_file,
 
 
     sort_variant_files(config, serotypes)
-    alignments = get_right_serotype_files(config, serotypes)
-    make_alignments(config, alignments)
+    get_right_serotype_files(config, serotypes)
+    make_alignments(config, serotypes)
 
     return
 
@@ -124,29 +124,18 @@ def get_right_serotype_files(config, serotypes):
     consensus = set()
     depths = set()
     variant_frequencies = set()    
-    alignments = set()
     depth = config["depth"]
     full_virus_type_list = config["virus_type_list"]
     
     for sample, serotype_lst in serotypes.items():
-        for option in full_virus_type_list:
+        for option in serotype_lst:
             
-            bam_file = f'{sample}.{option}.sort.bam'
-            bam_index = f'{sample}.{option}.sort.bam.bai'
-            consensus_file = f'{sample}.{option}.{depth}.cons.fa'
-            depth_file = f'{sample}.{option}.depth.txt'
-            variant_frequency = f'{sample}.{option}.{depth}.variants_frequency.tsv'
-            trimmed = f'{sample}.{option}.{depth}.out.trim.aln'
-            untrimmed = f'{sample}.{option}.{depth}.out.aln'
+            bam_files.add(f'{sample}.{option}.sort.bam')
+            bam_indices.add(f'{sample}.{option}.sort.bam.bai')
+            consensus.add(f'{sample}.{option}.{depth}.cons.fa')
+            depths.add(f'{sample}.{option}.depth.txt')
+            variant_frequencies.add(f'{sample}.{option}.{depth}.variants_frequency.tsv')
 
-            if option in serotype_lst:
-                bam_files.add(bam_file)
-                bam_indices.add(bam_index)
-                consensus.add(consensus_file)
-                depths.add(depth_file)
-                variant_frequencies.add(variant_frequency)
-                alignments.add(trimmed)
-                alignments.add(untrimmed)
 
     for bam in bam_files:
         source = os.path.join(config['tempdir'], bam)
@@ -173,24 +162,33 @@ def get_right_serotype_files(config, serotypes):
         dest = os.path.join(config["outdir"], "results", "variants")
         shutil.move(source, dest)
 
-    return alignments
 
-
-def make_alignments(config, alignments):
+def make_alignments(config, serotypes):
 
     alignment_dir = os.path.join(config["outdir"], "results", "alignments")
     tempdir = config["tempdir"]
+    depth = config["depth"]
+    full_virus_type_list = config["virus_type_list"]
+    
+    trimmed_aln_dict = defaultdict(list)
+    untrimmed_aln_dict = defaultdict(list)
+    for sample, serotype_lst in serotypes.items():
+        for i in serotype_lst:
+            trimmed = f'{sample}.{i}.{depth}.out.trim.aln'
+            untrimmed = f'{sample}.{i}.{depth}.out.aln'
+            
+            trimmed_aln_dict[i].append(trimmed)
+            untrimmed_aln_dict[i].append(untrimmed)
 
-    for virus_type in config["virus_type_list"]:
-        new_trimmed_file = f'{alignment_dir}/{virus_type}.trim.aln'
-        new_untrimmed_file = f'{alignment_dir}/{virus_type}.untrim.aln'
-        for aln in alignments:
-            if not os.stat(os.path.join(tempdir, aln)).st_size == 0:
-                if virus_type in aln:
-                    if "trim" in aln:
-                        os.system(f"cat {tempdir}/{aln} >> {new_trimmed_file}")
-                    else:
-                        os.system(f"cat {tempdir}/{aln} >> {new_untrimmed_file}")
+    for virus_type, alns in trimmed_aln_dict.items():
+        new_file = f'{alignment_dir}/{virus_type}.trim.aln'
+        cat_string = " ".join([f"{tempdir}/{aln}" for aln in alns])
+        os.system(f"cat {cat_string} >> {new_file}")
+
+    for virus_type, alns in untrimmed_aln_dict.items():
+        new_file = f'{alignment_dir}/{virus_type}.untrim.aln'
+        cat_string = " ".join([f"{tempdir}/{aln}" for aln in alns])
+        os.system(f"cat {cat_string} >> {new_file}")
 
 
 def make_empty_file(tempdir, depth, sample_name, serotype):

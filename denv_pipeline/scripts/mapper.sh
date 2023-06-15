@@ -11,11 +11,11 @@ log=$8
 while IFS= read -r virustype || [[ -n "$virustype" ]]; do 
 
     fasta=${primer_dir}/${virustype}.fasta
-    bed=${primer_dir}${virustype}.bed
-    trimbed=${primer_dir}${virustype}.trim.bed
+    bed=${primer_dir}/${virustype}.bed
+    trimbed=${primer_dir}/${virustype}.trim.bed
     consensus_name=${fname}.${virustype}
 
-    if ! [ -f ${primer_dir}${virustype}.fasta.ann ]; then
+    if ! [ -f ${primer_dir}/${virustype}.fasta.ann ]; then
         echo "----->>>> making index files for ${virustype}"
         bwa index ${fasta}
     fi
@@ -24,7 +24,7 @@ while IFS= read -r virustype || [[ -n "$virustype" ]]; do
     bwa mem -v 1 -t 16 ${fasta} $read1 $read2 | samtools view -bS -F 4 -F 2048 | samtools sort -o ${tempdir}/${fname}.${virustype}.bam >> ${log} 2>&1
 
     echo "----->>>>>Trimming bam file"
-    ivar trim -e -i ${tempdir}/${fname%.*}.${virustype}.bam -b ${bed} -p ${tempdir}/${fname}.${virustype}.trimmed.bam >> ${log} 2>&1
+    ivar trim -e -i ${tempdir}/${fname}.${virustype}.bam -b ${bed} -p ${tempdir}/${fname}.${virustype}.trimmed.bam >> ${log} 2>&1
 
     if ! [ -s  ${tempdir}/${fname%.*}.${virustype}.trimmed.bam ]; then
         echo "no trimmed bam file found, likely because no reads mapped successfully, exiting shell script"
