@@ -12,6 +12,6 @@ symlink: False
 outdir: "test_output_dry_run"
 indir: "one_sample"
 dry_run: True
-config: tests/dry_run_config.yml
+config: dry_run_config.yml
 reference_directory: "test_refs" 
 tempdir: "test_output_dry_run/test_temp"
