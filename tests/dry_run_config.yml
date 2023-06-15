@@ -1,5 +1,4 @@
 depth: 50
-tempdir: "test_temp"
 ct_file: "tests/test_ct_file.csv"
 ct_column: "test_ct"
 id_column: "test_id"
@@ -10,6 +9,9 @@ download: True
 temp: True
 overwrite: True
 symlink: False
-outdir: "tests/test_output"
-reference_directory: "tests/test_refs" 
+outdir: "tests/test_output_dry_run"
 indir: "tests/one_sample"
+dry_run: True
+config: tests/dry_run_config.yml
+reference_directory: "tests/test_refs" 
+tempdir: "tests/test_output_dry_run/test_temp"
