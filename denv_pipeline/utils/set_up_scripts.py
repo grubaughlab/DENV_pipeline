@@ -30,7 +30,7 @@ def get_defaults(config):
 
     config["outdir"] = f'seq_analysis_{dt.datetime.today().date()}' 
 
-    config["reference_directory"] = pkg_resources.resource_filename('denv_pipeline', 'DENV_primers_and_refs/')
+    config["reference_directory"] = pkg_resources.resource_filename('denv_pipeline', 'DENV_primers_and_refs')
 
     return config
 
@@ -158,9 +158,8 @@ def set_up_reference_directory(config):
 
     reference_directory = config["reference_directory"]
 
-    if reference_directory != pkg_resources.resource_filename('denv_pipeline', 'DENV_primers_and_refs/'):
-        if not reference_directory.endswith("/"):
-            config["reference_directory"] = f'{reference_directory}/'
+    if reference_directory != pkg_resources.resource_filename('denv_pipeline', 'DENV_primers_and_refs'):
+        config['reference_directory'] = reference_directory.rstrip("/")
         error_checks.check_primer_dir(config)
         
     config["virus_type_list"] = []
@@ -169,6 +168,18 @@ def set_up_reference_directory(config):
             config["virus_type_list"].append(l.strip("\n"))
 
     return config
+
+def set_up_temporary_directory_path(config):
+
+    if config["outdir"] not in config["tempdir"]:
+        temp = os.path.join(config["outdir"], config["tempdir"])
+    else:
+        temp = config["tempdir"]
+
+    config["tempdir"] = temp.rstrip("/")
+
+    return config
+
     
        
 def get_valid_keys():

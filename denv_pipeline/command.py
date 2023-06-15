@@ -72,11 +72,8 @@ def main(sysargs = sys.argv[1:]):
     if "indir" not in config:
         config["indir"] = config["outdir"]
 
-    error_checks.check_arg_addition(config, args, configfile)
-
     config["outdir"] = config["outdir"].rstrip("/")
-    config["tempdir"] = os.path.join(config["outdir"], config["tempdir"])
-
+    config = set_up_scripts.set_up_temporary_directory_path(config)
     config = set_up_scripts.set_up_reference_directory(config)
 
     if config["overwrite"]:

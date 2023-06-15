@@ -10,7 +10,7 @@ log=$8
 
 while IFS= read -r virustype || [[ -n "$virustype" ]]; do 
 
-    fasta=${primer_dir}${virustype}.fasta
+    fasta=${primer_dir}/${virustype}.fasta
     bed=${primer_dir}${virustype}.bed
     trimbed=${primer_dir}${virustype}.trim.bed
     consensus_name=${fname}.${virustype}
@@ -67,4 +67,4 @@ while IFS= read -r virustype || [[ -n "$virustype" ]]; do
 
     echo "--->>>>> Finished"
 
-done < "${primer_dir}refs.txt"
+done < "${primer_dir}/refs.txt"
