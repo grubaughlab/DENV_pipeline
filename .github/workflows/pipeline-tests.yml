@@ -26,7 +26,7 @@ jobs:
         run: denv_pipeline --config dry_run_config.yml --dry-run
       - name: test_setup
         working-directory: tests
-        run: python unit_tests_dry_run.py 
+        run: python scripts/unit_tests_dry_run.py 
               \--in-config dry_run_config.yml 
               \--out-config test_output_dry_run/output_config.yml
               \--outdir test_output_dry_run
