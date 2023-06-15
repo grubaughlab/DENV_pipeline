@@ -22,9 +22,13 @@ jobs:
       - name: install pipeline
         run: pip install -e .	
       - name: run_dry_run
-        run: denv_pipeline --config tests/dry_run_config.yml --dry-run
+        working-directory: tests
+        run: denv_pipeline --config dry_run_config.yml --dry-run
       - name: test_setup
-        run: python tests/unit_tests_dry_run.py 
-              \--in-config tests/dry_run_config.yml 
-              \--out-config $HOME/tests/test_output_dry_run/output_config.yml
-              \--outdir $HOME/tests/test_output_dry_run
+        working-directory: tests
+        run: python unit_tests_dry_run.py 
+              \--in-config dry_run_config.yml 
+              \--out-config test_output_dry_run/output_config.yml
+              \--outdir test_output_dry_run
+
+      
