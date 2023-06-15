@@ -8,5 +8,5 @@ download: True
 temp: True
 overwrite: True
 symlink: False
-outdir: "tests/test_output"
-indir: "tests/test_inputs"
+outdir: "test_output_full_run"
+indir: "test_inputs"
