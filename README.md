@@ -81,7 +81,7 @@ Within this, there will be:
 	- summary_all_samples.tsv: contains information about all possible virus options provided per sample
 	- alignment - contains alignments by virus type NB not to be used for phylogenetics because it is only rough for estimating coverage. If a trimmed bed file was provided then these are trimmed down, otherwise they are only untrimmed.
 	- consensus - consensus sequences of the called virus for each sample
-	- depth - text files of each position of the genome and their sequencing depth by sample
+	- depth - text files of each position of the genome and their sequencing depth by sample. NB positions are relative to reference sequence
 	- variants - contains a summary file of the number of variants by sample, and then a file for each sample containing additional information about variants
 
 2.  Within results, there are some QC plots:
