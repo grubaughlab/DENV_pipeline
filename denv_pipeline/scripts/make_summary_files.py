@@ -12,7 +12,6 @@ def summarise_files(config, per_sample_files, serotype_call_file, top_call_file,
     serotype_call = []
 
     for file in per_sample_files:
-        found_top = False
         possible_tops = []
         with open(file) as f:
             data = csv.DictReader(f, delimiter="\t")
@@ -20,19 +19,15 @@ def summarise_files(config, per_sample_files, serotype_call_file, top_call_file,
                 possible_tops.append(l)
                 all_lines.append(l)
 
-                if l['coverage_untrimmed'] != "0":
-                    if float(l['coverage_untrimmed']) >= 50:
-                        serotype_call.append(l)
-                        top_calls.append(l)
-                        found_top = True
-                        serotypes[l['sample_id']].append(l['serotype_called'])
+                if float(l['coverage_untrimmed']) >= 50:
+                    serotype_call.append(l)
+                    serotypes[l['sample_id']].append(l['serotype_called'])
             
-        if not found_top:
-            if len(possible_tops) > 0:
-                top = sorted(possible_tops, key=lambda x:float(x['coverage_untrimmed']), reverse=True)[0]
-                top_calls.append(top)
-            else:
-                continue
+        if len(possible_tops) > 0:
+            top = sorted(possible_tops, key=lambda x:float(x['coverage_untrimmed']), reverse=True)[0]
+            top_calls.append(top)
+        else:
+            top_calls.append(possible_tops[0])
 
     headers = ["sample_id","consensus_sequence_file","depth","serotype_called","reference_sequence_name","reference_sequence_length","number_aligned_bases","coverage_untrimmed","coverage_trimmed"]
     
