@@ -30,5 +30,16 @@ jobs:
               \--in-config dry_run_config.yml 
               \--out-config test_output_dry_run/output_config.yml
               \--outdir test_output_dry_run
+      - name: install snakemake dependencies
+        run: python -m pip install --upgrade pip pandas
+      - name: run_full
+        working-directory: tests
+        run: denv_pipeline --config base_run_config.yml
+        
+      - name: test_results
+        working-directory: tests
+        run: python scripts/unit_tests_results.py
+            \--outdir test_output_full_run/results 
+            \--depth 10
 
       
