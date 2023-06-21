@@ -118,6 +118,11 @@ Within this, there will be:
 
 ### All options
 
+``--config`` name of optional config file to specify all following options
+
+``--dry-run`` just run set up and not the full pipeline to check that it all works properly
+
+
 ``--outdir`` location where files will be stored
 
 ``--indir`` directory containing samples. Each sample must be a folder with the forward and reverse runs in. Default is same as output directory.
@@ -125,7 +130,7 @@ Within this, there will be:
 
 ``--reference-directory`` or ``-rd`` location where the bed files for primer trimming and associated reference sequences are. Default is the dengue directory provided as package information
 
-``--depth`` minimum depth to call consensus. Default is 20
+``--depth`` minimum depth to call consensus. Default is 10
 
 
 ``--temp`` keep temporary files
@@ -134,7 +139,10 @@ Within this, there will be:
 
 ``--download`` produce downloads directory (see above)
 
+
 ``--slurm`` parallelise on a cluster which uses slurm. The outer pipeline will run on the login node, but all actual analysis will be submitted to compute nodes.
+
+``--slurm-cores`` number of slurm cores to use default is 10
 
 
 ``--overwrite`` delete old results files and make new ones in the run
