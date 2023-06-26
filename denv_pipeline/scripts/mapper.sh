@@ -17,11 +17,12 @@ while IFS= read -r virustype || [[ -n "$virustype" ]]; do
 
     if ! [ -f ${primer_dir}/${virustype}.fasta.ann ]; then
         echo "----->>>> making index files for ${virustype}"
-        bwa index ${fasta}
+        bwa index ${fasta} >> ${log} 2>&1
     fi
 
     echo "----->>>>>Mapping reads against serotype "${virustype}" reference sequence"
-    bwa mem -v 1 -t 16 ${fasta} $read1 $read2 | samtools view -bS -F 4 -F 2048 | samtools sort -o ${tempdir}/${fname}.${virustype}.bam >> ${log} 2>&1
+    bwa mem -v 1 -t 16 ${fasta} $read1 $read2 > bwa_mem_output.txt >> ${log} 2>&1
+    samtools view -bS -F 4 -F 2048 bwa_mem_output.txt | samtools sort -o ${tempdir}/${fname}.${virustype}.bam >> ${log} 2>&1
 
     echo "----->>>>>Trimming bam file"
     ivar trim -e -i ${tempdir}/${fname}.${virustype}.bam -b ${bed} -p ${tempdir}/${fname}.${virustype}.trimmed.bam >> ${log} 2>&1
