@@ -29,8 +29,8 @@ rule mapper:
         tempdir = config["tempdir"],
         python_script = os.path.join(workflow.current_basedir,"serotype_caller.py")
     resources:
-        partition="bigmem",
-        mem_mb="1000G",
+        partition="day",
+        mem_mb_per_cpu="500G",
         cpus_per_task=1,
         runtime=300
     run:
