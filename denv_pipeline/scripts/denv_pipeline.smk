@@ -30,7 +30,8 @@ rule mapper:
         python_script = os.path.join(workflow.current_basedir,"serotype_caller.py")
     resources:
         partition="general",
-        mem_mb_per_cpu="10G",
+        constraint="exclusive",
+        mem_mb_per_cpu="3000G",
         cpus_per_task=1,
         runtime=300
     run:
