@@ -31,7 +31,7 @@ rule mapper:
     resources:
         partition="bigmem",
         constraint="exclusive",
-        mem_mb_per_cpu="3000G",
+        mem_mb_per_cpu="300G",
         cpus_per_task=1,
         runtime=300
     run:
