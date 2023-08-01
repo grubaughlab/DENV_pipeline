@@ -117,7 +117,7 @@ def check_primer_dir(config):
 
 def check_env_activated():
 
-    if pkgutil.find_loader('snakemake') is None:
+    if pkgutil.find_loader('snakemake') is None or pkgutil.find_loader('Bio') is None:
         sys.stderr.write(green(f"Error: installation not correct. Ensure that environment is activated and you have run 'pip install .'"))
         sys.exit(-1)
     
