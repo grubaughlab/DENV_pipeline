@@ -184,35 +184,3 @@ def make_alignments(config, serotypes):
         new_file = f'{alignment_dir}/{virus_type}.untrim.aln'
         cat_string = " ".join([f"{tempdir}/{aln}" for aln in alns])
         os.system(f"cat {cat_string} >> {new_file}")
-
-
-def make_empty_file(tempdir, depth, sample_name, serotype):
-    
-    headers = ["sample_id","consensus_sequence_file","depth","serotype_called","reference_sequence_name","reference_sequence_length","number_aligned_bases","coverage_untrimmed","coverage_trimmed"]
-
-    outfile = os.path.join(tempdir, f'{sample_name}_all_virustype_info.txt')
-
-    write_dict = {}
-    write_dict["sample_id"] = sample_name
-    write_dict["consensus_sequence_file"] = "NA"
-    write_dict['depth'] = depth
-
-    write_dict["serotype_called"] = "NA"
-    write_dict["reference_sequence_name"] = serotype
-    write_dict["reference_sequence_length"] = "NA"
-    write_dict["number_aligned_bases"] = 0
-    write_dict["coverage_untrimmed"] = 0
-    write_dict["coverage_trimmed"] = 0
-
-    if not os.path.exists(outfile):
-        with open(outfile, 'w') as fw:
-            writer = csv.DictWriter(fw, delimiter = "\t", fieldnames=headers)
-            writer.writeheader()
-            writer.writerow(write_dict)
-        
-    else:        
-        with open(outfile, 'a') as fw:
-            writer = csv.DictWriter(fw, delimiter = "\t", fieldnames=headers)
-            writer.writerow(write_dict)
-
-

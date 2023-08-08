@@ -27,14 +27,15 @@ rule mapper:
         primer_dir = config["reference_directory"],
         depth = config["depth"],
         tempdir = config["tempdir"],
-        python_script = os.path.join(workflow.current_basedir,"serotype_caller.py")
+        python_script = os.path.join(workflow.current_basedir,"serotype_caller.py"),
+        python_script2 = os.path.join(workflow.current_basedir, "make_empty_files.py")
     resources:
         partition="day",
         mem_mb_per_cpu="10G",
         cpus_per_task=2,
         runtime=300
     run:
-        shell("{params.mapper_script} {wildcards.sample} {input.read_location}/*R1* {input.read_location}/*R2* {params.primer_dir} {params.python_script} {params.depth} {params.tempdir} {log.log}  >> {log.log} 2>&1")
+        shell("{params.mapper_script} {wildcards.sample} {input.read_location}/*R1* {input.read_location}/*R2* {params.primer_dir} {params.python_script} {params.python_script2} {params.depth} {params.tempdir} {log.log}  >> {log.log} 2>&1")
         
         if not os.path.exists(os.path.join(params.tempdir,f"{wildcards.sample}_all_virustype_info.txt")):
             shell("touch {params.tempdir}/{wildcards.sample}_all_virustype_info.txt")

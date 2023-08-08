@@ -4,9 +4,10 @@ read1=$2
 read2=$3
 primer_dir=$4
 serotype_caller=$5
-depth=$6
-tempdir=$7
-log=$8
+empty_file_maker=$6
+depth=$7
+tempdir=$8
+log=$9
 
 while IFS= read -r virustype || [[ -n "$virustype" ]]; do 
 
@@ -28,7 +29,9 @@ while IFS= read -r virustype || [[ -n "$virustype" ]]; do
 
     if ! [ -s  ${tempdir}/${fname%.*}.${virustype}.trimmed.bam ]; then
         echo "no trimmed bam file found, likely because no reads mapped successfully, exiting shell script"
-        python -c "import denv_pipeline.scripts.make_summary_files; denv_pipeline.scripts.make_summary_files.make_empty_file('${tempdir}', '${depth}', '${fname}', '${virustype}')"
+        which python
+        python ${empty_file_maker} --depth ${depth} --tempdir ${tempdir} --sample-name ${fname} --virus-type ${virustype}
+        touch ${tempdir}/${fname}.${virustype}.depth.txt
         continue
     fi
 
@@ -53,6 +56,7 @@ while IFS= read -r virustype || [[ -n "$virustype" ]]; do
     fi
 
     echo "----->>>>>Calculating percentage coverage against serotype "${virustype}" cps reference sequence"
+    which python
     if [ -s ${trimbed} ]; then
         python ${serotype_caller} --alignment ${tempdir}/${fname}.${virustype}.${depth}.out.aln --bed-file ${trimbed} --outfile ${tempdir}/${fname}_all_virustype_info.txt
     else
