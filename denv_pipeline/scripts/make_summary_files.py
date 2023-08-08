@@ -26,8 +26,10 @@ def summarise_files(config, per_sample_files, serotype_call_file, top_call_file,
         if len(possible_tops) > 0:
             top = sorted(possible_tops, key=lambda x:float(x['coverage_untrimmed']), reverse=True)[0]
             top_calls.append(top)
-        else:
+        elif len(possible_tops) == 1:
             top_calls.append(possible_tops[0])
+        else:
+            pass
 
     headers = ["sample_id","consensus_sequence_file","depth","serotype_called","reference_sequence_name","reference_sequence_length","number_aligned_bases","coverage_untrimmed","coverage_trimmed"]
     
