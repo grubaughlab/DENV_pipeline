@@ -6,8 +6,9 @@ primer_dir=$4
 serotype_caller=$5
 empty_file_maker=$6
 depth=$7
-tempdir=$8
-log=$9
+threshold=$8
+tempdir=$9
+log=$10
 
 while IFS= read -r virustype || [[ -n "$virustype" ]]; do 
 
@@ -42,7 +43,7 @@ while IFS= read -r virustype || [[ -n "$virustype" ]]; do
     samtools index ${tempdir}/${fname}.${virustype}.sort.bam >> ${log} 2>&1
 
     echo "----->>>>>Generating consensus sequence"
-    samtools mpileup -aa --reference ${fasta} -A -d 10000 -Q 0 ${tempdir}/${fname}.${virustype}.sort.bam | ivar consensus -t 0.75 -m ${depth} -p ${tempdir}/${fname}.${virustype}.${depth}.cons -i ${consensus_name} >> ${log} 2>&1
+    samtools mpileup -aa --reference ${fasta} -A -d 10000 -Q 0 ${tempdir}/${fname}.${virustype}.sort.bam | ivar consensus -t ${threshold} -m ${depth} -p ${tempdir}/${fname}.${virustype}.${depth}.cons -i ${consensus_name} >> ${log} 2>&1
     
     echo "----->>>>>Aligning consensus cps sequence against the reference serotype "${virustype}" cps sequence"
     nextalign run  --reference ${fasta} --output-fasta ${tempdir}/${fname}.${virustype}.${depth}.out.aln ${tempdir}/${fname}.${virustype}.${depth}.cons.fa >> ${log} 2>&1

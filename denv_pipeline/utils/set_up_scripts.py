@@ -13,6 +13,7 @@ def get_defaults(config):
     config["config"] = False
     
     config["depth"] = 10
+    config["threshold"] = 0.75
     config["tempdir"] = "temporary_files"
     
     config['ct_file'] = False
@@ -194,6 +195,7 @@ def get_valid_keys():
     valid_keys.append("outdir")
     valid_keys.append("reference_directory")
     valid_keys.append("depth")
+    valid_keys.append("threshold")
     valid_keys.append("temp")
     valid_keys.append("tempdir")
     valid_keys.append("download")

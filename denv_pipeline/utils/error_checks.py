@@ -118,22 +118,22 @@ def check_primer_dir(config):
 def check_env_activated():
 
     if pkgutil.find_loader('snakemake') is None or pkgutil.find_loader('Bio') is None:
-        sys.stderr.write(green(f"Error: installation not correct. Ensure that environment is activated and you have run 'pip install .'"))
+        sys.stderr.write(green(f"Error: installation not correct. Ensure that environment is activated and you have run 'pip install .'\n"))
         sys.exit(-1)
     
 
 def check_ct_file(config):
 
     if config["ct_file"] and not config["ct_column"]:
-        sys.stderr.write(green(f"Error: ct_file specified but no ct_column for ct vs coverage plot. Please provide Ct column name and id column name."))
+        sys.stderr.write(green(f"Error: ct_file specified but no ct_column for ct vs coverage plot. Please provide Ct column name and id column name.\n"))
         sys.exit(-1)
 
     if config["ct_file"] and not config["id_column"]:
-        sys.stderr.write(green(f"Error: ct_file specified but no id_column for ct vs coverage plot. Please provide Ct column name and id column name."))
+        sys.stderr.write(green(f"Error: ct_file specified but no id_column for ct vs coverage plot. Please provide Ct column name and id column name.\n"))
         sys.exit(-1)
 
     if (config["ct_column"] or config["id_column"]) and not config["ct_file"]:
-        sys.stderr.write(green(f"Error: ct_column or id_column specified but no ct_file for ct vs coverage plot. Please provide file containing Ct information."))
+        sys.stderr.write(green(f"Error: ct_column or id_column specified but no ct_file for ct vs coverage plot. Please provide file containing Ct information.\n"))
         sys.exit(-1)
 
     if not os.path.exists(config["ct_file"]):
@@ -145,8 +145,15 @@ def check_ct_file(config):
         data = csv.DictReader(f)
         headers = data.fieldnames
         if config["ct_column"] not in headers:
-            sys.stderr.write(green(f"Error: {config['ct_column']} not found in ct_file"))
+            sys.stderr.write(green(f"Error: {config['ct_column']} not found in ct_file\n"))
             sys.exit(-1)
         if config["id_column"] not in headers:
-            sys.stderr.write(green(f"Error: {config['id_column']} not found in ct_file"))
+            sys.stderr.write(green(f"Error: {config['id_column']} not found in ct_file\n"))
             sys.exit(-1)
+
+
+def check_threshold(config):
+
+    if float(config["threshold"]) > 1:
+        sys.stderr.write(green(f"Error: consensus threshold must be between 0 and 1\n"))
+        sys.exit(-1)
