@@ -26,7 +26,7 @@ rule mapper:
         mapper_script = os.path.join(workflow.current_basedir,"mapper.sh"),
         primer_dir = config["reference_directory"],
         depth = config["depth"],
-        threshold = config["consensus_threshold"],
+        threshold = config["threshold"],
         tempdir = config["tempdir"],
         python_script = os.path.join(workflow.current_basedir,"serotype_caller.py"),
         python_script2 = os.path.join(workflow.current_basedir, "make_empty_files.py")
