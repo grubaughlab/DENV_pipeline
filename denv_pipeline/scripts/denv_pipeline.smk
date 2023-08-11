@@ -81,10 +81,14 @@ rule make_qc_plots:
         serotype_dict, colour_dict, patch_list = visualisations.prepare_for_plots(input.serotype_calls_file)
         
         visualisations.variant_plot(params.results_dir, input.variant_summary_file, serotype_dict, colour_dict, patch_list)
+        if config["download"]:
+            source = os.path.join(params.results_dir, "variant_plot.pdf")
+            dest = os.path.join(config["outdir"], "downloads")
+            shell("cp -r {source} {dest}")
 
         if config["ct_file"] and config["ct_column"] and config["id_column"]:
             visualisations.ct_plot(params.results_dir, config["ct_file"], config["ct_column"], config["id_column"], input.serotype_calls_file, serotype_dict, colour_dict, patch_list)
-
-
-        
-
+            if config["download"]:
+                source = os.path.join(params.results_dir, "ct_plot.pdf")
+                dest = os.path.join(config["outdir"], "downloads")
+                shell("cp -r {source} {dest}")
