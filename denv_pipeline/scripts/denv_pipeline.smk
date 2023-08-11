@@ -26,6 +26,7 @@ rule mapper:
         mapper_script = os.path.join(workflow.current_basedir,"mapper.sh"),
         primer_dir = config["reference_directory"],
         depth = config["depth"],
+        threshold = config["threshold"],
         tempdir = config["tempdir"],
         python_script = os.path.join(workflow.current_basedir,"serotype_caller.py"),
         python_script2 = os.path.join(workflow.current_basedir, "make_empty_files.py")
@@ -35,7 +36,7 @@ rule mapper:
         cpus_per_task=2,
         runtime=300
     run:
-        shell("{params.mapper_script} {wildcards.sample} {input.read_location}/*R1* {input.read_location}/*R2* {params.primer_dir} {params.python_script} {params.python_script2} {params.depth} {params.tempdir} {log.log}  >> {log.log} 2>&1")
+        shell("{params.mapper_script} {wildcards.sample} {input.read_location}/*R1* {input.read_location}/*R2* {params.primer_dir} {params.python_script} {params.python_script2} {params.depth} {params.threshold} {params.tempdir} {log.log}  >> {log.log} 2>&1")
         
         if not os.path.exists(os.path.join(params.tempdir,f"{wildcards.sample}_all_virustype_info.txt")):
             shell("touch {params.tempdir}/{wildcards.sample}_all_virustype_info.txt")
@@ -80,10 +81,14 @@ rule make_qc_plots:
         serotype_dict, colour_dict, patch_list = visualisations.prepare_for_plots(input.serotype_calls_file)
         
         visualisations.variant_plot(params.results_dir, input.variant_summary_file, serotype_dict, colour_dict, patch_list)
+        if config["download"]:
+            source = os.path.join(params.results_dir, "variant_plot.pdf")
+            dest = os.path.join(config["outdir"], "downloads")
+            shell("cp -r {source} {dest}")
 
         if config["ct_file"] and config["ct_column"] and config["id_column"]:
             visualisations.ct_plot(params.results_dir, config["ct_file"], config["ct_column"], config["id_column"], input.serotype_calls_file, serotype_dict, colour_dict, patch_list)
-
-
-        
-
+            if config["download"]:
+                source = os.path.join(params.results_dir, "ct_plot.pdf")
+                dest = os.path.join(config["outdir"], "downloads")
+                shell("cp -r {source} {dest}")

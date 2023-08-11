@@ -1,4 +1,5 @@
 depth: 50
+threshold: 0.75
 ct_file: "test_ct_file.csv"
 ct_column: "test_ct"
 id_column: "test_id"

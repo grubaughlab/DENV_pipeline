@@ -32,6 +32,7 @@ def main(sysargs = sys.argv[1:]):
     parser.add_argument("--outdir", dest="outdir", help="location where files will be stored.")
     parser.add_argument("--reference-directory", "-rd", help="location where bed files and reference genomes are")
     parser.add_argument("--depth", help="depth to map sequences to. Default=10")
+    parser.add_argument("--threshold", help="threshold to call consensus positions at, default=0.75",dest="threshold")
     
     parser.add_argument("--temp", dest="temp", action="store_true", help="keep intermediate files")
     parser.add_argument("--tempdir", dest="tempdir", help="where the temporary files go")
@@ -71,6 +72,8 @@ def main(sysargs = sys.argv[1:]):
         config = misc.add_arg_to_config(arg_name, arg_value, config)
     if "indir" not in config:
         config["indir"] = config["outdir"]
+
+    error_checks.check_threshold(config)
 
     config["outdir"] = config["outdir"].rstrip("/")
     config = set_up_scripts.set_up_temporary_directory_path(config)
