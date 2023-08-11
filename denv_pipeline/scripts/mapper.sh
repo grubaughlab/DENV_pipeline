@@ -61,9 +61,9 @@ while IFS= read -r virustype || [[ -n "$virustype" ]]; do
     echo "----->>>>>Calculating percentage coverage against serotype "${virustype}" cps reference sequence"
     which python
     if [ -s ${trimbed} ]; then
-        python ${serotype_caller} --alignment ${tempdir}/${fname}.${virustype}.${depth}.out.aln --bed-file ${trimbed} --outfile ${tempdir}/${fname}_all_virustype_info.txt
+        $CONDA_PREFIX/bin/python ${serotype_caller} --alignment ${tempdir}/${fname}.${virustype}.${depth}.out.aln --bed-file ${trimbed} --outfile ${tempdir}/${fname}_all_virustype_info.txt
     else
-        python ${serotype_caller}  --alignment ${tempdir}/${fname}.${virustype}.${depth}.out.aln --outfile ${tempdir}/${fname}_all_virustype_info.txt
+        $CONDA_PREFIX/bin/python ${serotype_caller}  --alignment ${tempdir}/${fname}.${virustype}.${depth}.out.aln --outfile ${tempdir}/${fname}_all_virustype_info.txt
     fi
 
     echo "----->>>>>Identifying variants"
