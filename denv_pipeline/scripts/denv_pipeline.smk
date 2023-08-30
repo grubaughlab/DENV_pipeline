@@ -22,7 +22,7 @@ rule mapper:
         individual_all_virustype_info = temp(os.path.join(config["tempdir"], "{sample}_all_virustype_info.txt"))
     log:
         out = os.path.join(config["outdir"], "log_files", "_".join(["{sample}", "mapping_stdout.log"])),
-        err = os.path.join(config["outdir"], "log_files", "_".join(["{sample}", "mapping_stderr.log"])),
+        err = os.path.join(config["outdir"], "log_files", "_".join(["{sample}", "mapping_stderr.log"]))
     params:
         mapper_script = os.path.join(workflow.current_basedir,"mapper.sh"),
         primer_dir = config["reference_directory"],
