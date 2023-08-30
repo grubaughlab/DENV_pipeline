@@ -8,7 +8,6 @@ empty_file_maker=$6
 depth=$7
 threshold=$8
 tempdir=$9
-log=$10
 
 while IFS= read -r virustype || [[ -n "$virustype" ]]; do 
 
