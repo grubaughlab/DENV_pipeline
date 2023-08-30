@@ -101,6 +101,9 @@ def symlink_setup(config, cwd):
 
     symlink = config["symlink"]
     
+    if not os.path.exists(config["indir"]):
+        misc.make_directory(config["indir"])
+
     os.chdir(config["indir"])
     os.system(f"ycgaFastq {symlink}")
     os.chdir(cwd)
