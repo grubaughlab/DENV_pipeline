@@ -120,7 +120,6 @@ def check_env_activated():
     if pkgutil.find_loader('snakemake') is None or pkgutil.find_loader('Bio') is None:
         sys.stderr.write(green(f"Error: installation not correct. Ensure that environment is activated and you have run 'pip install .'\n"))
         sys.exit(-1)
-    
 
 def check_ct_file(config):
 

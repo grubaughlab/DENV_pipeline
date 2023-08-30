@@ -121,10 +121,12 @@ def symlink_setup(config, cwd):
 
 def get_sample_list(config):
 
+    non_sample_dirs = ["results", "log_files", "downloads"]
+
     config["sample_list"] = []
     for sample_dir in os.listdir(config["indir"]):
         if os.path.isdir(os.path.join(config["indir"], sample_dir)):
-            if sample_dir != "results" and os.path.join(config["indir"], sample_dir) != config["tempdir"] and sample_dir != "log_files":
+            if sample_dir not in non_sample_dirs and os.path.join(config["indir"], sample_dir) != config["tempdir"]:
                 config["sample_list"].append(sample_dir)
 
     return config
