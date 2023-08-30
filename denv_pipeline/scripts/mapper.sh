@@ -24,11 +24,10 @@ while IFS= read -r virustype || [[ -n "$virustype" ]]; do
 
     echo "----->>>>>Mapping reads against serotype "${virustype}" reference sequence"
     which bwa
-    bwa mem -v 1 -t 2 ${fasta} $read1 $read2 | samtools view -bS -F 4 -F 2048 | samtools sort -o ${tempdir}/${fname}.${virustype}.bam >> ${log} 2>&1
+    bwa mem -v 1 -t 2 ${fasta} $read1 $read2 | samtools view -bS -F 4 -F 2048 | samtools sort -o ${tempdir}/${fname}.${virustype}.bam
 
     echo "----->>>>>Trimming bam file"
-    which ivar
-    ivar trim -e -i ${tempdir}/${fname}.${virustype}.bam -b ${bed} -p ${tempdir}/${fname}.${virustype}.trimmed.bam >> ${log} 2>&1
+    ivar trim -e -i ${tempdir}/${fname}.${virustype}.bam -b ${bed} -p ${tempdir}/${fname}.${virustype}.trimmed.bam
 
     if ! [ -s  ${tempdir}/${fname%.*}.${virustype}.trimmed.bam ]; then
         echo "no trimmed bam file found, likely because no reads mapped successfully, exiting shell script"
@@ -39,16 +38,16 @@ while IFS= read -r virustype || [[ -n "$virustype" ]]; do
     fi
 
     echo "----->>>>>Sorting bam file"
-    samtools sort ${tempdir}/${fname}.${virustype}.trimmed.bam -o ${tempdir}/${fname}.${virustype}.sort.bam >> ${log} 2>&1
+    samtools sort ${tempdir}/${fname}.${virustype}.trimmed.bam -o ${tempdir}/${fname}.${virustype}.sort.bam
 
     echo "----->>>>>Indexing bam file"
-    samtools index ${tempdir}/${fname}.${virustype}.sort.bam >> ${log} 2>&1
+    samtools index ${tempdir}/${fname}.${virustype}.sort.bam
 
     echo "----->>>>>Generating consensus sequence"
-    samtools mpileup -aa --reference ${fasta} -A -d 10000 -Q 0 ${tempdir}/${fname}.${virustype}.sort.bam | ivar consensus -t ${threshold} -m ${depth} -p ${tempdir}/${fname}.${virustype}.${depth}.cons -i ${consensus_name} >> ${log} 2>&1
+    samtools mpileup -aa --reference ${fasta} -A -d 10000 -Q 0 ${tempdir}/${fname}.${virustype}.sort.bam | ivar consensus -t ${threshold} -m ${depth} -p ${tempdir}/${fname}.${virustype}.${depth}.cons -i ${consensus_name}
     
     echo "----->>>>>Aligning consensus cps sequence against the reference serotype "${virustype}" cps sequence"
-    nextalign run  --reference ${fasta} --output-fasta ${tempdir}/${fname}.${virustype}.${depth}.out.aln ${tempdir}/${fname}.${virustype}.${depth}.cons.fa >> ${log} 2>&1
+    nextalign run  --reference ${fasta} --output-fasta ${tempdir}/${fname}.${virustype}.${depth}.out.aln ${tempdir}/${fname}.${virustype}.${depth}.cons.fa
     
     if [ -s ${tempdir}/${fname%.*}.${virustype}.${depth}.out.aln ]; then
         echo "----->>>>>Aligning with nextalign successful"
@@ -67,10 +66,10 @@ while IFS= read -r virustype || [[ -n "$virustype" ]]; do
     fi
 
     echo "----->>>>>Identifying variants"
-    samtools mpileup -aa --reference ${fasta} -A -d 0 -Q 0 ${tempdir}/${fname}.${virustype}.sort.bam | ivar variants -p ${tempdir}/${fname}.${virustype}.${depth}.variants -q 20 -t 0.03 -r ${fasta} >> ${log} 2>&1
+    samtools mpileup -aa --reference ${fasta} -A -d 0 -Q 0 ${tempdir}/${fname}.${virustype}.sort.bam | ivar variants -p ${tempdir}/${fname}.${virustype}.${depth}.variants -q 20 -t 0.03 -r ${fasta}
     
     echo "----->>>>>>Getting depths"
-    bedtools genomecov -d -ibam ${tempdir}/${fname}.${virustype}.sort.bam > ${tempdir}/${fname}.${virustype}.depth.txt; 
+    bedtools genomecov -d -ibam ${tempdir}/${fname}.${virustype}.sort.bam > ${tempdir}/${fname}.${virustype}.depth.txt 
 
     echo "--->>>>> Finished"
 

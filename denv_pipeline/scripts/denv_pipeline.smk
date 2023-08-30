@@ -21,7 +21,8 @@ rule mapper:
     output:
         individual_all_virustype_info = temp(os.path.join(config["tempdir"], "{sample}_all_virustype_info.txt"))
     log:
-        log = os.path.join(config["outdir"], "log_files", "_".join(["{sample}", "mapping.log"]))
+        out = os.path.join(config["outdir"], "log_files", "_".join(["{sample}", "mapping_stdout.log"])),
+        err = os.path.join(config["outdir"], "log_files", "_".join(["{sample}", "mapping_stderr.log"])),
     params:
         mapper_script = os.path.join(workflow.current_basedir,"mapper.sh"),
         primer_dir = config["reference_directory"],
@@ -36,7 +37,7 @@ rule mapper:
         cpus_per_task=2,
         runtime=300
     run:
-        shell("{params.mapper_script} {wildcards.sample} {input.read_location}/*R1* {input.read_location}/*R2* {params.primer_dir} {params.python_script} {params.python_script2} {params.depth} {params.threshold} {params.tempdir} {log.log}  >> {log.log} 2>&1")
+        shell("{params.mapper_script} {wildcards.sample} {input.read_location}/*R1* {input.read_location}/*R2* {params.primer_dir} {params.python_script} {params.python_script2} {params.depth} {params.threshold} {params.tempdir} {log.out} 2> {log.err} 1> {log.out}")
         
         if not os.path.exists(os.path.join(params.tempdir,f"{wildcards.sample}_all_virustype_info.txt")):
             shell("touch {params.tempdir}/{wildcards.sample}_all_virustype_info.txt")
