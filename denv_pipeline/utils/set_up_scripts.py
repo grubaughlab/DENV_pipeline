@@ -132,6 +132,10 @@ def get_sample_list(config):
             if sample_dir not in non_sample_dirs and os.path.join(config["indir"], sample_dir) != config["tempdir"]:
                 config["sample_list"].append(sample_dir)
 
+    if len(config["sample_list"]) == 0:
+        sys.stderr.write(misc.green(f"Error: No samples found to analyse.\n"))
+        sys.exit(-1)
+
     return config
 
 
