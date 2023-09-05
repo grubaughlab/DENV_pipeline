@@ -67,7 +67,6 @@ def populate_line(args):
                 
                 seq_trim = sequence[trim_pos[0]-1:trim_pos[1]]
                 perc_cov_trim = calculate_coverage(seq_trim, amb_list)[0]
-                perc_cov_relevant = perc_cov_trim
 
                 with open(args.alignment.replace(".out.aln",".out.trim.aln"), 'w') as new_file: 
                     SeqIO.write(seq_trim, new_file, 'fasta')
@@ -77,9 +76,8 @@ def populate_line(args):
 
         else:
             perc_cov_trim = "NA"
-            perc_cov_relevant = perc_cov
             
-        if perc_cov_relevant>=min_coverage:
+        if perc_cov>=min_coverage:
             write_dict["serotype_called"] = serotype
         else:
             write_dict["serotype_called"] = "NA"
