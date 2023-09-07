@@ -6,7 +6,7 @@ def header(v):
 
     print(f"""
     
-            DENVseq pipeline
+              DENVseq pipeline
                 Version {v}
         Verity Hill & Chrispin Chaguza
                 Grubaugh Lab
