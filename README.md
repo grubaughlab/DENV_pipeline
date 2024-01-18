@@ -10,6 +10,10 @@ It calls input files as a virus type if it has more than 50% coverage of the ref
 
 If running on a server, it is highly recommended to run it using screen/tmux or similar.
 
+# Tips
+
+- make sure that there are no dots in the reference name
+
 # Installation instructions
 
 1. Clone this repo by going to your command line interface and typing ```git clone https://github.com/grubaughlab/DENV_pipeline.git```
