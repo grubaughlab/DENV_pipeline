@@ -40,6 +40,7 @@ def main(sysargs = sys.argv[1:]):
 
     parser.add_argument("--slurm", help="flag for if running on HPC with slurm", action="store_true")
     parser.add_argument("--slurm-cores", help="number of slurm cores to assign. Default is 10", dest="slurm_cores", type=int)
+    parser.add_argument("--cores", help="number of non-slurm cores to assign. Default is 1", type=int)
     parser.add_argument("--verbose", "-v", dest="verbose", action="store_true")
     parser.add_argument("--help", "-h", action="store_true", dest="help")
     parser.add_argument("--overwrite", help="overwrite current results", action="store_true")
@@ -111,6 +112,10 @@ def main(sysargs = sys.argv[1:]):
             status = snakemake.snakemake(snakefile, printshellcmds=False, forceall=True, force_incomplete=True,
                                     workdir=cwd,config=config,lock=False, slurm=True, cores=config["slurm_cores"]
                                     )
+        elif config["cores"]:
+            status = snakemake.snakemake(snakefile, printshellcmds=False, forceall=True, force_incomplete=True,
+                                    workdir=cwd,config=config,lock=False, cores=config["cores"]
+            )
         else:
             status = snakemake.snakemake(snakefile, printshellcmds=False, forceall=True, force_incomplete=True,
                                     workdir=cwd,config=config,lock=False
