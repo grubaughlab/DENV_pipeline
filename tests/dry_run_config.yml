@@ -10,6 +10,7 @@ download: True
 temp: True
 overwrite: True
 symlink: False
+cores: False
 outdir: "test_output_dry_run"
 indir: "one_sample"
 dry_run: True
