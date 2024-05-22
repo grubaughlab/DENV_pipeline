@@ -18,7 +18,7 @@ jobs:
           environment-file: environment.yml
           activate-environment: analysis_env
           channels: conda-forge,bioconda,defaults
-          conda-version: "*"
+          miniconda-version: "latest"
       - name: install pipeline
         run: pip install -e .	
       - name: run_dry_run
