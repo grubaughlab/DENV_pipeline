@@ -63,6 +63,7 @@ If you want to try other viruses, or use your own reference and bed files:
 
 - Look at our directory "DENV_primers_and_refs" for formatting file names etc
 - Provide the stem of each file in the "refs.txt" tesxt file in the same folder
+- Make sure you have indexed your references by typing "bwa index <reference.fasta>"
 - Use the ``--reference-directory`` option to provide the path to the directory. 
 
 

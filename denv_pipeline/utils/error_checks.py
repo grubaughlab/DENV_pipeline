@@ -92,12 +92,16 @@ def check_primer_dir(config):
 
                 bed_file = f'{virus_type}.bed'
                 fasta_file = f'{virus_type}.fasta'
+                index_file = f'{virus_type}.fasta.amb'
 
                 if not bed_file in all_files:
                     sys.stderr.write(green(f"Error: Missing bed file for {virus_type} in {config['reference_directory']}. I am expecting it to be called {bed_file} and the '.bed' has to be lower case.\n"))
                     sys.exit(-1)
                 if not fasta_file in all_files:
                     sys.stderr.write(green(f"Error: Missing reference file for {virus_type} in {config['reference_directory']}. I am expecting it to be called {fasta_file}\n"))
+                    sys.exit(-1)
+                if not index_file in all_files:
+                    sys.stderr.write(green(f"Error: Missing reference index files for {virus_type} in {config['reference_directory']}. I am expecting it to be called {index_file}\n To generate this, please use bwa index <reference sequence>.\n"))
                     sys.exit(-1)
             
                 with open(os.path.join(config["reference_directory"],fasta_file)) as f:
