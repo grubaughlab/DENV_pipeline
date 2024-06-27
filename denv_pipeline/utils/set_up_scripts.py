@@ -163,6 +163,7 @@ def make_folders(config):
         misc.make_directory(os.path.join(results_dir, "depth"))
         misc.make_directory(os.path.join(results_dir, "consensus_sequences"))
         misc.make_directory(os.path.join(results_dir, "alignments"))
+        misc.make_directory(os.path.join(results_dir, "low_coverage_consensus"))
 
         if config["download"]:
             misc.make_directory(os.path.join(config["outdir"], "downloads")) 

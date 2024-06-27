@@ -7,6 +7,7 @@ import shutil
 def summarise_files(config, per_sample_files, serotype_call_file, top_call_file, all_info_file):
 
     serotypes = defaultdict(list)
+    all_coverage = defaultdict(dict)
     all_lines = []
     top_calls = []
     serotype_call = []
@@ -16,6 +17,10 @@ def summarise_files(config, per_sample_files, serotype_call_file, top_call_file,
         with open(file) as f:
             data = csv.DictReader(f, delimiter="\t")
             for l in data:
+                if not l['serotype_called'] in all_coverage[l['sample_id']]:
+                    all_coverage[l['sample_id']][l['serotype_called']] = []
+                all_coverage[l['sample_id']][l['serotype_called']].append(l['coverage_untrimmed'])
+
                 possible_tops.append(l)
                 all_lines.append(l)
 
@@ -54,6 +59,7 @@ def summarise_files(config, per_sample_files, serotype_call_file, top_call_file,
 
     sort_variant_files(config, serotypes)
     get_right_serotype_files(config, serotypes)
+    pull_low_coverage_seqs(config, all_coverage, serotypes)
     make_alignments(config, serotypes)
 
     return
@@ -186,3 +192,38 @@ def make_alignments(config, serotypes):
         new_file = f'{alignment_dir}/{virus_type}.untrim.aln'
         cat_string = " ".join([f"{tempdir}/{aln}" for aln in alns])
         os.system(f"cat {cat_string} >> {new_file}")
+
+
+def pull_low_coverage_seqs(config, all_coverage, high_coverage):
+
+    top_call = {}
+
+    for name, cov_dict in all_coverage.items():
+        if name not in high_coverage:
+            lst = []
+            for sero, cov in cov_dict.items():
+                if "sylvatic" not in sero:
+                    lst.append(cov)
+
+        in_order = sorted(lst, reverse=True)
+        if in_order[0] > (in_order[1] + 5):
+            top = [i for i in cov_dict if cov_dict[i]==in_order[0]][0]
+        else:
+            top = "NA"
+
+        top_call[name] = top
+        
+        low_cov_seqs = set()
+        depth = config["depth"]
+        with open(os.path.join(config["outdir"], "results", "low_coverage_calls.csv"), 'w') as fw:
+            fw.write("sample_id,serotype\n")
+            for name,call in top_call.items():
+                if call != "NA":
+                    fw.write(f"{name},{call}\n")
+
+                    low_cov_seqs.add(f'{name}.{call}.{depth}.cons.fa')
+
+        for cons in low_cov_seqs:
+            source = os.path.join(config['tempdir'], cons)
+            dest = os.path.join(config["outdir"], "results", "low_coverage_consensus")
+            shutil.move(source, dest)
