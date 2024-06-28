@@ -205,13 +205,13 @@ def pull_low_coverage_seqs(config, all_coverage, high_coverage):
                 if "sylvatic" not in sero:
                     lst.append(cov)
 
-        in_order = sorted(lst, reverse=True)
-        if in_order[0] > (in_order[1] + 5):
-            top = [i for i in cov_dict if cov_dict[i]==in_order[0]][0]
-        else:
-            top = "NA"
+            in_order = sorted(lst, reverse=True)
+            if in_order[0] > (in_order[1] + 5):
+                top = [i for i in cov_dict if cov_dict[i]==in_order[0]][0]
+            else:
+                top = "NA"
 
-        top_call[name] = top
+            top_call[name] = top
         
         low_cov_seqs = set()
         depth = config["depth"]
