@@ -22,15 +22,18 @@ def prepare_for_plots(final_serotype_calls):
     colour_dict = {}
     custom_cmap = mpl.colors.LinearSegmentedColormap.from_list("", ["#567CBE","#D58A80", "#ADB3D9"], len(all_viruses))
 
-    lst = custom_cmap(range(len(all_viruses)))
-    for i,j in enumerate(all_viruses):
-        colour_dict[j] = rgb2hex(lst[i])
+    if len(all_viruses) == 0:
+        return
+    else:
+        lst = custom_cmap(range(len(all_viruses)))
+        for i,j in enumerate(all_viruses):
+            colour_dict[j] = rgb2hex(lst[i])
 
-    patch_list = []
-    for serotype,hexc in colour_dict.items():
-        patch_list.append(mpatches.Patch(color=hexc, label=serotype))
- 
-    return virus_dict, colour_dict, patch_list
+        patch_list = []
+        for serotype,hexc in colour_dict.items():
+            patch_list.append(mpatches.Patch(color=hexc, label=serotype))
+    
+        return virus_dict, colour_dict, patch_list
 
 def variant_plot(results_dir, variants_summary_file, virus_dict, colour_dict, patch_list):
     

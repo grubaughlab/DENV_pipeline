@@ -17,9 +17,7 @@ def summarise_files(config, per_sample_files, serotype_call_file, top_call_file,
         with open(file) as f:
             data = csv.DictReader(f, delimiter="\t")
             for l in data:
-                if not l['serotype_called'] in all_coverage[l['sample_id']]:
-                    all_coverage[l['sample_id']][l['serotype_called']] = []
-                all_coverage[l['sample_id']][l['serotype_called']].append(l['coverage_untrimmed'])
+                all_coverage[l['sample_id']][l['reference_sequence_name']] = float(l['coverage_untrimmed'])
 
                 possible_tops.append(l)
                 all_lines.append(l)
@@ -202,22 +200,31 @@ def pull_low_coverage_seqs(config, all_coverage, high_coverage):
         if name not in high_coverage:
             lst = []
             for sero, cov in cov_dict.items():
-                if "sylvatic" not in sero:
-                    lst.append(cov)
+                lst.append(cov)
 
             in_order = sorted(lst, reverse=True)
-            if len(in_order) > 1:
+            if len(in_order) > 1: #I'm not sure when it would ever be less than 6, but leaving for now just in case
                 if in_order[0] > (in_order[1] + 5):
                     top = [i for i in cov_dict if cov_dict[i]==in_order[0]][0]
                 else:
-                    top = "NA"
+                    first = [i for i in cov_dict if cov_dict[i]==in_order[0]][0]
+                    second = [i for i in cov_dict if cov_dict[i]==in_order[1]][0]
+                    
+                    if second == f"{first}_sylvatic" or first == f"{second}_sylvatic":
+                        if in_order[0] > (in_order[2] + 5):
+                            top = [i for i in cov_dict if cov_dict[i]==in_order[0]][0]
+                        else:
+                            top = "NA"
+                    else:
+                        top = "NA"
+            
             elif len(in_order) == 1:
                 top = in_order[0]
             else:
                 top = "NA"
 
             top_call[name] = top
-        
+
         low_cov_seqs = set()
         depth = config["depth"]
         with open(os.path.join(config["outdir"], "results", "low_coverage_calls.csv"), 'w') as fw:
