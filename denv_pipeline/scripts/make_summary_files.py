@@ -225,17 +225,17 @@ def pull_low_coverage_seqs(config, all_coverage, high_coverage):
 
             top_call[name] = top
 
-        low_cov_seqs = set()
-        depth = config["depth"]
-        with open(os.path.join(config["outdir"], "results", "low_coverage_calls.csv"), 'w') as fw:
-            fw.write("sample_id,serotype\n")
-            for name,call in top_call.items():
-                if call != "NA":
-                    fw.write(f"{name},{call}\n")
+    low_cov_seqs = set()
+    depth = config["depth"]
+    with open(os.path.join(config["outdir"], "results", "low_coverage_calls.csv"), 'w') as fw:
+        fw.write("sample_id,serotype\n")
+        for name,call in top_call.items():
+            if call != "NA":
+                fw.write(f"{name},{call}\n")
 
-                    low_cov_seqs.add(f'{name}.{call}.{depth}.cons.fa')
+                low_cov_seqs.add(f'{name}.{call}.{depth}.cons.fa')
 
-        for cons in low_cov_seqs:
-            source = os.path.join(config['tempdir'], cons)
-            dest = os.path.join(config["outdir"], "results", "low_coverage_consensus")
-            shutil.move(source, dest)
+    for cons in low_cov_seqs:
+        source = os.path.join(config['tempdir'], cons)
+        dest = os.path.join(config["outdir"], "results", "low_coverage_consensus")
+        shutil.move(source, dest)
