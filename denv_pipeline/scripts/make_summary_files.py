@@ -203,7 +203,7 @@ def pull_low_coverage_seqs(config, all_coverage, high_coverage):
                 lst.append(cov)
 
             in_order = sorted(lst, reverse=True)
-            if len(in_order) > 1: #I'm not sure when it would ever be less than 6, but leaving for now just in case
+            if len(in_order) > 1: 
                 if in_order[0] > (in_order[1] + 5):
                     top = [i for i in cov_dict if cov_dict[i]==in_order[0]][0]
                 else:
@@ -219,7 +219,7 @@ def pull_low_coverage_seqs(config, all_coverage, high_coverage):
                         top = "NA"
             
             elif len(in_order) == 1:
-                top = in_order[0]
+                top = [i for i in cov_dict if cov_dict[i]==in_order[0]][0]
             else:
                 top = "NA"
 
