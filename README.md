@@ -11,6 +11,8 @@ It calls input files as a virus type if it has more than 50% coverage of the ref
 
 If running on a server, it is highly recommended to run it using screen/tmux or similar.
 
+If you use this pipeline for analysing your data, please cite: https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-024-10350-x
+
 # Tips
 
 - make sure that there are no dots in the reference name
