@@ -238,4 +238,5 @@ def pull_low_coverage_seqs(config, all_coverage, high_coverage):
     for cons in low_cov_seqs:
         source = os.path.join(config['tempdir'], cons)
         dest = os.path.join(config["outdir"], "results", "low_coverage_consensus")
-        shutil.move(source, dest)
+        if os.path.exists(source):
+            shutil.move(source, dest)
