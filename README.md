@@ -87,7 +87,7 @@ Within this, there will be:
 	- consensus - consensus sequences of the called virus for each sample
 	- low coverage consensus - consensus sequences for samples which had less than 50% coverage against the reference sequence and so didn't receive a formal serotype call. Only those with more than 5% difference betwen the coverage of one serotype and the next highest coverage taken (sylvatics excluded) to give an estimate for which serotype they may be. We have found that low coverage genomes can still be successfully assigned lineages using genome detective, but we do not recommend using them for broader phylogenetic studies.
 	- depth - text files of each position of the genome and their sequencing depth by sample. NB positions are relative to reference sequence
-	- variants - contains a summary file of the number of variants by sample, and then a file for each sample containing additional information about variants
+	- variants - contains a summary file of the number of variants by sample, and then a file for each sample containing additional information about variants. **Summary file contains iSNVs in 20-80% frequency. Individual files contain all iSNVs above 3% **
 
 2.  Within results, there are some QC plots:
 
