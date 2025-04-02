@@ -17,3 +17,4 @@ dry_run: True
 config: dry_run_config.yml
 reference_directory: "test_refs" 
 tempdir: "test_output_dry_run/test_temp"
+no_cap: False

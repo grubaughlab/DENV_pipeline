@@ -10,3 +10,4 @@ overwrite: True
 symlink: False
 outdir: "test_output_full_run"
 indir: "test_inputs"
+no_cap: False
