@@ -29,6 +29,7 @@ rule mapper:
         depth = config["depth"],
         threshold = config["threshold"],
         tempdir = config["tempdir"],
+        cap = config["cap"],
         python_script = os.path.join(workflow.current_basedir,"serotype_caller.py"),
         python_script2 = os.path.join(workflow.current_basedir, "make_empty_files.py")
     resources:
@@ -37,7 +38,7 @@ rule mapper:
         cpus_per_task=2,
         runtime=300
     run:
-        shell("{params.mapper_script} {wildcards.sample} {input.read_location}/*R1* {input.read_location}/*R2* {params.primer_dir} {params.python_script} {params.python_script2} {params.depth} {params.threshold} {params.tempdir} 2> {log.err} 1> {log.out}")
+        shell("{params.mapper_script} {wildcards.sample} {input.read_location}/*R1* {input.read_location}/*R2* {params.primer_dir} {params.python_script} {params.python_script2} {params.depth} {params.threshold} {params.tempdir} {params.cap} 2> {log.err} 1> {log.out}")
         
         if not os.path.exists(os.path.join(params.tempdir,f"{wildcards.sample}_all_virustype_info.txt")):
             shell("touch {params.tempdir}/{wildcards.sample}_all_virustype_info.txt")

@@ -33,6 +33,7 @@ def main(sysargs = sys.argv[1:]):
     parser.add_argument("--reference-directory", "-rd", help="location where bed files and reference genomes are")
     parser.add_argument("--depth", help="depth to map sequences to. Default=10")
     parser.add_argument("--threshold", help="threshold to call consensus positions at, default=0.75",dest="threshold")
+    parser.add_argument("--no-cap", help="remove cap from number of reads used for consensus generation. Default uses 10,000 reads.",dest="no_cap", action="store_true")
     
     parser.add_argument("--temp", dest="temp", action="store_true", help="keep intermediate files")
     parser.add_argument("--tempdir", dest="tempdir", help="where the temporary files go")
@@ -94,6 +95,11 @@ def main(sysargs = sys.argv[1:]):
     if config["ct_file"] or config["ct_column"] or config["id_column"]:
         error_checks.check_ct_file(config)    
 
+    if config["no_cap"]:
+        config["cap"] = 0
+    else:
+        config["cap"] = 10000
+
     set_up_scripts.output_config(config)
 
     snakefile = os.path.join(thisdir,"scripts", "denv_pipeline.smk")
@@ -109,7 +115,7 @@ def main(sysargs = sys.argv[1:]):
    
     if not config["dry_run"]:
         if config["slurm"]:
-            status = snakemake.snakemake(snakefile, printshellcmds=False, forceall=True, force_incomplete=True,
+            status = snakemake.snakemake(snakefile, printshellcmds=False, forceall=True, force_incomplete=True, latency_wait=10,
                                     workdir=cwd,config=config,lock=False, slurm=True, cores=config["slurm_cores"]
                                     )
         elif config["cores"]:
@@ -117,7 +123,7 @@ def main(sysargs = sys.argv[1:]):
                                     workdir=cwd,config=config,lock=False, cores=config["cores"]
             )
         else:
-            status = snakemake.snakemake(snakefile, printshellcmds=False, forceall=True, force_incomplete=True,
+            status = snakemake.snakemake(snakefile, printshellcmds=True, forceall=True, force_incomplete=True,
                                     workdir=cwd,config=config,lock=False
                                     )
 

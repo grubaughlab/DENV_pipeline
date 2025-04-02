@@ -15,6 +15,7 @@ def get_defaults(config):
     config["depth"] = 10
     config["threshold"] = 0.75
     config["tempdir"] = "temporary_files"
+    config["no_cap"] = False
     
     config['ct_file'] = False
     config["ct_column"] = False
@@ -220,6 +221,7 @@ def get_valid_keys():
     valid_keys.append("ct_file")
     valid_keys.append("ct_column")
     valid_keys.append("id_column")
+    valid_keys.append("no_cap")
 
     return valid_keys
 
